@@ -17,8 +17,4 @@ public enum ControlType {
 		return type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
-	}
-
 }

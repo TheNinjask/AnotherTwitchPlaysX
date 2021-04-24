@@ -35,15 +35,6 @@ public class TwitchPlayer {
 		this.session = session;
 	}
 	
-	/*public static class TwitchListener{
-		
-		@Handler
-		public void onMessage(ChannelMessageEvent event){
-			//TODO
-		}
-		
-	}*/
-	
 	public boolean isConnected() {
 		return connected;
 	}

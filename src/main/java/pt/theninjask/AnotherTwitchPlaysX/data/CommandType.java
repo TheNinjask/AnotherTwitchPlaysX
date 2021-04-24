@@ -15,8 +15,4 @@ public enum CommandType {
 		return type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
-	}
-	
 }

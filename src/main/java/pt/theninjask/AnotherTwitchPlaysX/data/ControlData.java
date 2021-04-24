@@ -81,33 +81,54 @@ public class ControlData implements Data {
 		}
 	}
 	
-	public void execute(Robot robot, Map<String, Object> map) {
+	public void execute(Robot robot, Map<String, String> map) {
 		switch(type) {
 		default:
 			int duration;
 			int scroll;
 			int x;
 			int y;
+			String tmp;
 			break;
 		case KEY:
 			robot.keyPress(key);
-			duration = (int)map.getOrDefault("duration", this.duration);
+			tmp = map.get("duration");
+			if(tmp==null)
+				duration = this.duration;
+			else
+				duration = Integer.parseInt(tmp);
 			robot.delay(duration);
 			robot.keyRelease(key);
 			break;
 		case MOUSE_MOV:
-			x = (int)map.getOrDefault("x", inDepthCursor.getX());
-			y = (int)map.getOrDefault("y", inDepthCursor.getY());
+			tmp = map.get("x");
+			if(tmp==null)
+				x = inDepthCursor.getX();
+			else
+				x = Integer.parseInt(tmp);
+			tmp = map.get("y");
+			if(tmp==null)
+				y = inDepthCursor.getY();
+			else
+				y = Integer.parseInt(tmp);
 			robot.mouseMove(x,y);
 			break;
 		case MOUSE_CLICK:
 			robot.mousePress(key);
-			duration = (int)map.getOrDefault("duration", this.duration);
+			tmp = map.get("duration");
+			if(tmp==null)
+				duration = this.duration;
+			else
+				duration = Integer.parseInt(tmp);
 			robot.delay(duration);
 			robot.mouseRelease(key);
 			break;
 		case MOUSE_WHEEL:
-			scroll = (int)map.getOrDefault("scroll", inDepthCursor.getScroll());
+			tmp = map.get("scroll");
+			if(tmp==null)
+				scroll = inDepthCursor.getScroll();
+			else
+				scroll = Integer.parseInt(tmp);
 			robot.mouseWheel(scroll);
 			break;			
 		}
