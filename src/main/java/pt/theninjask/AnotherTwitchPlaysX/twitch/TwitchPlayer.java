@@ -2,13 +2,12 @@ package pt.theninjask.AnotherTwitchPlaysX.twitch;
 
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
-import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.util.StsUtil;
 
-import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
 import pt.theninjask.AnotherTwitchPlaysX.exception.AlreadyConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoSessionDataException;
+import pt.theninjask.AnotherTwitchPlaysX.exception.NotSetupException;
 
 public class TwitchPlayer {
 
@@ -36,42 +35,60 @@ public class TwitchPlayer {
 		this.session = session;
 	}
 	
-	public static class TwitchListener{
+	/*public static class TwitchListener{
 		
 		@Handler
 		public void onMessage(ChannelMessageEvent event){
 			//TODO
 		}
 		
-	}
+	}*/
 	
 	public boolean isConnected() {
 		return connected;
 	}
 	
-	public boolean connect() {
+	public void setup() {
 		if(session==null)
 			throw new NoSessionDataException();
 		if(connected)
 			throw new AlreadyConnectedException();
-		try {
-			client = Client.builder().nick(session.getNickname())
+		client = Client.builder().nick(session.getNickname())
+				.server().host(SERVER).port(PORT, SecurityType.SECURE).password(session.getOauth()).then()
+				.management().stsStorageManager(StsUtil.getDefaultStorageManager()).then()
+				.build();
+		client.addChannel(session.getChannel());
+	}
+	
+	public void setupAndConnect() {
+		if(session==null)
+			throw new NoSessionDataException();
+		if(connected)
+			throw new AlreadyConnectedException();
+		client = Client.builder().nick(session.getNickname())
 					.server().host(SERVER).port(PORT, SecurityType.SECURE).password(session.getOauth()).then()
 					.management().stsStorageManager(StsUtil.getDefaultStorageManager()).then()
 					.build();
-			client.getEventManager().registerEventListener(new TwitchListener());
-			client.addChannel(session.getChannel());
-			client.connect();
-			connected = true;
-			return true;
-		}catch (Exception e) {
-			return false;
-		}
+		client.addChannel(session.getChannel());
+		client.connect();
+		connected = true;
+	}
+	
+	public void registerEventListener(Object listener) {
+		if(client == null)
+			throw new NotSetupException();
+		client.getEventManager().registerEventListener(listener);
+	}
+	
+	public void connect() {
+		client.connect();
+		connected = true;
 	}
 	
 	public void disconnect() {
 		connected = false;
 		client.shutdown();
+		client = null;
 	}
 
 }

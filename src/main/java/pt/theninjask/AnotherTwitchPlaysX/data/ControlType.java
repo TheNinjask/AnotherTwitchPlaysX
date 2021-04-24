@@ -2,9 +2,10 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 
 public enum ControlType {
 	
-	MOUSE("mouse"),
+	MOUSE_MOV("mouse_mov"),
+	MOUSE_CLICK("mouse_click"),
 	KEY("key"),
-	WHEEL("wheel");
+	MOUSE_WHEEL("mouse_wheel");
 	
 	private String type;
 	
