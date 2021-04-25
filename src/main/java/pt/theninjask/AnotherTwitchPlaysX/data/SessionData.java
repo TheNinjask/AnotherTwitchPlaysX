@@ -11,6 +11,12 @@ public class SessionData implements Data {
 
 	public SessionData() {}
 	
+	public SessionData(String nickname, String channel, String oauth) {
+		this.nickname = nickname;
+		this.channel = channel;
+		this.oauth = oauth;
+	}
+	
 	public String getNickname() {
 		return nickname;
 	}
