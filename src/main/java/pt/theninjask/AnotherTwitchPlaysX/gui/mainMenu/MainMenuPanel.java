@@ -132,13 +132,11 @@ public class MainMenuPanel extends JPanel {
 	}
 	
 	private JSlider twitchChatSlider() {
-		twitchChatSize = new JSlider(5,20,5);
-		twitchChatSize.setMajorTickSpacing(15);
+		twitchChatSize = new JSlider(TwitchChatFrame.MSG_DISPLAY_MIN,TwitchChatFrame.MSG_DISPLAY_INFINITE,5);
+		twitchChatSize.setMajorTickSpacing(45);
 		twitchChatSize.setPaintLabels(true);
 		twitchChatSize.setOpaque(false);
 		twitchChatSize.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		twitchChatSize.setEnabled(false);
-		twitchChatSize.setToolTipText("#TODO implement");
 		return twitchChatSize;
 	}
 	
@@ -147,7 +145,10 @@ public class MainMenuPanel extends JPanel {
 		label.setText(String.format(Constants.CURRENT_CHAT_SIZE, twitchChatSize.getValue()));
 		label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		twitchChatSize.addChangeListener(e->{
-			label.setText(String.format(Constants.CURRENT_CHAT_SIZE, twitchChatSize.getValue()));
+			int value = twitchChatSize.getValue();
+			label.setText(String.format(Constants.CURRENT_CHAT_SIZE, value<TwitchChatFrame.MSG_DISPLAY_INFINITE ? value : "Infinite"));
+			TwitchChatFrame.getInstance().setMessageCap(value);
+			TwitchChatFrame.getInstance().updateChatSize();
 		});
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		return label;

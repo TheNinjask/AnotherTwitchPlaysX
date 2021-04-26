@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
@@ -28,9 +29,17 @@ public class TwitchChatFrame extends JFrame {
 	
 	private static TwitchChatFrame singleton = new TwitchChatFrame();
 	
+	public static final int MSG_DISPLAY_MIN = 5;
+	
+	public static final int MSG_DISPLAY_MAX = 50;
+	
+	public static final int MSG_DISPLAY_INFINITE = 51;
+	
 	private JTextArea chat;
 	
 	private JScrollPane scroll;
+	
+	private int messageCap = 5;
 	
 	private TwitchChatFrame() {
 		this.setTitle(String.format("%s's Twitch Chat", DataManager.getInstance().getSession().getChannel().substring(1)));
@@ -82,13 +91,26 @@ public class TwitchChatFrame extends JFrame {
 	
 	@Handler
 	public void onMessage(ChannelMessageEvent event){
+		updateChatSize();
 		chat.append(String.format("<%s> %s\n",
-				event.getActor().getNick(), event.getMessage())
-		);
+					event.getActor().getNick(), event.getMessage()));
 	}
 	
 	public void clearChat() {
 		chat.setText("");
+	}
+	
+	public void updateChatSize() {
+		try {
+			if(messageCap<MSG_DISPLAY_INFINITE) {
+				int toClear = chat.getLineCount() - messageCap - 1;
+				if(toClear>=0) {
+					chat.replaceRange("", 0, chat.getLineEndOffset(toClear));
+				}
+			}
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void setTextColor(Color newColor) {
@@ -102,5 +124,9 @@ public class TwitchChatFrame extends JFrame {
 	public void setColor(Color text, Color bg) {
 		chat.setForeground(text);
 		scroll.getViewport().setBackground(bg);
+	}
+	
+	public void setMessageCap(int newCap) {
+		messageCap = newCap;
 	}
 }
