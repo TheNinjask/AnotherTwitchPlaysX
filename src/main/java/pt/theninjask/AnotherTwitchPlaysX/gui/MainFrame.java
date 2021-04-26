@@ -13,8 +13,8 @@ import javax.swing.JPanel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
@@ -28,15 +28,16 @@ public class MainFrame extends JFrame {
 	
 	private static MainFrame singleton = new MainFrame();
 	
-	private JPanel currentPanel = MainMenuPanel.getInstance();
+	private JPanel currentPanel = LoginPanel.getInstance();
 	
 	private MainFrame() {
+		this.onStart();
 		this.setTitle(Constants.TITLE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
-		this.add(currentPanel);
 		this.setIconImage(icon.getImage());
+		this.add(currentPanel);
 		this.setVisible(true);
 		this.setResizable(false);
 		this.addWindowListener(new WindowAdapter() {
@@ -67,6 +68,19 @@ public class MainFrame extends JFrame {
 	
 	public static MainFrame getInstance() {
 		return singleton;
+	}
+
+	private void onStart() {
+		File sessionFile = new File("session.json");
+		if(sessionFile.exists())
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+				SessionData session = objectMapper.readValue(sessionFile, SessionData.class);
+				DataManager.getInstance().setSession(session);
+				LoginPanel.getInstance().setSession(session);
+			} catch (IOException e) {
+				Constants.showExceptionDialog(e);
+			}
 	}
 	
 	public void replacePanel(JPanel newPanel) {

@@ -1,14 +1,21 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
@@ -36,14 +43,16 @@ public class MainMenuPanel extends JPanel {
 	
 	private MainMenuPanel() {
 		this.setBackground(Constants.TWITCH_COLOR);
-		this.setLayout(new GridLayout(7, 1));
+		this.setLayout(new GridLayout(9, 1));
 		this.add(connectButton());
 		this.add(commandsButton());
 		this.add(gameButton());
 		this.add(changeSessionButton());
 		this.add(twitchChatButton());
+		this.add(twitchChatColorModeLabel());
+		this.add(twitchChatColorModePanel());
 		this.add(twitchChatSlider());
-		this.add(twitchChatSliderLabel(),5);
+		this.add(twitchChatSliderLabel(),7);
 	}
 	
 	public static MainMenuPanel getInstance() {
@@ -62,6 +71,8 @@ public class MainMenuPanel extends JPanel {
 				gameButton.setEnabled(false);
 				gameButton.setText("Start");
 				changeSessionButton.setEnabled(true);
+				TwitchChatFrame.getInstance().setVisible(false);
+				TwitchChatFrame.getInstance().clearChat();
 			}else {
 				TwitchPlayer.getInstance().setupAndConnect();
 				connectButton.setText("Disconnect");
@@ -99,6 +110,24 @@ public class MainMenuPanel extends JPanel {
 		twitchChatButton = new JButton("Show Twitch Chat");
 		twitchChatButton.setFocusable(false);
 		twitchChatButton.setEnabled(false);
+		twitchChatButton.addActionListener(l->{
+			if(TwitchChatFrame.getInstance().isVisible()) {
+				TwitchChatFrame.getInstance().setVisible(false);
+				twitchChatButton.setText("Show Twitch Chat");
+				TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
+			}else {
+				TwitchChatFrame.getInstance().setVisible(true);
+				TwitchChatFrame.getInstance().addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent event) {
+						twitchChatButton.setText("Show Twitch Chat");
+						TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
+					}
+				});
+				twitchChatButton.setText("Hide Twitch Chat");
+				TwitchPlayer.getInstance().registerEventListener(TwitchChatFrame.getInstance());
+			}
+		});
 		return twitchChatButton;
 	}
 	
@@ -108,6 +137,8 @@ public class MainMenuPanel extends JPanel {
 		twitchChatSize.setPaintLabels(true);
 		twitchChatSize.setOpaque(false);
 		twitchChatSize.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitchChatSize.setEnabled(false);
+		twitchChatSize.setToolTipText("#TODO implement");
 		return twitchChatSize;
 	}
 	
@@ -120,6 +151,50 @@ public class MainMenuPanel extends JPanel {
 		});
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		return label;
+	}
+	
+	private JLabel twitchChatColorModeLabel() {
+		JLabel label = new JLabel();
+		label.setText("Color Mode for Twitch Chat");
+		label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		return label;
+	}
+	
+	private JPanel twitchChatColorModePanel() {
+		JPanel tmp = new JPanel(new FlowLayout());
+		tmp.setOpaque(false);
+		ButtonGroup group = new ButtonGroup();
+		JRadioButton light = new JRadioButton("Light Mode");
+		JRadioButton night = new JRadioButton("Night Mode");
+		JRadioButton twitch = new JRadioButton("Twitch Mode");
+		light.setOpaque(false);
+		light.setFocusable(false);
+		light.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		light.addActionListener(i->{
+			TwitchChatFrame.getInstance().setColor(Color.BLACK, Color.WHITE);
+		});
+		night.setOpaque(false);
+		night.setFocusable(false);
+		night.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		night.addActionListener(i->{
+			TwitchChatFrame.getInstance().setColor(Color.WHITE, Color.BLACK);
+		});
+		twitch.setOpaque(false);
+		twitch.setFocusable(false);
+		twitch.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitch.setSelected(true);
+		twitch.addActionListener(i->{
+			TwitchChatFrame.getInstance().setColor(Constants.TWITCH_COLOR_COMPLEMENT,
+					Constants.TWITCH_COLOR);
+		});
+		group.add(light);
+		group.add(night);
+		group.add(twitch);
+		tmp.add(light);
+		tmp.add(night);
+		tmp.add(twitch);
+		return tmp;
 	}
 	
 }

@@ -74,6 +74,12 @@ public class TwitchPlayer {
 		client.getEventManager().registerEventListener(listener);
 	}
 	
+	public void unregisterEventListener(Object listener) {
+		if(client == null)
+			throw new NotSetupException();
+		client.getEventManager().unregisterEventListener(listener);
+	}
+	
 	public void connect() {
 		client.connect();
 		connected = true;

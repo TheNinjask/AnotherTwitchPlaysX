@@ -185,7 +185,7 @@ public class LoginPanel extends JPanel {
 			}
 			SessionData session = new SessionData(
 					nickname.getText(),
-					channel.getText(),
+					String.format("#%s", channel.getText()),
 					oauth.getText()
 					);
 			DataManager.getInstance().setSession(
@@ -207,6 +207,14 @@ public class LoginPanel extends JPanel {
 	
 	public boolean rememberSession() {
 		return rememberSession.isSelected();
+	}
+	
+	public void setSession(SessionData session) {
+		nickname.setText(session.getNickname());
+		channel.setText(session.getChannel().substring(1));
+		oauth.setText(session.getOauth());
+		//ANNOYING LITTLE PIECE OF CODE ofc ;)
+		//rememberSession.setSelected(true);
 	}
 	
 }
