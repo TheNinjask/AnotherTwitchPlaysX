@@ -8,6 +8,7 @@ import org.kitteh.irc.client.library.util.StsUtil;
 import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
 import pt.theninjask.AnotherTwitchPlaysX.exception.AlreadyConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoSessionDataException;
+import pt.theninjask.AnotherTwitchPlaysX.exception.NotConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NotSetupException;
 
 public class TwitchPlayer {
@@ -89,6 +90,16 @@ public class TwitchPlayer {
 		connected = false;
 		client.shutdown();
 		client = null;
+	}
+	
+	public void sendMessage(String message) {
+		if(session==null)
+			throw new NoSessionDataException();
+		if(!connected)
+			throw new NotConnectedException();
+		client.getChannel(session.getChannel()).ifPresent(c->{
+			c.sendMessage(message);
+		});
 	}
 
 }

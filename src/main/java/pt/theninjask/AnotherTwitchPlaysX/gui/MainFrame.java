@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,7 +49,6 @@ public class MainFrame extends JFrame {
 					if(TwitchPlayer.getInstance().isConnected())
 						TwitchPlayer.getInstance().disconnect();
 				}
-				super.windowClosing(event);
 			}
 		});
 	}
@@ -58,8 +58,16 @@ public class MainFrame extends JFrame {
 			try {
 				ObjectMapper objectMapper = new ObjectMapper();
 				File file = new File("session.json");
+				JTextField tmp = new JTextField(String.format(Constants.SAVING_SESSION_MSG, file.getAbsolutePath()));
+				tmp.setEditable(false);
+				tmp.setBorder(null);
+				tmp.setOpaque(false);
+				tmp.setToolTipText(Constants.CHANNEL_FIELD_TIP);
+				tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				objectMapper.writeValue(file, DataManager.getInstance().getSession());
-				JOptionPane.showMessageDialog(null, String.format(Constants.SAVING_SESSION_MSG, file.getAbsolutePath()), "Saving Session", JOptionPane.INFORMATION_MESSAGE);			
+				Constants.showCustomColorMessageDialog(null, 
+						tmp, 
+						"Saving Session", JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);			
 			} catch (IOException e) {
 				Constants.showExceptionDialog(e);
 			}	

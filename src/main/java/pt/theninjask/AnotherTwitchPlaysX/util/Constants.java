@@ -1,19 +1,25 @@
 package pt.theninjask.AnotherTwitchPlaysX.util;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 public final class Constants {
 
 	private Constants() {}
 
 	public static final URL ICON_PATH = Constants.class.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/image/favicon.png");
+	
+	public static final ImageIcon ICON = new ImageIcon(Constants.ICON_PATH);
 	
 	public static final String TITLE = "Another TwitchPlaysX";
 	
@@ -54,6 +60,45 @@ public final class Constants {
 	
 	//JUST FOR ME :) BUT NOT RECOMENDED
 	public static final Color BLUE_COLOR = new Color(0x123456);
+	
+	public static final void showCustomColorMessageDialog(Component parentComponent, 
+			Object message, 
+			String title, 
+			int messageType, 
+			Icon icon, 
+			Color color) {
+		Object paneBG = UIManager.get("OptionPane.background");
+	    Object panelBG = UIManager.get("Panel.background");
+	    UIManager.put("OptionPane.background", color);
+	    UIManager.put("Panel.background", color);
+
+	    JOptionPane.showMessageDialog(parentComponent, message, title, messageType, icon);
+
+	    UIManager.put("OptionPane.background", paneBG);
+	    UIManager.put("Panel.background", panelBG);
+	}
+	
+	public static final int showCustomColorOptionDialog(Component parentComponent, 
+			Object message, 
+			String title, 
+			int optionType, 
+			int messageType, 
+			Icon icon, 
+			Object[] options, 
+			Object initialValue,
+			Color color) {
+		Object paneBG = UIManager.get("OptionPane.background");
+	    Object panelBG = UIManager.get("Panel.background");
+	    UIManager.put("OptionPane.background", color);
+	    UIManager.put("Panel.background", color);
+
+	    int value = JOptionPane.showOptionDialog(parentComponent, message, title, optionType, messageType, icon, options, initialValue);
+
+	    UIManager.put("OptionPane.background", paneBG);
+	    UIManager.put("Panel.background", panelBG);
+	    return value;
+	}
+
 	
 	public static final void showExceptionDialog(Exception e) {
 		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getName(), JOptionPane.WARNING_MESSAGE);
