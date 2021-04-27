@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
@@ -30,7 +31,7 @@ public class LoginPanel extends JPanel {
 	
 	private JTextField channel;
 	
-	private JTextField oauth;
+	private JPasswordField oauth;
 	
 	private JButton openOauth;
 	
@@ -111,6 +112,20 @@ public class LoginPanel extends JPanel {
 		tmp.add(oauthLabel());
 		tmp.add(insertOAuth());
 		tmp.add(openTwitchOauth());
+		
+		JCheckBox tmpCheck = new JCheckBox("Show Token");
+		tmpCheck.setFocusable(false);
+		tmpCheck.setOpaque(false);
+		tmpCheck.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		tmpCheck.addActionListener(l->{
+			if(tmpCheck.isSelected()) {
+				oauth.setEchoChar((char)0);
+			}else {
+				oauth.setEchoChar((char)8226);
+			}
+		});
+		tmp.add(tmpCheck);
+		
 		tmp.setOpaque(false);
 		return tmp;
 	}
@@ -127,8 +142,8 @@ public class LoginPanel extends JPanel {
 		return tmp;
 	}
 	
-	private JTextField insertOAuth() {
-		oauth = new JTextField();
+	private JPasswordField insertOAuth() {
+		oauth = new JPasswordField();
 		oauth.setPreferredSize(new Dimension(145, 25));
 		oauth.setBorder(null);
 		return oauth;
@@ -164,7 +179,7 @@ public class LoginPanel extends JPanel {
 				JOptionPane.showMessageDialog(null, "Please insert your twitch channel name.", "Missing Channel Name", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
-			if(!(oauth.getText().length()>0)) {
+			if(!(oauth.getPassword().length>0)) {
 				String[] options = {"Ok", "Go to get OAuth Token"};
 				switch(JOptionPane.showOptionDialog(
 						null,
@@ -186,7 +201,7 @@ public class LoginPanel extends JPanel {
 			SessionData session = new SessionData(
 					nickname.getText(),
 					String.format("#%s", channel.getText()),
-					oauth.getText()
+					new String(oauth.getPassword())
 					);
 			DataManager.getInstance().setSession(
 					session
