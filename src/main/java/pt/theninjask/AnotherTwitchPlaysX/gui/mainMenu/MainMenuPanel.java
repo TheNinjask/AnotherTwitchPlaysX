@@ -1,14 +1,19 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,6 +54,14 @@ public class MainMenuPanel extends JPanel {
 	
 	private JSlider sponsorSlider;
 	
+	private JCheckBox twitchChatOnTop;
+	
+	private JPanel twitchChatColorModePanel;
+	
+	private JPanel twitchChatMode;
+	
+	private JPanel twitchChatOptionsPanel;
+	
 	private MainMenuPanel() {
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new GridLayout(10, 1));
@@ -57,10 +70,13 @@ public class MainMenuPanel extends JPanel {
 		this.add(gameButton());
 		this.add(changeSessionButton());
 		this.add(twitchChatButton());
-		this.add(twitchChatColorModeLabel());
-		this.add(twitchChatColorModePanel());
+		twitchChatMode();
+		twitchChatColorModePanel();
+		setTwitchChatOnTop();
+		this.add(twitchChatOptionsLabel());
+		this.add(twitchChatOptionsPanel());
 		this.add(twitchChatSlider());
-		this.add(twitchChatSliderLabel(),7);
+		this.add(twitchChatSliderLabel(),this.getComponentCount()-1);
 		this.add(sponsorMeInChat());
 	}
 	
@@ -127,6 +143,7 @@ public class MainMenuPanel extends JPanel {
 			if(TwitchChatFrame.getInstance().isVisible()) {
 				TwitchChatFrame.getInstance().setVisible(false);
 				twitchChatButton.setText("Show Twitch Chat");
+				TwitchChatFrame.getInstance().clearChat();
 				TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
 			}else {
 				TwitchChatFrame.getInstance().setVisible(true);
@@ -134,6 +151,7 @@ public class MainMenuPanel extends JPanel {
 					@Override
 					public void windowClosing(WindowEvent event) {
 						twitchChatButton.setText("Show Twitch Chat");
+						TwitchChatFrame.getInstance().clearChat();
 						TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
 					}
 				});
@@ -169,18 +187,39 @@ public class MainMenuPanel extends JPanel {
 		return label;
 	}
 	
-	private JLabel twitchChatColorModeLabel() {
+	private JPanel twitchChatOptionsLabel() {
+		JPanel tmp = new JPanel(new BorderLayout());
+		tmp.setOpaque(false);
+		tmp.setFocusable(false);
 		JLabel label = new JLabel();
-		label.setText("Color Mode for Twitch Chat");
+		label.setText("Twitch Chat Options");
 		label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setFocusable(false);
-		return label;
+
+		JButton left = new JButton("<");
+		left.setFocusable(false);
+		//left.setHorizontalAlignment(JButton.LEFT);
+		left.addActionListener(l->{
+			moveOptionPanel(false);
+		});
+		tmp.add(left, BorderLayout.WEST);
+		tmp.add(label, BorderLayout.CENTER);
+		JButton right = new JButton(">");
+		right.setFocusable(false);
+		//right.setHorizontalAlignment(JButton.RIGHT);
+		right.addActionListener(l->{
+			moveOptionPanel(true);
+		});
+		tmp.add(right, BorderLayout.EAST);
+		
+		
+		return tmp;
 	}
 	
 	private JPanel twitchChatColorModePanel() {
-		JPanel tmp = new JPanel(new FlowLayout());
-		tmp.setOpaque(false);
+		twitchChatColorModePanel = new JPanel(new FlowLayout());
+		twitchChatColorModePanel.setOpaque(false);
 		ButtonGroup group = new ButtonGroup();
 		JRadioButton light = new JRadioButton("Light Mode");
 		JRadioButton night = new JRadioButton("Night Mode");
@@ -208,10 +247,88 @@ public class MainMenuPanel extends JPanel {
 		group.add(light);
 		group.add(night);
 		group.add(twitch);
-		tmp.add(light);
-		tmp.add(night);
-		tmp.add(twitch);
-		return tmp;
+		twitchChatColorModePanel.add(light);
+		twitchChatColorModePanel.add(night);
+		twitchChatColorModePanel.add(twitch);
+		return twitchChatColorModePanel;
+	}
+	
+	private JCheckBox setTwitchChatOnTop() {
+		twitchChatOnTop = new JCheckBox();
+		
+		twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
+		twitchChatOnTop.setHorizontalTextPosition(JCheckBox.LEFT);
+		twitchChatOnTop.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitchChatOnTop.setHorizontalAlignment(JCheckBox.CENTER);
+		twitchChatOnTop.setOpaque(false);
+		twitchChatOnTop.setFocusable(false);
+		
+		twitchChatOnTop.addActionListener(l->{
+			if(twitchChatOnTop.isSelected()) {
+				twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
+				TwitchChatFrame.getInstance().setAlwaysOnTop(true);
+			}else {
+				twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
+				TwitchChatFrame.getInstance().setAlwaysOnTop(false);
+				MainFrame.getInstance().toFront();
+				MainFrame.getInstance().requestFocus();
+			}
+		});
+		
+		return twitchChatOnTop;
+	}
+	
+	private JPanel twitchChatMode() {
+		twitchChatMode = new JPanel(new FlowLayout());
+		twitchChatMode.setOpaque(false);
+		ButtonGroup group = new ButtonGroup();
+		JRadioButton plain = new JRadioButton("Plain Mode");
+		JRadioButton cmd = new JRadioButton("Cmd Mode");
+		plain.setOpaque(false);
+		plain.setFocusable(false);
+		plain.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		plain.addActionListener(i->{
+			TwitchChatFrame.getInstance().setColor(Color.BLACK, Color.WHITE);
+		});
+		cmd.setOpaque(false);
+		cmd.setFocusable(false);
+		cmd.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		cmd.addActionListener(i->{
+			TwitchChatFrame.getInstance().setColor(Color.WHITE, Color.BLACK);
+		});
+		group.add(plain);
+		group.add(cmd);
+		twitchChatMode.add(plain);
+		twitchChatMode.add(cmd);
+		return twitchChatMode;
+	}
+	
+	private JPanel twitchChatOptionsPanel() {
+		twitchChatOptionsPanel = new JPanel(new GridBagLayout());
+		twitchChatOptionsPanel.setOpaque(false);
+		twitchChatOptionsPanel.add(twitchChatColorModePanel);
+		twitchChatOptionsPanel.setFocusable(false);
+		return twitchChatOptionsPanel;
+	}
+	
+	private void moveOptionPanel(boolean right) {
+		
+		List<JComponent> options = Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatOnTop);
+		
+		int index = options.indexOf(twitchChatOptionsPanel.getComponent(0));
+		
+		if(right) {
+			index+=1;
+			index = index>=options.size() ? 0 : index;
+		}else {
+			index-=1;
+			index = index<0 ? options.size()-1 : index;
+		}
+		twitchChatOptionsPanel.removeAll();
+		twitchChatOptionsPanel.add(options.get(index));
+		
+		twitchChatOptionsPanel.revalidate();
+		twitchChatOptionsPanel.repaint();
 	}
 	
 	private JCheckBox sponsorMeInChat() {

@@ -129,4 +129,5 @@ public class TwitchChatFrame extends JFrame {
 	public void setMessageCap(int newCap) {
 		messageCap = newCap;
 	}
+
 }
