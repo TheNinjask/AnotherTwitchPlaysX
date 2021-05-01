@@ -2,6 +2,7 @@ package pt.theninjask.AnotherTwitchPlaysX.gui.chat;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseListener;
@@ -129,5 +130,16 @@ public class TwitchChatFrame extends JFrame {
 	public void setMessageCap(int newCap) {
 		messageCap = newCap;
 	}
-
+	
+	public void setFontSize(int size) {
+		chat.setFont(new Font(chat.getFont().getFontName(), 0, size));
+	}
+	
+	public void setFont(String name) {
+		chat.setFont(new Font(name, 0, chat.getFont().getSize()));
+	}
+	
+	public Font getCurrentFont() {
+		return chat.getFont();
+	}
 }

@@ -3,6 +3,7 @@ package pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
@@ -13,6 +14,7 @@ import java.util.List;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,6 +26,7 @@ import javax.swing.SwingConstants;
 
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame;
+import pt.theninjask.AnotherTwitchPlaysX.gui.command.CommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.SponsorBot;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
@@ -62,6 +65,14 @@ public class MainMenuPanel extends JPanel {
 	
 	private JPanel twitchChatOptionsPanel;
 	
+	private JComboBox<String> twitchChatFont;
+	
+	private JSlider twitchChatFontSize;
+	
+	private JPanel twitchChatFontPanel;
+	
+	private JPanel twitchChatFontSizePanel;
+	
 	private MainMenuPanel() {
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new GridLayout(10, 1));
@@ -73,6 +84,8 @@ public class MainMenuPanel extends JPanel {
 		twitchChatMode();
 		twitchChatColorModePanel();
 		setTwitchChatOnTop();
+		twitchChatFont();
+		twitchChatFontSize();
 		this.add(twitchChatOptionsLabel());
 		this.add(twitchChatOptionsPanel());
 		this.add(twitchChatSlider());
@@ -114,8 +127,11 @@ public class MainMenuPanel extends JPanel {
 	}
 	
 	private JButton commandsButton() {
-		commandsButton = new JButton("Set Commands");
+		commandsButton = new JButton(String.format("Set Commands (%s)", CommandPanel.getInstance().isOn()? "Active":"Inactive"));
 		commandsButton.setFocusable(false);
+		commandsButton.addActionListener(l->{
+			MainFrame.getInstance().replacePanel(CommandPanel.getInstance());
+		});
 		return commandsButton;
 	}
 	
@@ -147,16 +163,16 @@ public class MainMenuPanel extends JPanel {
 				TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
 			}else {
 				TwitchChatFrame.getInstance().setVisible(true);
-				TwitchChatFrame.getInstance().addWindowListener(new WindowAdapter() {
-					@Override
-					public void windowClosing(WindowEvent event) {
-						twitchChatButton.setText("Show Twitch Chat");
-						TwitchChatFrame.getInstance().clearChat();
-						TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
-					}
-				});
 				twitchChatButton.setText("Hide Twitch Chat");
 				TwitchPlayer.getInstance().registerEventListener(TwitchChatFrame.getInstance());
+			}
+		});
+		TwitchChatFrame.getInstance().addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent event) {
+				twitchChatButton.setText("Show Twitch Chat");
+				TwitchChatFrame.getInstance().clearChat();
+				TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
 			}
 		});
 		return twitchChatButton;
@@ -313,7 +329,12 @@ public class MainMenuPanel extends JPanel {
 	
 	private void moveOptionPanel(boolean right) {
 		
-		List<JComponent> options = Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatOnTop);
+		List<JComponent> options = Arrays.asList(
+				twitchChatColorModePanel,
+				twitchChatMode,
+				twitchChatFontPanel,
+				twitchChatFontSizePanel,
+				twitchChatOnTop);
 		
 		int index = options.indexOf(twitchChatOptionsPanel.getComponent(0));
 		
@@ -331,6 +352,43 @@ public class MainMenuPanel extends JPanel {
 		twitchChatOptionsPanel.repaint();
 	}
 	
+	private JPanel twitchChatFont() {
+		twitchChatFontPanel = new JPanel(new FlowLayout());
+		twitchChatFontPanel.setFocusable(false);
+		twitchChatFontPanel.setOpaque(false);
+		JLabel tmp = new JLabel("Font:");
+		tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitchChatFontPanel.add(tmp);
+		twitchChatFont = new JComboBox<String>(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+		twitchChatFont.setSelectedItem(TwitchChatFrame.getInstance().getCurrentFont().getName());
+		twitchChatFont.addActionListener(l->{
+			TwitchChatFrame.getInstance().setFont((String) twitchChatFont.getSelectedItem());
+		});
+		twitchChatFontPanel.add(twitchChatFont);
+		return twitchChatFontPanel;		
+	}
+	
+	private JPanel twitchChatFontSize() {
+		twitchChatFontSizePanel = new JPanel(new FlowLayout());
+		twitchChatFontSizePanel.setFocusable(false);
+		twitchChatFontSizePanel.setOpaque(false);
+		JLabel tmp = new JLabel("Font Size: (12)");
+		tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitchChatFontSizePanel.add(tmp);
+		twitchChatFontSize = new JSlider(5, 50, 12);
+		
+		twitchChatFontSize.setMajorTickSpacing(45);
+		twitchChatFontSize.setOpaque(false);
+		twitchChatFontSize.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitchChatFontSize.addChangeListener(l->{
+			tmp.setText(String.format("Font Size: (%s)", twitchChatFontSize.getValue()));
+			TwitchChatFrame.getInstance().setFontSize(twitchChatFontSize.getValue());
+		});
+		
+		twitchChatFontSizePanel.add(twitchChatFontSize);
+		return twitchChatFontSizePanel;		
+	}
+	
 	private JCheckBox sponsorMeInChat() {
 		sponsor = new JCheckBox();
 		sponsor.setText("Sponsor Me(Creator) in chat?");
@@ -344,7 +402,7 @@ public class MainMenuPanel extends JPanel {
 			if(sponsor.isSelected()) {
 				String[] options = {"Got it","Nevermind"};
 				JTextArea label = new JTextArea();
-				label.setText("Before going any further, I wanna leave it clear that this app will use the account of the OAuth provided to send messages for me in chat.\nSo don't worry that the account is not being hacked.\nJust wanted to state to not provoke any worry or/and confusion.\nIf you want to do it but are scared of this you can use a burner account, the app will still work.");
+				label.setText("Before going any further, I wanna leave it clear that this app will use the account of the OAuth provided to send messages for me in chat.\nSo don't worry that the account is not being hacked.\nJust wanted to state to not provoke any worry or/and confusion.\nIf you want to do it but are scared of this, you can use a burner account the app will still work.");
 				label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				label.setFocusable(false);
 				label.setOpaque(false);

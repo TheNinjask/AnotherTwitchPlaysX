@@ -3,6 +3,8 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 import java.awt.Robot;
 import java.util.Map;
 
+import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+
 public class ControlData implements Data {
 
 	private int key;
@@ -15,8 +17,19 @@ public class ControlData implements Data {
 	
 	private InDepthCursorData inDepthCursor;
 	
+	private Map<String, String> map;
+	
 	public ControlData() {}
 
+	public ControlData(int key, int duration, int aftermathDelay, ControlType type, InDepthCursorData inDepthCursor, Map<String, String> map) {
+		this.key = key;
+		this.duration = duration;
+		this.aftermathDelay = aftermathDelay;
+		this.type = type;
+		this.inDepthCursor = inDepthCursor;
+		this.map = map;
+	}
+	
 	public int getDuration() {
 		return duration;
 	}
@@ -57,6 +70,14 @@ public class ControlData implements Data {
 		this.aftermathDelay = aftermathDelay;
 	}
 
+	public Map<String, String> getMap() {
+		return map;
+	}
+
+	public void setMap(Map<String, String> map) {
+		this.map = map;
+	}
+
 	public void execute(Robot robot){
 		switch(type) {
 		case KEY:
@@ -81,7 +102,24 @@ public class ControlData implements Data {
 		}
 	}
 	
-	public void execute(Robot robot, Map<String, String> map) {
+	private String getValueFromMap(String key, Map<String, String> vars) {
+		String var = this.map.get(key);
+		if(var==null)
+			return null;
+		String value = vars.get(var);
+		return value;
+	}
+	
+	@SuppressWarnings("unused")
+	private String getValueFromMap(String key, Map<String, String> vars, String defaultValue) {
+		String var = this.map.get(key);
+		if(var==null)
+			return null;
+		String value = vars.getOrDefault(key, defaultValue);
+		return value;
+	}
+	
+	public void execute(Robot robot, Map<String, String> vars) {
 		switch(type) {
 		default:
 			int duration;
@@ -91,46 +129,36 @@ public class ControlData implements Data {
 			String tmp;
 			break;
 		case KEY:
-			robot.keyPress(key);
-			tmp = map.get("duration");
-			if(tmp==null)
-				duration = this.duration;
-			else
-				duration = Integer.parseInt(tmp);
+			robot.keyPress(Constants.getKeyCodeOrDefault(getValueFromMap("key", vars),key));
+			tmp = getValueFromMap("duration", vars);
+			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
 			robot.delay(duration);
 			robot.keyRelease(key);
 			break;
 		case MOUSE_MOV:
-			tmp = map.get("x");
-			if(tmp==null)
-				x = inDepthCursor.getX();
-			else
-				x = Integer.parseInt(tmp);
-			tmp = map.get("y");
-			if(tmp==null)
-				y = inDepthCursor.getY();
-			else
-				y = Integer.parseInt(tmp);
+			tmp = getValueFromMap("x", vars);
+			x =  tmp==null? inDepthCursor.getX() : Integer.parseInt(tmp);
+			tmp = getValueFromMap("y", vars);
+			y = tmp==null ? inDepthCursor.getY() : Integer.parseInt(tmp);
 			robot.mouseMove(x,y);
 			break;
 		case MOUSE_CLICK:
 			robot.mousePress(key);
-			tmp = map.get("duration");
-			if(tmp==null)
-				duration = this.duration;
-			else
-				duration = Integer.parseInt(tmp);
+			tmp = getValueFromMap("duration", vars);
+			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
 			robot.delay(duration);
 			robot.mouseRelease(key);
 			break;
 		case MOUSE_WHEEL:
-			tmp = map.get("scroll");
-			if(tmp==null)
-				scroll = inDepthCursor.getScroll();
-			else
-				scroll = Integer.parseInt(tmp);
+			tmp = getValueFromMap("scroll", vars);
+			scroll = tmp==null ? inDepthCursor.getScroll() : Integer.parseInt(tmp);
 			robot.mouseWheel(scroll);
 			break;			
 		}
+		/*try {
+			String tmp = getValueFromMap("aftermathDelay", vars);
+			int aftermathDelay = tmp==null? this.aftermathDelay : Integer.parseInt(tmp);
+			robot.wait(aftermathDelay * 1000);
+		} catch (InterruptedException e) {}*/
 	}
 }

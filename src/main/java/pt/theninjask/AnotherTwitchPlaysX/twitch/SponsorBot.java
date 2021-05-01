@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEndedEvent;
 
 import net.engio.mbassy.listener.Handler;
+import pt.theninjask.AnotherTwitchPlaysX.exception.NotSetupException;
 
 public class SponsorBot implements Runnable{
 	
@@ -44,7 +45,9 @@ public class SponsorBot implements Runnable{
 	
 	public void stop() {
 		running.set(false);
-		TwitchPlayer.getInstance().unregisterEventListener(this);
+		try {
+			TwitchPlayer.getInstance().unregisterEventListener(this);			
+		}catch (NotSetupException e) {}
 		if(sponsor!=null && sponsor.isAlive())
 			sponsor.interrupt();
 	}

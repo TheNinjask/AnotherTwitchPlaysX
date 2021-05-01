@@ -48,4 +48,8 @@ public class CommandData implements Data {
 		this.vars = vars;
 	}
 	
+	public String toString() {
+		return lead;
+	}
+	
 }
