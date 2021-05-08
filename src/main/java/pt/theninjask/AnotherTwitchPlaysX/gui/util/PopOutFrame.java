@@ -1,6 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui.util;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -22,12 +23,15 @@ public class PopOutFrame extends JFrame {
 	public PopOutFrame(JComponent comp) {
 		this.parent = null;
 		this.add(comp);
-
+		
 		this.setTitle(Constants.TITLE);
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
 		this.setBackground(Constants.TWITCH_COLOR);
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+		comp.requestFocusInWindow();
 		this.setVisible(true);
 	}
 	
@@ -49,6 +53,9 @@ public class PopOutFrame extends JFrame {
 				parent.repaint();
 			}
 		});
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+		comp.requestFocusInWindow();
 		this.setVisible(true);
 	}
 	

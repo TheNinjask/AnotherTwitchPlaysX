@@ -14,5 +14,9 @@ public enum CommandType {
 	public String getType() {
 		return type;
 	}
+	
+	public static CommandType[] getAll() {
+		return new CommandType[] {QUEUE,UNISON};
+	}
 
 }

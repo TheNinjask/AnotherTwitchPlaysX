@@ -2,35 +2,38 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 
 public class InDepthCursorData implements Data {
 
-	private int x;
+	private Integer x;
 	
-	private int y;
+	private Integer y;
 	
-	private int scroll;
+	private Integer scroll;
 	
-	public InDepthCursorData() {}
+	public InDepthCursorData() {
+		this.x=0;
+		this.y=0;
+	}
 
-	public int getY() {
+	public Integer getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	public void setY(Integer y) {
 		this.y = y;
 	}
 
-	public int getX() {
+	public Integer getX() {
 		return x;
 	}
 
-	public void setX(int x) {
+	public void setX(Integer x) {
 		this.x = x;
 	}
 
-	public int getScroll() {
+	public Integer getScroll() {
 		return scroll;
 	}
 
-	public void setScroll(int scroll) {
+	public void setScroll(Integer scroll) {
 		this.scroll = scroll;
 	}
 	

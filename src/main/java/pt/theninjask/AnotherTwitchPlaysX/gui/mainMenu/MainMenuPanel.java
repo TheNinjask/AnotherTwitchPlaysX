@@ -22,11 +22,10 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame;
-import pt.theninjask.AnotherTwitchPlaysX.gui.command.CommandPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.SponsorBot;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
@@ -44,6 +43,8 @@ public class MainMenuPanel extends JPanel {
 	private JButton connectButton;
 	
 	private JButton commandsButton;
+	
+	private JButton commandsStartButton;
 	
 	private JButton gameButton;
 	
@@ -126,13 +127,22 @@ public class MainMenuPanel extends JPanel {
 		return connectButton;
 	}
 	
-	private JButton commandsButton() {
-		commandsButton = new JButton(String.format("Set Commands (%s)", CommandPanel.getInstance().isOn()? "Active":"Inactive"));
+	private JPanel commandsButton() {
+		JPanel tmp = new JPanel(new BorderLayout());
+		commandsButton = new JButton("Set Commands");
 		commandsButton.setFocusable(false);
 		commandsButton.addActionListener(l->{
-			MainFrame.getInstance().replacePanel(CommandPanel.getInstance());
+			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
 		});
-		return commandsButton;
+		tmp.add(commandsButton, BorderLayout.CENTER);
+		commandsStartButton = new JButton("Start");
+		commandsStartButton.setFocusable(false);
+		commandsStartButton.setEnabled(false);
+		commandsStartButton.addActionListener(l->{
+			//TODO
+		});
+		tmp.add(commandsStartButton,BorderLayout.EAST);
+		return tmp;
 	}
 	
 	private JButton gameButton() {
@@ -199,7 +209,7 @@ public class MainMenuPanel extends JPanel {
 			TwitchChatFrame.getInstance().setMessageCap(value);
 			TwitchChatFrame.getInstance().updateChatSize();
 		});
-		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setHorizontalAlignment(JLabel.CENTER);
 		return label;
 	}
 	
@@ -316,6 +326,8 @@ public class MainMenuPanel extends JPanel {
 		group.add(cmd);
 		twitchChatMode.add(plain);
 		twitchChatMode.add(cmd);
+		plain.setEnabled(false);
+		cmd.setEnabled(false);
 		return twitchChatMode;
 	}
 	

@@ -8,7 +8,10 @@ public class DataManager {
 	
 	private SessionData session;
 	
-	private DataManager() {}
+	//private List<CommandData> commands;
+	
+	private DataManager() {
+	}
 	
 	public static DataManager getInstance() {
 		return singleton;

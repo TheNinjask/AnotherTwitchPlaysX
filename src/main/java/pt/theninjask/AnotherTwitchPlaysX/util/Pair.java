@@ -18,4 +18,5 @@ public class Pair<X,Y> {
 	public Y getValue() {
 		return value;
 	}
+	
 }

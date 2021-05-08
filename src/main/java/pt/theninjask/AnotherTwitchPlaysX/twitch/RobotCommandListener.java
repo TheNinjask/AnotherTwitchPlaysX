@@ -23,14 +23,7 @@ public class RobotCommandListener {
 	
 	public RobotCommandListener(CommandData data) {
 		this.data = data;
-		StringBuilder regex = new StringBuilder(data.getLead());
-		for (Pair<String, CommandVarType> elem : data.getVars()) {
-			regex.append(
-					String.format("\\s?(?<%s>%s*)", elem.getKey(), elem.getValue().getRegex())
-					);
-		}
-		pattern = Pattern.compile(regex.toString(), Pattern.CASE_INSENSITIVE);
-		
+		pattern = Pattern.compile(this.data.getRegex(), Pattern.CASE_INSENSITIVE);
 	}
 	
 	@Handler

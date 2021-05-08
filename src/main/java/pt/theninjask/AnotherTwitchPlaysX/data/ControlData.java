@@ -1,5 +1,6 @@
 package pt.theninjask.AnotherTwitchPlaysX.data;
 
+import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.util.Map;
 
@@ -7,11 +8,11 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class ControlData implements Data {
 
-	private int key;
+	private Integer key;
 	
-	private int duration;
+	private Integer duration;
 	
-	private int aftermathDelay;
+	private Integer aftermathDelay;
 	
 	private ControlType type;
 	
@@ -19,9 +20,12 @@ public class ControlData implements Data {
 	
 	private Map<String, String> map;
 	
-	public ControlData() {}
+	public ControlData() {
+		this.duration = 0;
+		this.aftermathDelay = 0;
+	}
 
-	public ControlData(int key, int duration, int aftermathDelay, ControlType type, InDepthCursorData inDepthCursor, Map<String, String> map) {
+	public ControlData(Integer key, Integer duration, Integer aftermathDelay, ControlType type, InDepthCursorData inDepthCursor, Map<String, String> map) {
 		this.key = key;
 		this.duration = duration;
 		this.aftermathDelay = aftermathDelay;
@@ -30,19 +34,19 @@ public class ControlData implements Data {
 		this.map = map;
 	}
 	
-	public int getDuration() {
+	public Integer getDuration() {
 		return duration;
 	}
 
-	public void setDuration(int duration) {
+	public void setDuration(Integer duration) {
 		this.duration = duration;
 	}
 
-	public int getKey() {
+	public Integer getKey() {
 		return key;
 	}
 
-	public void setKey(int key) {
+	public void setKey(Integer key) {
 		this.key = key;
 	}
 
@@ -52,6 +56,18 @@ public class ControlData implements Data {
 
 	public void setType(ControlType type) {
 		this.type = type;
+		switch (this.type) {
+		case MOUSE_CLICK:
+		case MOUSE_MOV:
+		case MOUSE_WHEEL:
+			if(inDepthCursor==null)
+				inDepthCursor = new InDepthCursorData();
+			break;
+		default:
+			if(inDepthCursor!=null)
+				inDepthCursor = null;
+			break;
+		}
 	}
 
 	public InDepthCursorData getInDepthCursor() {
@@ -62,11 +78,11 @@ public class ControlData implements Data {
 		this.inDepthCursor = inDepthCursor;
 	}
 	
-	public int getAftermathDelay() {
+	public Integer getAftermathDelay() {
 		return aftermathDelay;
 	}
 
-	public void setAftermathDelay(int aftermathDelay) {
+	public void setAftermathDelay(Integer aftermathDelay) {
 		this.aftermathDelay = aftermathDelay;
 	}
 
@@ -122,12 +138,13 @@ public class ControlData implements Data {
 	public void execute(Robot robot, Map<String, String> vars) {
 		switch(type) {
 		default:
-			int duration;
-			int scroll;
-			int x;
-			int y;
+			Integer duration;
+			Integer scroll;
+			Integer x;
+			Integer y;
 			String tmp;
 			break;
+			
 		case KEY:
 			robot.keyPress(Constants.getKeyCodeOrDefault(getValueFromMap("key", vars),key));
 			tmp = getValueFromMap("duration", vars);
@@ -135,6 +152,7 @@ public class ControlData implements Data {
 			robot.delay(duration);
 			robot.keyRelease(key);
 			break;
+			
 		case MOUSE_MOV:
 			tmp = getValueFromMap("x", vars);
 			x =  tmp==null? inDepthCursor.getX() : Integer.parseInt(tmp);
@@ -142,13 +160,36 @@ public class ControlData implements Data {
 			y = tmp==null ? inDepthCursor.getY() : Integer.parseInt(tmp);
 			robot.mouseMove(x,y);
 			break;
-		case MOUSE_CLICK:
+			
+		case MOUSE_CLICK:	
+			tmp = getValueFromMap("x", vars);
+			//this is implying dead code in x==null even tho it is the same
+			//x = tmp==null? inDepthCursor.getX() : Integer.parseInt(tmp);
+			if(tmp==null)
+				x = inDepthCursor.getX();
+			else
+				x = Integer.parseInt(tmp);
+			tmp = getValueFromMap("y", vars);
+			//this is implying dead code in y==null even tho it is the same
+			//y = tmp==null ? inDepthCursor.getY() : Integer.parseInt(tmp);
+			if(tmp==null)
+				y = inDepthCursor.getY();
+			else
+				y = Integer.parseInt(tmp);
+			if(x!=null || y!=null) {
+				if(x==null)
+					x = MouseInfo.getPointerInfo().getLocation().x;
+				if(y==null)
+					y = MouseInfo.getPointerInfo().getLocation().y;
+				robot.mouseMove(x,y);
+			}
 			robot.mousePress(key);
 			tmp = getValueFromMap("duration", vars);
 			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
 			robot.delay(duration);
 			robot.mouseRelease(key);
 			break;
+		
 		case MOUSE_WHEEL:
 			tmp = getValueFromMap("scroll", vars);
 			scroll = tmp==null ? inDepthCursor.getScroll() : Integer.parseInt(tmp);
@@ -157,7 +198,7 @@ public class ControlData implements Data {
 		}
 		/*try {
 			String tmp = getValueFromMap("aftermathDelay", vars);
-			int aftermathDelay = tmp==null? this.aftermathDelay : Integer.parseInt(tmp);
+			Integer aftermathDelay = tmp==null? this.aftermathDelay : Integer.parseInt(tmp);
 			robot.wait(aftermathDelay * 1000);
 		} catch (InterruptedException e) {}*/
 	}
