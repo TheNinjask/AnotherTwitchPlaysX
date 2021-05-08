@@ -8,6 +8,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -39,10 +40,14 @@ public class ControlDataPanel extends JPanel {
 
 	private CommandPanel parent;
 
+	private AtomicBoolean isRefreshActive;
+	
+	
 	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
 		this.data = newData;
 		this.parent = parent;
 		this.in = in;
+		this.isRefreshActive = new AtomicBoolean(false);
 		this.in.add(this);
 		this.setLayout(new BorderLayout());
 
@@ -180,15 +185,15 @@ public class ControlDataPanel extends JPanel {
 		indexPanel.add(indexLabel);
 		index = new JComboBox<Integer>();
 		for (JPanel jPanel : in) {
-			index.addItem(in.indexOf(jPanel));
+			index.addItem(this.in.indexOf(jPanel));
 		}
-		index.setSelectedIndex(in.indexOf(this));
-		index.addActionListener(l -> {
+		index.setSelectedIndex(this.in.indexOf(this));
+		index.addActionListener(l->{
+			if(isRefreshActive.get())
+				return;
 			this.in.remove(this);
 			this.in.add(index.getSelectedIndex(), this);
-			in.forEach(e -> {
-				e.refreshIndex();
-			});
+			this.parent.resetMoveControlDisplayButtons();
 		});
 		indexPanel.add(index);
 		left.add(indexPanel);
@@ -209,11 +214,15 @@ public class ControlDataPanel extends JPanel {
 	}
 
 	public void refreshIndex() {
-		index = new JComboBox<Integer>();
+		//index.setSelectedIndex(-1);
+		//System.out.println(index.getItemCount());
+		isRefreshActive.set(true);
+		index.removeAllItems();
 		for (JPanel jPanel : in) {
 			index.addItem(in.indexOf(jPanel));
 		}
 		index.setSelectedIndex(in.indexOf(this));
+		isRefreshActive.set(false);
 	}
 
 	public ControlData getControlData() {

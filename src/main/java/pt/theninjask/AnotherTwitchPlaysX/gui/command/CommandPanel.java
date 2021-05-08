@@ -211,7 +211,9 @@ public class CommandPanel extends JPanel {
 			} else {
 				if (!right) {
 					this.right.setEnabled(true);
-					controlsPanel.add(controls.get(controls.size() - 1));
+					ControlDataPanel tmp = controls.get(controls.size() - 1);
+					tmp.refreshIndex();
+					controlsPanel.add(tmp);
 					if (controls.size() == 1)
 						this.left.setEnabled(false);
 				} else
@@ -226,19 +228,45 @@ public class CommandPanel extends JPanel {
 					controlsPanel.add(addPanel);
 					this.right.setEnabled(false);
 				} else {
-					controlsPanel.add(controls.get(currentIndex + 1));
+					ControlDataPanel tmp = controls.get(currentIndex + 1);
+					tmp.refreshIndex();
+					controlsPanel.add(tmp);
 				}
 			} else {
 				if (currentIndex - 1 <= 0) {
-					controlsPanel.add(controls.get(0));
+					ControlDataPanel tmp = controls.get(0);
+					tmp.refreshIndex();
+					controlsPanel.add(tmp);
 					this.left.setEnabled(false);
 				} else {
-					controlsPanel.add(controls.get(currentIndex - 1));
+					ControlDataPanel tmp = controls.get(currentIndex - 1);
+					tmp.refreshIndex();
+					controlsPanel.add(tmp);
 				}
 			}
 		}
 		controlsPanel.revalidate();
 		controlsPanel.repaint();
+	}
+	
+	public void resetMoveControlDisplayButtons() {
+		Component comp = controlsPanel.getComponent(0);
+		if (!(comp instanceof ControlDataPanel))
+			if(controls.isEmpty()) {
+				this.right.setEnabled(false);
+				this.left.setEnabled(false);
+			}else {
+				this.left.setEnabled(true);
+				this.right.setEnabled(false);
+			}
+		else
+			if(controls.indexOf(comp)==0) {
+				this.left.setEnabled(false);
+				this.right.setEnabled(true);
+			}else {
+				this.right.setEnabled(true);
+				this.left.setEnabled(true);
+			}
 	}
 
 	private JPanel displayAdd() {
