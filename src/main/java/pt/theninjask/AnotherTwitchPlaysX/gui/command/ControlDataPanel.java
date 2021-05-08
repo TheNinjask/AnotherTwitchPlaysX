@@ -37,14 +37,11 @@ public class ControlDataPanel extends JPanel {
 
 	private JComboBox<Integer> index;
 
-	private JPanel parent;
+	private CommandPanel parent;
 
-	private JPanel defaultPanel;
-
-	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, JPanel parent, JPanel defaultPanel) {
+	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
 		this.data = newData;
 		this.parent = parent;
-		this.defaultPanel = defaultPanel;
 		this.in = in;
 		this.in.add(this);
 		this.setLayout(new BorderLayout());
@@ -198,13 +195,11 @@ public class ControlDataPanel extends JPanel {
 		// JButton help = new JButton("Help");
 		JButton remove = new JButton("Remove");
 		remove.addActionListener(l -> {
-			this.parent.removeAll();
-			int currIndex = this.in.indexOf(this);
 			this.in.remove(this);
-			if (this.in.size() > 0)
-				this.parent.add(this.in.get(currIndex > 0 ? currIndex - 1 : currIndex));
+			if(in.isEmpty())
+				this.parent.moveControlDisplay(true);
 			else
-				this.parent.add(this.defaultPanel);
+				this.parent.moveControlDisplay(false);
 			this.parent.revalidate();
 			this.parent.repaint();
 		});

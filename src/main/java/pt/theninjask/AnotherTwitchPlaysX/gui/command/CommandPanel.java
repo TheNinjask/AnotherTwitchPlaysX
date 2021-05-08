@@ -188,7 +188,7 @@ public class CommandPanel extends JPanel {
 		controlsPanel.setOpaque(false);
 		displayAdd();
 		for (ControlData elem : data.getControls()) {
-			controls.add(new ControlDataPanel(elem, controls, controlsPanel, addPanel));
+			controls.add(new ControlDataPanel(elem, controls, this));
 		}
 		if (controls.isEmpty()) {
 			controlsPanel.add(addPanel);
@@ -200,7 +200,7 @@ public class CommandPanel extends JPanel {
 		return displayControl;
 	}
 
-	private void moveControlDisplay(boolean right) {
+	public void moveControlDisplay(boolean right) {
 		Component comp = controlsPanel.getComponent(0);
 		controlsPanel.removeAll();
 		if (!(comp instanceof ControlDataPanel))
@@ -270,7 +270,7 @@ public class CommandPanel extends JPanel {
 				return;
 			}
 			controlsPanel.removeAll();
-			controlsPanel.add(new ControlDataPanel(cData, controls, controlsPanel, addPanel));
+			controlsPanel.add(new ControlDataPanel(cData, controls, this));
 			controlsPanel.revalidate();
 			controlsPanel.repaint();
 			right.setEnabled(true);
