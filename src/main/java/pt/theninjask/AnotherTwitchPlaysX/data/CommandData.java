@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import pt.theninjask.AnotherTwitchPlaysX.exception.NoLeadDefinedException;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
 public class CommandData implements Data {
@@ -59,6 +60,8 @@ public class CommandData implements Data {
 	}
 	
 	public String getRegex() {
+		if(lead==null)
+			throw new NoLeadDefinedException();
 		StringBuilder regex = new StringBuilder(lead);
 		for (Pair<String, CommandVarType> elem : vars) {
 			regex.append(
@@ -69,6 +72,8 @@ public class CommandData implements Data {
 	}
 	
 	public String getRegexExample() {
+		if(lead==null)
+			throw new NoLeadDefinedException();
 		StringBuilder example = new StringBuilder(lead);
 		Random tmp = new Random();
 		for (Pair<String, CommandVarType> elem : vars) {
@@ -79,5 +84,76 @@ public class CommandData implements Data {
 					);
 		}
 		return example.toString();
+	}
+	
+	public boolean equals(CommandData other) {
+		if(other==null)
+			return false;
+		if(lead==null) {
+			if(other.lead!=null)
+				return false;				
+		}else{
+			if(!lead.equals(other.lead))
+				return false;
+		}
+		if(type==null) {
+			if(other.type!=null)
+				return false;				
+		}else{
+			if(!type.equals(other.type))
+				return false;
+		}
+		if(controls==null) {
+			if(other.controls!=null)
+				return false;				
+		}else{
+			if(other.controls==null)
+				return false;
+			if(controls.size()!=other.controls.size())
+				return false;
+			for(int i=0; i<controls.size() ;i++) {
+				if(!controls.get(i).equals(other.controls.get(i)))
+					return false;
+			}
+		}
+		if(vars==null) {
+			if(other.vars!=null)
+				return false;
+		}else {
+			if(other.vars==null)
+				return false;
+			if(vars.size()!=other.vars.size())
+				return false;
+			for(int i=0; i<vars.size() ;i++) {
+				if(!vars.get(i).equals(other.vars.get(i)))
+					return false;
+			}
+		}
+		return true;
+	}
+	
+	public CommandData clone() {
+		CommandData copy = new CommandData();
+		copy.setLead(lead==null?null:new String(lead));
+		copy.setType(type==null?null:type);
+		if(controls==null)
+			copy.setControls(null);
+		else {
+			ArrayList<ControlData> tmp = new ArrayList<ControlData>();
+			for (ControlData elem : controls) {
+				tmp.add(elem.clone());
+			}
+			copy.setControls(tmp);
+		}
+		if(vars==null)
+			copy.setVars(null);
+		else {
+			ArrayList<Pair<String, CommandVarType>> tmp = new ArrayList<Pair<String, CommandVarType>>();
+			for (Pair<String, CommandVarType> elem : vars) {
+				tmp.add(new Pair<String, CommandVarType>(new String(elem.getKey()), elem.getValue()));
+			}
+			copy.setVars(tmp);
+		}
+		return copy;
 	}
 }

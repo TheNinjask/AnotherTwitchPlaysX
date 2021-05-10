@@ -5,7 +5,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MouseCoords implements Runnable {
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.mouse.NativeMouseEvent;
+import org.jnativehook.mouse.NativeMouseInputListener;
+
+public class MouseCoords implements NativeMouseInputListener {
 
 	private AtomicInteger x;
 
@@ -14,8 +19,6 @@ public class MouseCoords implements Runnable {
 	private AtomicBoolean isRunning;
 
 	private ConcurrentLinkedQueue<MouseCoordsListener> queue;
-
-	private Thread worker;
 
 	private static MouseCoords singleton = new MouseCoords();
 
@@ -41,43 +44,71 @@ public class MouseCoords implements Runnable {
 	public void registerListener(MouseCoordsListener event) {
 		queue.add(event);
 		if(!isRunning.get()) {
-			start();
+			try {
+				GlobalScreen.registerNativeHook();
+				GlobalScreen.addNativeMouseMotionListener(this);
+				isRunning.set(true);
+			} catch (NativeHookException e) {
+				e.printStackTrace();
+				Constants.showExceptionDialog(e);
+			}
 		}
 	}
 
 	public void unregisterListener(MouseCoordsListener event) {
 		queue.remove(event);
 		if(queue.isEmpty()) {
-			stop();
+			try {
+				GlobalScreen.unregisterNativeHook();
+				isRunning.set(false);
+			} catch (NativeHookException e) {
+				e.printStackTrace();
+				Constants.showExceptionDialog(e);
+			}
 		}
 	}
 
 	public void clearListeners() {
 		queue.clear();
-		stop();
-	}
-
-	private void start() {
-		worker = new Thread(this);
-		worker.start();
-	}
-
-	@Override
-	public void run() {
-		isRunning.set(true);
-		while (isRunning.get()) {
-			x.set(MouseInfo.getPointerInfo().getLocation().x);
-			y.set(MouseInfo.getPointerInfo().getLocation().y);
-			try {
-				queue.forEach(e -> {
-					e.function(x, y);
-				});
-			} catch (Exception e) {
-			}
+		try {
+			GlobalScreen.unregisterNativeHook();
+			isRunning.set(false);
+		} catch (NativeHookException e) {
+			e.printStackTrace();
+			Constants.showExceptionDialog(e);
 		}
 	}
 
-	private void stop() {
-		isRunning.set(false);
+	@Override
+	public void nativeMouseClicked(NativeMouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void nativeMousePressed(NativeMouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void nativeMouseReleased(NativeMouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void nativeMouseMoved(NativeMouseEvent e) {
+		x.set(e.getX());
+		y.set(e.getY());
+		queue.forEach(elem -> {
+			elem.function(x, y);
+		});	
+	}
+
+	@Override
+	public void nativeMouseDragged(NativeMouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

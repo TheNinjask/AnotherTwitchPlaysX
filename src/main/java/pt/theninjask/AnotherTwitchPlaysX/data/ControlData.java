@@ -3,8 +3,8 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.util.Map;
-
-import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ControlData implements Data {
 
@@ -21,8 +21,8 @@ public class ControlData implements Data {
 	private Map<String, String> map;
 	
 	public ControlData() {
-		this.duration = 0;
-		this.aftermathDelay = 0;
+		//this.duration = 0;
+		//this.aftermathDelay = 0;
 	}
 
 	public ControlData(Integer key, Integer duration, Integer aftermathDelay, ControlType type, InDepthCursorData inDepthCursor, Map<String, String> map) {
@@ -97,20 +97,30 @@ public class ControlData implements Data {
 	public void execute(Robot robot){
 		switch(type) {
 		case KEY:
+			if(key==null)
+				break;
 			robot.keyPress(key);
-			robot.delay(duration);
+			if(duration!=null);
+				robot.delay(duration);
 			robot.keyRelease(key);
 			break;
 		case MOUSE_MOV:
-			robot.mouseMove(inDepthCursor.getX(), inDepthCursor.getY());
+			if(inDepthCursor!=null && inDepthCursor.getX()!=null && inDepthCursor.getY()!=null)
+				robot.mouseMove(inDepthCursor.getX(), inDepthCursor.getY());
 			break;
 		case MOUSE_CLICK:
+			if(inDepthCursor!=null && inDepthCursor.getX()!=null && inDepthCursor.getY()!=null)
+				robot.mouseMove(inDepthCursor.getX(), inDepthCursor.getY());
+			if(key==null)
+				break;
 			robot.mousePress(key);
-			robot.delay(duration);
+			if(duration!=null);
+				robot.delay(duration);
 			robot.mouseRelease(key);
 			break;
 		case MOUSE_WHEEL:
-			robot.mouseWheel(inDepthCursor.getScroll());
+			if(inDepthCursor!=null && inDepthCursor.getScroll()!=null)
+				robot.mouseWheel(inDepthCursor.getScroll());
 			break;
 		default:
 			break;
@@ -146,43 +156,64 @@ public class ControlData implements Data {
 			break;
 			
 		case KEY:
-			robot.keyPress(Constants.getKeyCodeOrDefault(getValueFromMap("key", vars),key));
+			if(key==null)
+				break;
+			robot.keyPress(key);
 			tmp = getValueFromMap("duration", vars);
 			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
-			robot.delay(duration);
+			if(duration!=null)
+				robot.delay(duration);
 			robot.keyRelease(key);
 			break;
 			
 		case MOUSE_MOV:
 			tmp = getValueFromMap("x", vars);
-			x =  tmp==null? inDepthCursor.getX() : Integer.parseInt(tmp);
+			if(tmp==null){
+				if(inDepthCursor!=null)
+					x=inDepthCursor.getX();
+				else
+					x=null;
+			}else x=Integer.parseInt(tmp);
+			if(x==null)
+				x=MouseInfo.getPointerInfo().getLocation().x;
 			tmp = getValueFromMap("y", vars);
-			y = tmp==null ? inDepthCursor.getY() : Integer.parseInt(tmp);
+			if(tmp==null){
+				if(inDepthCursor!=null)
+					y=inDepthCursor.getY();
+				else
+					y=null;
+			}else y=Integer.parseInt(tmp);
+			if(y==null)
+				y=MouseInfo.getPointerInfo().getLocation().y;
 			robot.mouseMove(x,y);
 			break;
 			
 		case MOUSE_CLICK:	
 			tmp = getValueFromMap("x", vars);
+			//deprecated comment
 			//this is implying dead code in x==null even tho it is the same
 			//x = tmp==null? inDepthCursor.getX() : Integer.parseInt(tmp);
-			if(tmp==null)
-				x = inDepthCursor.getX();
-			else
-				x = Integer.parseInt(tmp);
+			if(tmp==null){
+				if(inDepthCursor!=null)
+					x=inDepthCursor.getX();
+				else
+					x=null;
+			}else x=Integer.parseInt(tmp);
+			if(x==null)
+				x=MouseInfo.getPointerInfo().getLocation().x;
 			tmp = getValueFromMap("y", vars);
+			//deprecated comment
 			//this is implying dead code in y==null even tho it is the same
 			//y = tmp==null ? inDepthCursor.getY() : Integer.parseInt(tmp);
-			if(tmp==null)
-				y = inDepthCursor.getY();
-			else
-				y = Integer.parseInt(tmp);
-			if(x!=null || y!=null) {
-				if(x==null)
-					x = MouseInfo.getPointerInfo().getLocation().x;
-				if(y==null)
-					y = MouseInfo.getPointerInfo().getLocation().y;
-				robot.mouseMove(x,y);
-			}
+			if(tmp==null){
+				if(inDepthCursor!=null)
+					y=inDepthCursor.getY();
+				else
+					y=null;
+			}else y=Integer.parseInt(tmp);
+			if(y==null)
+				y=MouseInfo.getPointerInfo().getLocation().y;
+			robot.mouseMove(x,y);
 			robot.mousePress(key);
 			tmp = getValueFromMap("duration", vars);
 			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
@@ -192,8 +223,14 @@ public class ControlData implements Data {
 		
 		case MOUSE_WHEEL:
 			tmp = getValueFromMap("scroll", vars);
-			scroll = tmp==null ? inDepthCursor.getScroll() : Integer.parseInt(tmp);
-			robot.mouseWheel(scroll);
+			if(tmp==null){
+				if(inDepthCursor!=null)
+					scroll=inDepthCursor.getScroll();
+				else
+					scroll=null;
+			}else scroll=Integer.parseInt(tmp);
+			if(scroll!=null)
+				robot.mouseWheel(scroll);
 			break;			
 		}
 		/*try {
@@ -202,4 +239,79 @@ public class ControlData implements Data {
 			robot.wait(aftermathDelay * 1000);
 		} catch (InterruptedException e) {}*/
 	}
+	
+	public boolean equals(ControlData other) {
+		if(other==null)
+			return false;
+		if(key==null) {
+			if(other.key!=null)
+				return false;				
+		}else{
+			if(!key.equals(other.key))
+				return false;
+		}
+		if(duration==null) {
+			if(other.duration!=null)
+				return false;				
+		}else{
+			if(!duration.equals(other.duration))
+				return false;
+		}
+		if(aftermathDelay==null) {
+			if(other.aftermathDelay!=null)
+				return false;				
+		}else{
+			if(!aftermathDelay.equals(other.aftermathDelay))
+				return false;
+		}
+		if(type==null) {
+			if(other.type!=null)
+				return false;				
+		}else{
+			if(!type.equals(other.type))
+				return false;
+		}
+		if(inDepthCursor==null) {
+			if(other.inDepthCursor!=null)
+				return false;				
+		}else{
+			if(!inDepthCursor.equals(other.inDepthCursor))
+				return false;
+		}
+		if(map==null) {
+			if(other.map!=null)
+				return false;
+		}else {
+			if(other.map==null)
+				return false;
+			if(map.size()!=other.map.size())
+				return false;
+			for (Entry<String, String> elem : map.entrySet()) {
+				String value = other.map.get(elem.getKey());
+				if(value!=elem.getValue())
+					return false;
+			}
+		}
+		return true;
+	}
+	
+	public ControlData clone() {
+		ControlData copy = new ControlData();
+		copy.setKey(key==null?null:new Integer(key.intValue()));
+		copy.setDuration(duration==null?null:new Integer(duration.intValue()));
+		copy.setAftermathDelay(aftermathDelay==null?null:new Integer(aftermathDelay.intValue()));
+		copy.setType(type==null?null:type);
+		copy.setInDepthCursor(inDepthCursor==null?null:inDepthCursor.clone());
+		if(map==null)
+			copy.setMap(null);
+		else {
+			ConcurrentHashMap<String, String> mapCopy = new ConcurrentHashMap<String, String>(map.size());
+			map.forEach((k,v)->{
+				mapCopy.put(k, v);
+			});
+			copy.setMap(mapCopy);
+		}
+		return copy;
+	}
+	
 }

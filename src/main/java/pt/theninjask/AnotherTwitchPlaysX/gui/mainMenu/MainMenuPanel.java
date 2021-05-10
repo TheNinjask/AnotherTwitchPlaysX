@@ -308,8 +308,8 @@ public class MainMenuPanel extends JPanel {
 		twitchChatMode = new JPanel(new FlowLayout());
 		twitchChatMode.setOpaque(false);
 		ButtonGroup group = new ButtonGroup();
-		JRadioButton plain = new JRadioButton("Plain Mode");
-		JRadioButton cmd = new JRadioButton("Cmd Mode");
+		JRadioButton plain = new JRadioButton("All Mode");
+		JRadioButton cmd = new JRadioButton("Cmd Only Mode");
 		plain.setOpaque(false);
 		plain.setFocusable(false);
 		plain.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);

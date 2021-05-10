@@ -1,6 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui.command;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.InputEvent;
@@ -22,8 +23,10 @@ import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
+import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
+import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoordsListener;
 
 public class ControlDataPanel extends JPanel {
 
@@ -42,6 +45,7 @@ public class ControlDataPanel extends JPanel {
 
 	private AtomicBoolean isRefreshActive;
 	
+	private MouseCoordsListener listener = null;
 	
 	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
 		this.data = newData;
@@ -50,7 +54,8 @@ public class ControlDataPanel extends JPanel {
 		this.isRefreshActive = new AtomicBoolean(false);
 		this.in.add(this);
 		this.setLayout(new BorderLayout());
-
+		this.setOpaque(false);
+		
 		JPanel center;
 		switch (data.getType()) {
 		case KEY:
@@ -60,17 +65,23 @@ public class ControlDataPanel extends JPanel {
 			center = new JPanel(new GridLayout(5, 1));
 			break;
 		}
-
+		center.setOpaque(false);
 		JPanel inputPanel = new JPanel(new FlowLayout());
+		inputPanel.setOpaque(false);
 		JLabel inputLabel = new JLabel(data.getType() == ControlType.KEY ? "Key" : "Button");
+		inputLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		inputPanel.add(inputLabel);
 		switch (data.getType()) {
 		case KEY:
 			JButton key = new JButton("None");
+			key.setFocusable(false);
 			key.addActionListener(l -> {
 				JPanel pressPanel = new JPanel(new GridLayout(2, 1));
+				pressPanel.setBackground(Constants.TWITCH_COLOR);
 				JLabel press = new JLabel(String.format("Press a key (Current: %s)",
 						data.getKey() == null ? "None" : KeyEvent.getKeyText(data.getKey())));
+				press.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				press.setHorizontalAlignment(JLabel.CENTER);
 				pressPanel.add(press);
 				pressPanel.setFocusable(true);
 				pressPanel.addKeyListener(new KeyAdapter() {
@@ -95,6 +106,7 @@ public class ControlDataPanel extends JPanel {
 			break;
 		case MOUSE_CLICK:
 			JComboBox<JComboItem<Integer>> opt = new JComboBox<JComboItem<Integer>>();
+			opt.setFocusable(false);
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON1_DOWN_MASK, "Left"));
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON2_DOWN_MASK, "Right"));
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON3_DOWN_MASK, "Middle"));
@@ -107,6 +119,7 @@ public class ControlDataPanel extends JPanel {
 		case MOUSE_WHEEL:
 		default:
 			JLabel na = new JLabel("N/A");
+			na.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			inputPanel.add(na);
 			break;
 		}
@@ -120,24 +133,32 @@ public class ControlDataPanel extends JPanel {
 		secFormatter.setAllowsInvalid(false);
 
 		JPanel durationPanel = new JPanel();
+		durationPanel.setOpaque(false);
 		JLabel durationLabel = new JLabel("Duration (sec):");
+		durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		durationPanel.add(durationLabel);
 		JTextField duration = new JFormattedTextField(secFormatter);
-		duration.setText(data.getDuration().toString());
+		if(data.getDuration()!=null)
+			duration.setText(data.getDuration().toString());
 		duration.addActionListener(l->{
 			data.setDuration(Integer.parseInt(duration.getText()));
 		});
+		duration.setPreferredSize(new Dimension(50, 20));
 		durationPanel.add(duration);
 		center.add(durationPanel);
 
 		JPanel aftermathPanel = new JPanel();
+		aftermathPanel.setOpaque(false);
 		JLabel aftermathLabel = new JLabel("Aftermath (sec):");
+		aftermathLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		aftermathPanel.add(aftermathLabel);
 		JTextField aftermath = new JFormattedTextField(secFormatter);
-		aftermath.setText(data.getDuration().toString());
+		if(data.getAftermathDelay()!=null)
+			aftermath.setText(data.getAftermathDelay().toString());
 		aftermath.addActionListener(l->{
 			data.setAftermathDelay(Integer.parseInt(aftermath.getText()));
 		});
+		aftermath.setPreferredSize(new Dimension(50, 20));
 		aftermathPanel.add(aftermath);
 		center.add(aftermathPanel);
 
@@ -149,41 +170,53 @@ public class ControlDataPanel extends JPanel {
 			coordsFormatter.setAllowsInvalid(false);
 			
 			JPanel xPanel = new JPanel();
+			xPanel.setOpaque(false);
 			JLabel xLabel = new JLabel(String.format("X (%s) stay:", MouseCoords.getInstance().getX().get()));
+			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			xPanel.add(xLabel);
 			JTextField x = new JFormattedTextField(coordsFormatter);
-			x.setText(data.getInDepthCursor().getX().toString());
+			if(data.getInDepthCursor()!=null && data.getInDepthCursor().getX()!=null)
+				x.setText(data.getInDepthCursor().getX().toString());
 			x.addActionListener(l->{
 				data.getInDepthCursor().setX(Integer.parseInt(x.getText()));
 			});
+			x.setPreferredSize(new Dimension(50, 20));
 			xPanel.add(x);
 			center.add(xPanel);
 			
 			JPanel yPanel = new JPanel();
+			yPanel.setOpaque(false);
 			JLabel yLabel = new JLabel(String.format("Y (%s) stay:", MouseCoords.getInstance().getY().get()));
+			yLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			yPanel.add(yLabel);
 			JTextField y = new JFormattedTextField(coordsFormatter);
-			y.setText(data.getInDepthCursor().getY().toString());
+			if(data.getInDepthCursor()!=null && data.getInDepthCursor().getY()!=null)
+				y.setText(data.getInDepthCursor().getY().toString());
 			y.addActionListener(l->{
 				data.getInDepthCursor().setY(Integer.parseInt(y.getText()));
 			});
+			y.setPreferredSize(new Dimension(50, 20));
 			yPanel.add(y);
 			center.add(yPanel);
-			
-			MouseCoords.getInstance().registerListener((eX, eY) -> {
+			listener = (eX, eY) -> {
 				xLabel.setText(String.format("X (%s) stay:", MouseCoords.getInstance().getX().get()));
 				yLabel.setText(String.format("Y (%s) stay:", MouseCoords.getInstance().getY().get()));
-			});
+			};
+			MouseCoords.getInstance().registerListener(listener);
 
 		}
 		this.add(center, BorderLayout.CENTER);
 
-		JPanel left = new JPanel(new GridLayout(3, 1));
-
-		JPanel indexPanel = new JPanel();
+		JPanel left = new JPanel(new GridLayout(5, 1));
+		left.setOpaque(false);
+		
+		//JPanel indexPanel = new JPanel();
+		//indexPanel.setOpaque(false);
 		JLabel indexLabel = new JLabel("#index");
-		indexPanel.add(indexLabel);
+		indexLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		left.add(indexLabel);
 		index = new JComboBox<Integer>();
+		index.setFocusable(false);
 		for (JPanel jPanel : in) {
 			index.addItem(this.in.indexOf(jPanel));
 		}
@@ -195,21 +228,24 @@ public class ControlDataPanel extends JPanel {
 			this.in.add(index.getSelectedIndex(), this);
 			this.parent.resetMoveControlDisplayButtons();
 		});
-		indexPanel.add(index);
-		left.add(indexPanel);
+		left.add(index);
+		//left.add(indexPanel);
 		// JButton help = new JButton("Help");
-		JButton remove = new JButton("Remove");
+		JButton remove = new JButton("[X]");
+		remove.setFocusable(false);
 		remove.addActionListener(l -> {
 			this.in.remove(this);
 			if(in.isEmpty())
 				this.parent.moveControlDisplay(true);
 			else
 				this.parent.moveControlDisplay(false);
+			if(listener!=null)
+				MouseCoords.getInstance().unregisterListener(listener);
 			this.parent.revalidate();
 			this.parent.repaint();
 		});
 		left.add(remove);
-
+		//left.setPreferredSize(new Dimension(50, 151));
 		this.add(left, BorderLayout.EAST);
 	}
 

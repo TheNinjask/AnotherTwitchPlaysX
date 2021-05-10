@@ -5,16 +5,19 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.util.JTableCommand;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class AllCommandPanel extends JPanel {
@@ -46,6 +49,7 @@ public class AllCommandPanel extends JPanel {
 	}
 	
 	public static AllCommandPanel getInstance() {
+		singleton.refreshTable();
 		return singleton;
 	}
 	
@@ -67,6 +71,7 @@ public class AllCommandPanel extends JPanel {
 		create.setOpaque(false);
 		create.addActionListener(l->{
 			replacePanel(mainCommandPanel);
+			DataManager.getInstance().setCommands(new ArrayList<CommandData>());
 		});
 		tmp.add(create);
 		
@@ -133,7 +138,7 @@ public class AllCommandPanel extends JPanel {
 			MainFrame.getInstance().replacePanel(new CommandPanel());
 		});
 		right.add(insert);
-		
+		/*
 		JButton start = new JButton("Start");
 		start.setFocusable(false);
 		start.addActionListener(l->{
@@ -146,8 +151,9 @@ public class AllCommandPanel extends JPanel {
 			}
 		});
 		right.add(start);
-		
+		*/
 		JButton help = new JButton("Help");
+		help.setEnabled(false);
 		help.setFocusable(false);
 		right.add(help);
 		
@@ -194,4 +200,10 @@ public class AllCommandPanel extends JPanel {
 		this.revalidate();
 		this.repaint();
 	}
+	
+	private void refreshTable() {
+		if(table!=null)
+			this.table.clearAndSet(DataManager.getInstance().getCommands());
+	}
+	
 }

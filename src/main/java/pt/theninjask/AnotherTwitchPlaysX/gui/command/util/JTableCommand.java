@@ -1,5 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui.command.util;
 
+import java.util.List;
+
 import javax.swing.JTable;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
@@ -33,6 +35,13 @@ public class JTableCommand extends JTable {
 	
 	public void addRow(CommandData data) {
 		table.addRow(data);
+	}
+	
+	public void clearAndSet(List<CommandData> data) {
+		table.clear();
+		for (CommandData commandData : data) {
+			table.addRow(commandData);
+		}
 	}
 
 }

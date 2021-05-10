@@ -22,6 +22,7 @@ import pt.theninjask.AnotherTwitchPlaysX.data.CommandType;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 
@@ -32,9 +33,9 @@ public class CommandPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private CommandData data;
-
-	private boolean isSaved;
+	private CommandData saved;
+	
+	private CommandData current;
 
 	private List<ControlDataPanel> controls;
 
@@ -47,14 +48,23 @@ public class CommandPanel extends JPanel {
 	private JButton right;
 
 	public CommandPanel() {
-		this(new CommandData());
-		this.isSaved = false;
+		this.current = new CommandData();
+		this.saved = null;
+		controls = new ArrayList<ControlDataPanel>();
+		this.setBackground(Constants.TWITCH_COLOR);
+		this.setLayout(new GridLayout(2, 1));
+		JPanel tmp = new JPanel(new BorderLayout());
+		tmp.setOpaque(false);
+		tmp.add(buildPanelString(), BorderLayout.CENTER);
+		tmp.add(buttonMenu(), BorderLayout.EAST);
+		this.add(tmp);
+		this.add(controlScroll());
 	}
 
 	public CommandPanel(CommandData data) {
+		this.current = data.clone();
+		this.saved = data;
 		controls = new ArrayList<ControlDataPanel>();
-		this.data = data;
-		this.isSaved = true;
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new GridLayout(2, 1));
 		JPanel tmp = new JPanel(new BorderLayout());
@@ -82,9 +92,14 @@ public class CommandPanel extends JPanel {
 		JLabel leadLabel = new JLabel("Lead: ");
 		leadLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		leadPanel.add(leadLabel);
-		JTextField lead = new JTextField("#TODO");
+		JTextField lead = new JTextField("");
+		if(current.getLead()!=null)
+			lead.setText(current.getLead());
 		lead.setBorder(null);
 		lead.setPreferredSize(new Dimension(151, 20));
+		lead.addCaretListener(l->{
+			current.setLead(lead.getText());
+		});
 		leadPanel.add(lead);
 		mainPanel.add(leadPanel);
 
@@ -95,6 +110,10 @@ public class CommandPanel extends JPanel {
 		typePanel.add(typeLabel);
 		JComboBox<CommandType> type = new JComboBox<CommandType>(CommandType.getAll());
 		type.setSelectedItem(CommandType.UNISON);
+		type.addActionListener(l->{
+			current.setType(type.getItemAt(type.getSelectedIndex()));
+		});
+		type.setFocusable(false);
 		type.setEnabled(false);
 		typePanel.add(type);
 		mainPanel.add(typePanel);
@@ -105,9 +124,11 @@ public class CommandPanel extends JPanel {
 		varsLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		varsPanel.add(varsLabel);
 
+		//TODO
 		JComboBox<String> vars = new JComboBox<String>();
 		vars.addItem("ADD");
 		vars.setSelectedItem(null);
+		vars.setFocusable(false);
 		vars.setEnabled(false);
 		varsPanel.add(vars);
 
@@ -122,13 +143,13 @@ public class CommandPanel extends JPanel {
 		JButton back = new JButton("Back");
 		back.setFocusable(false);
 		back.addActionListener(l -> {
-			if (!isSaved) {
+			if (saved==null || !saved.equals(current)) {
 				JTextArea msg = new JTextArea();
 				msg.setText("This command has not saved changes!");
 				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				msg.setFocusable(false);
 				msg.setOpaque(false);
-				String[] options = { "Leave", "Go Back" };
+				String[] options = { "Ok", "Go Back" };
 				int resp = Constants.showCustomColorOptionDialog(null, msg, "COMMAND NOT SAVED",
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, null,
 						Constants.TWITCH_COLOR);
@@ -148,18 +169,64 @@ public class CommandPanel extends JPanel {
 
 		JButton syntax = new JButton("Syntax");
 		syntax.setFocusable(false);
+		syntax.addActionListener(l->{
+			try {
+				
+			JPanel tmp = new JPanel(new GridLayout(2, 1));
+			tmp.setOpaque(false);
+			JLabel syntaxLabel = new JLabel(String.format("Syntax: %s", current.getRegex()));
+			syntaxLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			tmp.add(syntaxLabel);
+			JLabel egLabel = new JLabel(String.format("Example: %s", current.getRegexExample()));
+			egLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			tmp.add(egLabel);
+			Constants.showCustomColorMessageDialog(
+					null, 
+					tmp, 
+					"Syntax of command", 
+					JOptionPane.PLAIN_MESSAGE, 
+					null, 
+					Constants.TWITCH_COLOR
+					);
+			}catch (Exception e) {
+				Constants.showExpectedExceptionDialog(e);
+			}
+		});
 		bMenu.add(syntax);
 
 		JButton help = new JButton("Help");
+		help.setEnabled(false);
 		help.setFocusable(false);
 		bMenu.add(help);
 
 		JButton save = new JButton("Save");
 		save.setFocusable(false);
+		save.addActionListener(l->{
+			if(saved!=null) {
+				int index = DataManager.getInstance().getCommands().indexOf(saved);
+				DataManager.getInstance().getCommands().remove(saved);
+				for (ControlDataPanel elem : controls) {
+					current.getControls().add(elem.getControlData());
+				}
+				saved=current;
+				DataManager.getInstance().getCommands().add(index, current);				
+			}else {
+				for (ControlDataPanel elem : controls) {
+					current.getControls().add(elem.getControlData());
+				}
+				saved = current;
+				DataManager.getInstance().getCommands().add(current);
+			}
+		});
 		bMenu.add(save);
 
 		JButton delete = new JButton("Delete");
 		delete.setFocusable(false);
+		delete.addActionListener(l->{
+			if(saved!=null)
+				DataManager.getInstance().getCommands().remove(saved);
+			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
+		});
 		bMenu.add(delete);
 
 		return bMenu;
@@ -187,8 +254,8 @@ public class CommandPanel extends JPanel {
 		controlsPanel = new JPanel(new BorderLayout());
 		controlsPanel.setOpaque(false);
 		displayAdd();
-		for (ControlData elem : data.getControls()) {
-			controls.add(new ControlDataPanel(elem, controls, this));
+		for (ControlData elem : current.getControls()) {
+			new ControlDataPanel(elem, controls, this);
 		}
 		if (controls.isEmpty()) {
 			controlsPanel.add(addPanel);
@@ -251,22 +318,21 @@ public class CommandPanel extends JPanel {
 	
 	public void resetMoveControlDisplayButtons() {
 		Component comp = controlsPanel.getComponent(0);
-		if (!(comp instanceof ControlDataPanel))
+		if (!(comp instanceof ControlDataPanel)) {
+			this.right.setEnabled(false);
 			if(controls.isEmpty()) {
-				this.right.setEnabled(false);
 				this.left.setEnabled(false);
 			}else {
 				this.left.setEnabled(true);
-				this.right.setEnabled(false);
 			}
-		else
+		}else {
+			this.right.setEnabled(true);
 			if(controls.indexOf(comp)==0) {
 				this.left.setEnabled(false);
-				this.right.setEnabled(true);
 			}else {
-				this.right.setEnabled(true);
 				this.left.setEnabled(true);
 			}
+		}
 	}
 
 	private JPanel displayAdd() {
@@ -308,7 +374,7 @@ public class CommandPanel extends JPanel {
 		return addPanel;
 	}
 
-	public CommandData getCommandData() {
-		return data;
+	public CommandData getCurrentCommandData() {
+		return current;
 	}
 }

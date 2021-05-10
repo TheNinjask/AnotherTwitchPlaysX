@@ -1,5 +1,69 @@
 package pt.theninjask.AnotherTwitchPlaysX.util;
 
+import static java.awt.event.KeyEvent.VK_0;
+import static java.awt.event.KeyEvent.VK_1;
+import static java.awt.event.KeyEvent.VK_2;
+import static java.awt.event.KeyEvent.VK_3;
+import static java.awt.event.KeyEvent.VK_4;
+import static java.awt.event.KeyEvent.VK_5;
+import static java.awt.event.KeyEvent.VK_6;
+import static java.awt.event.KeyEvent.VK_7;
+import static java.awt.event.KeyEvent.VK_8;
+import static java.awt.event.KeyEvent.VK_9;
+import static java.awt.event.KeyEvent.VK_A;
+import static java.awt.event.KeyEvent.VK_AMPERSAND;
+import static java.awt.event.KeyEvent.VK_ASTERISK;
+import static java.awt.event.KeyEvent.VK_AT;
+import static java.awt.event.KeyEvent.VK_B;
+import static java.awt.event.KeyEvent.VK_BACK_QUOTE;
+import static java.awt.event.KeyEvent.VK_BACK_SLASH;
+import static java.awt.event.KeyEvent.VK_C;
+import static java.awt.event.KeyEvent.VK_CIRCUMFLEX;
+import static java.awt.event.KeyEvent.VK_CLOSE_BRACKET;
+import static java.awt.event.KeyEvent.VK_COLON;
+import static java.awt.event.KeyEvent.VK_COMMA;
+import static java.awt.event.KeyEvent.VK_D;
+import static java.awt.event.KeyEvent.VK_DOLLAR;
+import static java.awt.event.KeyEvent.VK_E;
+import static java.awt.event.KeyEvent.VK_ENTER;
+import static java.awt.event.KeyEvent.VK_EQUALS;
+import static java.awt.event.KeyEvent.VK_EXCLAMATION_MARK;
+import static java.awt.event.KeyEvent.VK_F;
+import static java.awt.event.KeyEvent.VK_G;
+import static java.awt.event.KeyEvent.VK_H;
+import static java.awt.event.KeyEvent.VK_I;
+import static java.awt.event.KeyEvent.VK_J;
+import static java.awt.event.KeyEvent.VK_K;
+import static java.awt.event.KeyEvent.VK_L;
+import static java.awt.event.KeyEvent.VK_LEFT_PARENTHESIS;
+import static java.awt.event.KeyEvent.VK_M;
+import static java.awt.event.KeyEvent.VK_MINUS;
+import static java.awt.event.KeyEvent.VK_N;
+import static java.awt.event.KeyEvent.VK_NUMBER_SIGN;
+import static java.awt.event.KeyEvent.VK_O;
+import static java.awt.event.KeyEvent.VK_OPEN_BRACKET;
+import static java.awt.event.KeyEvent.VK_P;
+import static java.awt.event.KeyEvent.VK_PERIOD;
+import static java.awt.event.KeyEvent.VK_PLUS;
+import static java.awt.event.KeyEvent.VK_Q;
+import static java.awt.event.KeyEvent.VK_QUOTE;
+import static java.awt.event.KeyEvent.VK_QUOTEDBL;
+import static java.awt.event.KeyEvent.VK_R;
+import static java.awt.event.KeyEvent.VK_RIGHT_PARENTHESIS;
+import static java.awt.event.KeyEvent.VK_S;
+import static java.awt.event.KeyEvent.VK_SEMICOLON;
+import static java.awt.event.KeyEvent.VK_SLASH;
+import static java.awt.event.KeyEvent.VK_SPACE;
+import static java.awt.event.KeyEvent.VK_T;
+import static java.awt.event.KeyEvent.VK_TAB;
+import static java.awt.event.KeyEvent.VK_U;
+import static java.awt.event.KeyEvent.VK_UNDERSCORE;
+import static java.awt.event.KeyEvent.VK_V;
+import static java.awt.event.KeyEvent.VK_W;
+import static java.awt.event.KeyEvent.VK_X;
+import static java.awt.event.KeyEvent.VK_Y;
+import static java.awt.event.KeyEvent.VK_Z;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -10,9 +74,9 @@ import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import static java.awt.event.KeyEvent.*;
 
 public final class Constants {
 
@@ -107,6 +171,18 @@ public final class Constants {
 		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getName(), JOptionPane.WARNING_MESSAGE);
 	}
 	
+	public static final void showExpectedExceptionDialog(Exception e) {
+		JLabel exception = new JLabel(e.getMessage());
+		exception.setForeground(TWITCH_COLOR_COMPLEMENT);
+		Object paneBG = UIManager.get("OptionPane.background");
+	    Object panelBG = UIManager.get("Panel.background");
+	    UIManager.put("OptionPane.background", TWITCH_COLOR);
+	    UIManager.put("Panel.background", TWITCH_COLOR);
+		JOptionPane.showMessageDialog(null, exception, e.getClass().getName(), JOptionPane.WARNING_MESSAGE, null);
+		UIManager.put("OptionPane.background", paneBG);
+	    UIManager.put("Panel.background", panelBG);
+	}
+	
 	public static final void openWebsite(String website){
 		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 		    try {
@@ -119,6 +195,7 @@ public final class Constants {
 		}
 	}
 
+	@Deprecated
 	public static final int getKeyCodeOrDefault(String key, int defaultValue) {
 		Integer value = getKeyCode(key);
 		if(value==null)
@@ -126,6 +203,13 @@ public final class Constants {
 		return value;
 	}
 	
+	@Deprecated
+	/**
+	 * Avoid using this function at least I dont like it the way it is now
+	 * Maybe in the future have a "learn" capability like a area where the user
+	 * presses keys and show the code and string associated
+	 * and it is saved as a map<string,keycode> for the vars
+	 */
 	public static final Integer getKeyCode(String key) {
 		// adapted from sauce: https://stackoverflow.com/a/1248709
 		if(key==null || key.length()!=1 )
