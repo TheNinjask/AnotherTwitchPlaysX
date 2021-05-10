@@ -62,8 +62,9 @@ public class ControlData implements Data {
 	public void setType(ControlType type) {
 		this.type = type;
 		switch (this.type) {
-		case MOUSE_CLICK:
-		case MOUSE_MOV:
+		//case MOUSE_CLICK:
+		//case MOUSE_MOV:
+		case MOUSE:
 		case MOUSE_WHEEL:
 			if(inDepthCursor==null)
 				inDepthCursor = new InDepthCursorData();
@@ -109,11 +110,12 @@ public class ControlData implements Data {
 				robot.delay(duration);
 			robot.keyRelease(key);
 			break;
-		case MOUSE_MOV:
+		/*case MOUSE_MOV:
 			if(inDepthCursor!=null && inDepthCursor.getX()!=null && inDepthCursor.getY()!=null)
 				robot.mouseMove(inDepthCursor.getX(), inDepthCursor.getY());
 			break;
-		case MOUSE_CLICK:
+		case MOUSE_CLICK:*/
+		case MOUSE:
 			if(inDepthCursor!=null && inDepthCursor.getX()!=null && inDepthCursor.getY()!=null)
 				robot.mouseMove(inDepthCursor.getX(), inDepthCursor.getY());
 			if(key==null)
@@ -171,7 +173,7 @@ public class ControlData implements Data {
 			robot.keyRelease(key);
 			break;
 			
-		case MOUSE_MOV:
+		/*case MOUSE_MOV:
 			tmp = getValueFromMap("x", vars);
 			if(tmp==null){
 				if(inDepthCursor!=null)
@@ -193,7 +195,8 @@ public class ControlData implements Data {
 			robot.mouseMove(x,y);
 			break;
 			
-		case MOUSE_CLICK:	
+		case MOUSE_CLICK:*/
+		case MOUSE:
 			tmp = getValueFromMap("x", vars);
 			//deprecated comment
 			//this is implying dead code in x==null even tho it is the same

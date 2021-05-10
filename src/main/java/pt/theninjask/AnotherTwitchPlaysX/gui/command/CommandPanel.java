@@ -353,7 +353,7 @@ public class CommandPanel extends JPanel {
 			ControlData cData = new ControlData();
 			switch (resp) {
 			case JOptionPane.NO_OPTION:
-				cData.setType(ControlType.MOUSE_CLICK);
+				cData.setType(ControlType.MOUSE);
 				break;
 			case JOptionPane.YES_OPTION:
 				cData.setType(ControlType.KEY);

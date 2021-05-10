@@ -50,21 +50,23 @@ public class JTableButtonMouseListener extends MouseAdapter {
 		if(SwingUtilities.isRightMouseButton(e) || SwingUtilities.isMiddleMouseButton(e)) {
 			return;
 		}
-		if(selected!=null) {
-			selected.getModel().setPressed(false);
-			table.revalidate();
-			table.repaint();
-		}
 		int column = table.getColumnModel().getColumnIndexAtX(e.getX());
 		int row = e.getY() / table.getRowHeight();
 
 		if (row < table.getRowCount() && row >= 0 && column < table.getColumnCount() && column >= 0) {
 			Object value = table.getValueAt(row, column);
 			if (value instanceof JButton) {
-				JButton tmp = ((JButton) value);
-				if(selected==tmp)
-					tmp.doClick();
+				if(selected==value) {
+					selected.doClick();
+					selected.getModel().setPressed(false);
+					table.revalidate();
+					table.repaint();
+				}
 			}
+		}else if(selected!=null) {
+			selected.getModel().setPressed(false);
+			table.revalidate();
+			table.repaint();
 		}
 	}
 	

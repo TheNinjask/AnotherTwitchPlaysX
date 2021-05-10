@@ -106,9 +106,11 @@ public class ControlDataPanel extends JPanel {
 			});
 			inputPanel.add(key);
 			break;
-		case MOUSE_CLICK:
+		//case MOUSE_CLICK:
+		case MOUSE:
 			JComboBox<JComboItem<Integer>> opt = new JComboBox<JComboItem<Integer>>();
 			opt.setFocusable(false);
+			opt.addItem(new JComboItem<Integer>(null, "None"));
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON1_DOWN_MASK, "Left"));
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON2_DOWN_MASK, "Right"));
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON3_DOWN_MASK, "Middle"));
@@ -117,7 +119,7 @@ public class ControlDataPanel extends JPanel {
 			});
 			inputPanel.add(opt);
 			break;
-		case MOUSE_MOV:
+		//case MOUSE_MOV:
 		case MOUSE_WHEEL:
 		default:
 			JLabel na = new JLabel("N/A");
@@ -287,7 +289,7 @@ public class ControlDataPanel extends JPanel {
 		aftermathPanel.add(aftermath);
 		center.add(aftermathPanel);
 
-		if ((data.getType() == ControlType.MOUSE_CLICK || data.getType() == ControlType.MOUSE_MOV)
+		if (data.getType() == ControlType.MOUSE
 				&& data.getInDepthCursor() != null) {
 			NumberFormatter xFormatter = new NumberFormatter(format);
 			xFormatter.setValueClass(Integer.class);
