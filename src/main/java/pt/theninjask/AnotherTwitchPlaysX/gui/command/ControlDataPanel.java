@@ -17,6 +17,8 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
@@ -44,9 +46,9 @@ public class ControlDataPanel extends JPanel {
 	private CommandPanel parent;
 
 	private AtomicBoolean isRefreshActive;
-	
+
 	private MouseCoordsListener listener = null;
-	
+
 	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
 		this.data = newData;
 		this.parent = parent;
@@ -55,7 +57,7 @@ public class ControlDataPanel extends JPanel {
 		this.in.add(this);
 		this.setLayout(new BorderLayout());
 		this.setOpaque(false);
-		
+
 		JPanel center;
 		switch (data.getType()) {
 		case KEY:
@@ -110,7 +112,7 @@ public class ControlDataPanel extends JPanel {
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON1_DOWN_MASK, "Left"));
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON2_DOWN_MASK, "Right"));
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON3_DOWN_MASK, "Middle"));
-			opt.addActionListener(l->{
+			opt.addActionListener(l -> {
 				this.data.setKey(opt.getItemAt(opt.getSelectedIndex()).get());
 			});
 			inputPanel.add(opt);
@@ -126,22 +128,87 @@ public class ControlDataPanel extends JPanel {
 
 		center.add(inputPanel);
 
-		NumberFormatter secFormatter = new NumberFormatter(NumberFormat.getInstance());
-		secFormatter.setValueClass(Integer.class);
-		secFormatter.setMinimum(0);
-		secFormatter.setMaximum(Integer.MAX_VALUE);
-		secFormatter.setAllowsInvalid(false);
+		/*
+		 * DecimalFormatSymbols symb = new DecimalFormatSymbols();
+		 * symb.setGroupingSeparator(Character.MIN_VALUE); DecimalFormat format = new
+		 * DecimalFormat(); format.setDecimalFormatSymbols(symb);
+		 */
+		NumberFormat format = NumberFormat.getInstance();
+		;
+		format.setGroupingUsed(false);
 
+		NumberFormatter durationFormatter = new NumberFormatter(format);
+		durationFormatter.setValueClass(Integer.class);
+		durationFormatter.setMinimum(0);
+		durationFormatter.setMaximum(Integer.MAX_VALUE);
+		durationFormatter.setAllowsInvalid(false);
 		JPanel durationPanel = new JPanel();
 		durationPanel.setOpaque(false);
 		JLabel durationLabel = new JLabel("Duration (sec):");
 		durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		durationPanel.add(durationLabel);
-		JTextField duration = new JFormattedTextField(secFormatter);
-		if(data.getDuration()!=null)
+		JTextField duration = new JFormattedTextField(durationFormatter);
+		if (data.getDuration() != null)
 			duration.setText(data.getDuration().toString());
-		duration.addActionListener(l->{
-			data.setDuration(Integer.parseInt(duration.getText()));
+		duration.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				update();
+			}
+
+			private void update() {
+				try {
+					data.setDuration(Integer.parseInt(duration.getText()));
+				} catch (NumberFormatException e) {
+				}
+			}
+		});
+		/*
+		 * duration.addActionListener(l->{
+		 * data.setDuration(Integer.parseInt(duration.getText())); });
+		 */
+		duration.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				switch (e.getKeyCode()) {
+				default:
+					int updated;
+					Integer durationVal;
+					break;
+				case KeyEvent.VK_UP:
+				case KeyEvent.VK_KP_UP:
+					durationVal = data.getDuration();
+					if (durationVal == null)
+						break;
+					if (durationVal == Integer.MAX_VALUE)
+						break;
+					updated = durationVal + 1;
+					data.setDuration(updated);
+					duration.setText(Integer.toString(updated));
+					break;
+				case KeyEvent.VK_DOWN:
+				case KeyEvent.VK_KP_DOWN:
+					durationVal = data.getDuration();
+					if (durationVal == null)
+						break;
+					updated = durationVal - 1;
+					if (updated < 0)
+						break;
+					data.setDuration(updated);
+					duration.setText(Integer.toString(updated));
+					break;
+				}
+			}
 		});
 		duration.setPreferredSize(new Dimension(50, 20));
 		durationPanel.add(duration);
@@ -152,50 +219,220 @@ public class ControlDataPanel extends JPanel {
 		JLabel aftermathLabel = new JLabel("Aftermath (sec):");
 		aftermathLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		aftermathPanel.add(aftermathLabel);
-		JTextField aftermath = new JFormattedTextField(secFormatter);
-		if(data.getAftermathDelay()!=null)
+		NumberFormatter aftermathFormatter = new NumberFormatter(format);
+		aftermathFormatter.setValueClass(Integer.class);
+		aftermathFormatter.setMinimum(0);
+		aftermathFormatter.setMaximum(Integer.MAX_VALUE);
+		aftermathFormatter.setAllowsInvalid(false);
+		JTextField aftermath = new JFormattedTextField(aftermathFormatter);
+		if (data.getAftermathDelay() != null)
 			aftermath.setText(data.getAftermathDelay().toString());
-		aftermath.addActionListener(l->{
-			data.setAftermathDelay(Integer.parseInt(aftermath.getText()));
+		aftermath.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				update();
+			}
+
+			private void update() {
+				try {
+					data.setAftermathDelay(Integer.parseInt(aftermath.getText()));
+				} catch (NumberFormatException e) {
+				}
+			}
 		});
 		aftermath.setPreferredSize(new Dimension(50, 20));
+		aftermath.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				switch (e.getKeyCode()) {
+				default:
+					int updated;
+					Integer aftermathVal;
+					break;
+				case KeyEvent.VK_UP:
+				case KeyEvent.VK_KP_UP:
+					aftermathVal = data.getAftermathDelay();
+					if (aftermathVal == null)
+						break;
+					if (aftermathVal == Integer.MAX_VALUE)
+						break;
+					updated = aftermathVal + 1;
+					data.setAftermathDelay(updated);
+					aftermath.setText(Integer.toString(updated));
+					break;
+				case KeyEvent.VK_DOWN:
+				case KeyEvent.VK_KP_DOWN:
+					aftermathVal = data.getAftermathDelay();
+					if (aftermathVal == null)
+						break;
+					updated = aftermathVal - 1;
+					if (updated < 0)
+						break;
+					data.setAftermathDelay(updated);
+					aftermath.setText(Integer.toString(updated));
+					break;
+				}
+			}
+		});
 		aftermathPanel.add(aftermath);
 		center.add(aftermathPanel);
 
-		if (data.getType() == ControlType.MOUSE_CLICK || data.getType() == ControlType.MOUSE_MOV) {
-			NumberFormatter coordsFormatter = new NumberFormatter(NumberFormat.getInstance());
-			coordsFormatter.setValueClass(Integer.class);
-			coordsFormatter.setMinimum(Integer.MIN_VALUE);
-			coordsFormatter.setMaximum(Integer.MAX_VALUE);
-			coordsFormatter.setAllowsInvalid(false);
-			
+		if ((data.getType() == ControlType.MOUSE_CLICK || data.getType() == ControlType.MOUSE_MOV)
+				&& data.getInDepthCursor() != null) {
+			NumberFormatter xFormatter = new NumberFormatter(format);
+			xFormatter.setValueClass(Integer.class);
+			xFormatter.setMinimum(Integer.MIN_VALUE);
+			xFormatter.setMaximum(Integer.MAX_VALUE);
+			xFormatter.setAllowsInvalid(false);
+
 			JPanel xPanel = new JPanel();
 			xPanel.setOpaque(false);
 			JLabel xLabel = new JLabel(String.format("X (%s) stay:", MouseCoords.getInstance().getX().get()));
 			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			xPanel.add(xLabel);
-			JTextField x = new JFormattedTextField(coordsFormatter);
-			if(data.getInDepthCursor()!=null && data.getInDepthCursor().getX()!=null)
+			JTextField x = new JFormattedTextField(xFormatter);
+			if (data.getInDepthCursor().getX() != null)
 				x.setText(data.getInDepthCursor().getX().toString());
-			x.addActionListener(l->{
-				data.getInDepthCursor().setX(Integer.parseInt(x.getText()));
+			x.getDocument().addDocumentListener(new DocumentListener() {
+
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					update();
+				}
+
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					update();
+				}
+
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					update();
+				}
+
+				private void update() {
+					try {
+						data.getInDepthCursor().setX(Integer.parseInt(x.getText()));
+					} catch (NumberFormatException e) {
+					}
+				}
 			});
 			x.setPreferredSize(new Dimension(50, 20));
+			x.addKeyListener(new KeyAdapter() {
+				public void keyPressed(KeyEvent e) {
+					switch (e.getKeyCode()) {
+					default:
+						int updated;
+						Integer xVal;
+						break;
+					case KeyEvent.VK_UP:
+					case KeyEvent.VK_KP_UP:
+						xVal = data.getInDepthCursor().getX();
+						if (xVal == null)
+							break;
+						if (xVal == Integer.MAX_VALUE)
+							break;
+						updated = xVal + 1;
+						data.getInDepthCursor().setX(updated);
+						x.setText(Integer.toString(updated));
+						break;
+					case KeyEvent.VK_DOWN:
+					case KeyEvent.VK_KP_DOWN:
+						xVal = data.getInDepthCursor().getX();
+						if (xVal == null)
+							break;
+						if (xVal == Integer.MIN_VALUE)
+							break;
+						updated = xVal - 1;
+						data.getInDepthCursor().setX(updated);
+						x.setText(Integer.toString(updated));
+						break;
+					}
+				}
+			});
 			xPanel.add(x);
 			center.add(xPanel);
-			
+
 			JPanel yPanel = new JPanel();
 			yPanel.setOpaque(false);
 			JLabel yLabel = new JLabel(String.format("Y (%s) stay:", MouseCoords.getInstance().getY().get()));
 			yLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			yPanel.add(yLabel);
-			JTextField y = new JFormattedTextField(coordsFormatter);
-			if(data.getInDepthCursor()!=null && data.getInDepthCursor().getY()!=null)
+			NumberFormatter yFormatter = new NumberFormatter(format);
+			yFormatter.setValueClass(Integer.class);
+			yFormatter.setMinimum(Integer.MIN_VALUE);
+			yFormatter.setMaximum(Integer.MAX_VALUE);
+			yFormatter.setAllowsInvalid(false);
+			JTextField y = new JFormattedTextField(yFormatter);
+			if (data.getInDepthCursor().getY() != null)
 				y.setText(data.getInDepthCursor().getY().toString());
-			y.addActionListener(l->{
-				data.getInDepthCursor().setY(Integer.parseInt(y.getText()));
+			y.getDocument().addDocumentListener(new DocumentListener() {
+
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					update();
+				}
+
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					update();
+				}
+
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					update();
+				}
+
+				private void update() {
+					try {
+						data.getInDepthCursor().setY(Integer.parseInt(y.getText()));
+					} catch (NumberFormatException e) {
+					}
+				}
 			});
 			y.setPreferredSize(new Dimension(50, 20));
+			y.addKeyListener(new KeyAdapter() {
+				public void keyPressed(KeyEvent e) {
+					switch (e.getKeyCode()) {
+					default:
+						int updated;
+						Integer yVal;
+						break;
+					case KeyEvent.VK_UP:
+					case KeyEvent.VK_KP_UP:
+						yVal = data.getInDepthCursor().getY();
+						if (yVal == null)
+							break;
+						if (yVal == Integer.MAX_VALUE)
+							break;
+						updated = yVal + 1;
+						data.getInDepthCursor().setY(updated);
+						y.setText(Integer.toString(updated));
+						break;
+					case KeyEvent.VK_DOWN:
+					case KeyEvent.VK_KP_DOWN:
+						yVal = data.getInDepthCursor().getY();
+						if (yVal == null)
+							break;
+						if (yVal == Integer.MIN_VALUE)
+							break;
+						updated = yVal - 1;
+						data.getInDepthCursor().setY(updated);
+						y.setText(Integer.toString(updated));
+						break;
+					}
+				}
+			});
 			yPanel.add(y);
 			center.add(yPanel);
 			listener = (eX, eY) -> {
@@ -209,9 +446,9 @@ public class ControlDataPanel extends JPanel {
 
 		JPanel left = new JPanel(new GridLayout(5, 1));
 		left.setOpaque(false);
-		
-		//JPanel indexPanel = new JPanel();
-		//indexPanel.setOpaque(false);
+
+		// JPanel indexPanel = new JPanel();
+		// indexPanel.setOpaque(false);
 		JLabel indexLabel = new JLabel("#index");
 		indexLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		left.add(indexLabel);
@@ -221,37 +458,37 @@ public class ControlDataPanel extends JPanel {
 			index.addItem(this.in.indexOf(jPanel));
 		}
 		index.setSelectedIndex(this.in.indexOf(this));
-		index.addActionListener(l->{
-			if(isRefreshActive.get())
+		index.addActionListener(l -> {
+			if (isRefreshActive.get())
 				return;
 			this.in.remove(this);
 			this.in.add(index.getSelectedIndex(), this);
 			this.parent.resetMoveControlDisplayButtons();
 		});
 		left.add(index);
-		//left.add(indexPanel);
+		// left.add(indexPanel);
 		// JButton help = new JButton("Help");
 		JButton remove = new JButton("[X]");
 		remove.setFocusable(false);
 		remove.addActionListener(l -> {
 			this.in.remove(this);
-			if(in.isEmpty())
+			if (in.isEmpty())
 				this.parent.moveControlDisplay(true);
 			else
 				this.parent.moveControlDisplay(false);
-			if(listener!=null)
+			if (listener != null)
 				MouseCoords.getInstance().unregisterListener(listener);
 			this.parent.revalidate();
 			this.parent.repaint();
 		});
 		left.add(remove);
-		//left.setPreferredSize(new Dimension(50, 151));
+		// left.setPreferredSize(new Dimension(50, 151));
 		this.add(left, BorderLayout.EAST);
 	}
 
 	public void refreshIndex() {
-		//index.setSelectedIndex(-1);
-		//System.out.println(index.getItemCount());
+		// index.setSelectedIndex(-1);
+		// System.out.println(index.getItemCount());
 		isRefreshActive.set(true);
 		index.removeAllItems();
 		for (JPanel jPanel : in) {

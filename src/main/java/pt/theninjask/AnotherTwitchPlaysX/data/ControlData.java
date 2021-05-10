@@ -2,6 +2,7 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 
 import java.awt.MouseInfo;
 import java.awt.Robot;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,8 +22,12 @@ public class ControlData implements Data {
 	private Map<String, String> map;
 	
 	public ControlData() {
-		//this.duration = 0;
-		//this.aftermathDelay = 0;
+		this.key = null;
+		this.duration = 0;
+		this.aftermathDelay = 0;
+		this.type = null;
+		this.inDepthCursor = null;
+		this.map = new HashMap<String, String>();
 	}
 
 	public ControlData(Integer key, Integer duration, Integer aftermathDelay, ControlType type, InDepthCursorData inDepthCursor, Map<String, String> map) {

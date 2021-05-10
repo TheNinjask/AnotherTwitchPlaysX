@@ -19,8 +19,17 @@ public class CommandData implements Data {
 	private List<Pair<String, CommandVarType>> vars;
 	
 	public CommandData() {
+		this.lead = "";
+		this.type = null;
 		this.controls = new ArrayList<ControlData>();
 		this.vars = new ArrayList<Pair<String,CommandVarType>>();
+	}
+	
+	public CommandData(String lead, CommandType type, List<ControlData> controls, List<Pair<String, CommandVarType>> vars) {
+		this.lead = lead;
+		this.type = type;
+		this.controls = controls;
+		this.vars = vars;
 	}
 	
 	public String getLead() {

@@ -9,6 +9,9 @@ public class InDepthCursorData implements Data {
 	private Integer scroll;
 	
 	public InDepthCursorData() {
+		this.x = null;
+		this.y = null;
+		this.scroll = null;
 	}
 	
 	public InDepthCursorData(Integer x, Integer y, Integer scroll) {
