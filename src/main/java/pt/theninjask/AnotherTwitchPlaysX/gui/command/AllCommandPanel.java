@@ -5,12 +5,20 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
@@ -31,10 +39,6 @@ public class AllCommandPanel extends JPanel {
 	
 	private JPanel currentPanel = newOrLoadPanel();
 	
-	private boolean isSaved;
-	
-	private boolean isOn;
-	
 	private JPanel mainCommandPanel;
 	
 	private JTableCommand table;
@@ -44,21 +48,11 @@ public class AllCommandPanel extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.add(currentPanel, BorderLayout.CENTER);
 		mainCommandPanel();
-		this.isSaved = true;
-		this.isOn = false;
 	}
 	
 	public static AllCommandPanel getInstance() {
 		singleton.refreshTable();
 		return singleton;
-	}
-	
-	public boolean isSaved() {
-		return isSaved;
-	}
-	
-	public boolean isOn() {
-		return isOn;
 	}
 	
 	private JPanel newOrLoadPanel() {
@@ -82,6 +76,20 @@ public class AllCommandPanel extends JPanel {
 		JButton load = new JButton("Load");
 		load.setFocusable(false);
 		load.setOpaque(false);
+		load.addActionListener(l->{
+			try {
+				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
+				if(file!=null) {
+					ObjectMapper mapper = new ObjectMapper();
+					List<CommandData> commands = mapper.readValue(file, mapper.getTypeFactory().constructCollectionType(List.class, CommandData.class));
+					DataManager.getInstance().setCommands(commands);
+					refreshTable();
+					replacePanel(mainCommandPanel);
+				}
+			} catch (IOException e) {
+				Constants.showExpectedExceptionDialog(e);
+			}
+		});
 		right.add(load);
 		
 		JButton back = new JButton("Back");
@@ -173,10 +181,43 @@ public class AllCommandPanel extends JPanel {
 		
 		JButton save = new JButton("Save");
 		save.setFocusable(false);
+		save.addActionListener(l->{
+			File file = Constants.showSaveFile(new File("commands.json"),new FileNameExtensionFilter("JSON", "json"), this);
+			if(file!=null){
+				try {
+					ObjectMapper objectMapper = new ObjectMapper();
+					JTextField tmp = new JTextField(String.format("Commands saved in %s", file.getAbsolutePath()));
+					tmp.setEditable(false);
+					tmp.setBorder(null);
+					tmp.setOpaque(false);
+					tmp.setToolTipText(Constants.CHANNEL_FIELD_TIP);
+					tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+					objectMapper.writeValue(file, DataManager.getInstance().getCommands());
+					Constants.showCustomColorMessageDialog(null, 
+							tmp, 
+							"Saving Commands", JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);			
+				} catch (IOException e) {
+					Constants.showExceptionDialog(e);
+				}
+			}
+		});
 		right.add(save);
 		
 		JButton load = new JButton("Load");
 		load.setFocusable(false);
+		load.addActionListener(l->{
+			try {
+			File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
+			if(file!=null) {
+				ObjectMapper mapper = new ObjectMapper();
+				List<CommandData> tmp = mapper.readValue(file, mapper.getTypeFactory().constructCollectionType(List.class, CommandData.class));
+				DataManager.getInstance().setCommands(tmp);
+				refreshTable();
+			}
+		} catch (IOException e) {
+			Constants.showExpectedExceptionDialog(e);
+		}
+		});
 		right.add(load);
 		
 		JButton back = new JButton("Back");

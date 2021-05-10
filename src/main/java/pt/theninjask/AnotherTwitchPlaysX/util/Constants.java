@@ -67,6 +67,7 @@ import static java.awt.event.KeyEvent.VK_Z;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -74,9 +75,12 @@ import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public final class Constants {
 
@@ -127,6 +131,61 @@ public final class Constants {
 	
 	//JUST FOR ME :) BUT NOT RECOMENDED
 	public static final Color BLUE_COLOR = new Color(0x123456);
+	
+	public static File showSaveFile(File defaultFile, FileNameExtensionFilter filter, Component comp) {
+		JFileChooser chooser = null;
+		int resp = JFileChooser.ERROR_OPTION;
+	    try {
+	    	LookAndFeel previousLF = UIManager.getLookAndFeel();
+	    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    	chooser = new JFileChooser();
+			chooser.setSelectedFile(defaultFile);
+			chooser.addChoosableFileFilter(filter);
+			chooser.setFileFilter(filter);
+	        UIManager.setLookAndFeel(previousLF);
+	    } catch (Exception e) {
+	    	chooser = new JFileChooser();
+			chooser.setSelectedFile(defaultFile);
+			chooser.addChoosableFileFilter(filter);
+			chooser.setFileFilter(filter);
+	    }
+	    resp = chooser.showSaveDialog(comp);
+	    switch (resp) {
+		case JFileChooser.APPROVE_OPTION:
+			return chooser.getSelectedFile();
+		case JFileChooser.CANCEL_OPTION:
+		case JFileChooser.ERROR_OPTION:
+		default:
+			return null;
+		}
+	}
+	
+	public static File showOpenFile(FileNameExtensionFilter filter, Component comp) {
+		JFileChooser chooser = null;
+		int resp = JFileChooser.ERROR_OPTION;
+	    try {
+	    	LookAndFeel previousLF = UIManager.getLookAndFeel();
+	    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    	chooser = new JFileChooser();
+			chooser.addChoosableFileFilter(filter);
+			chooser.setFileFilter(filter);
+	        UIManager.setLookAndFeel(previousLF);
+	    } catch (Exception e) {
+	    	chooser = new JFileChooser();
+			chooser.addChoosableFileFilter(filter);
+			chooser.setFileFilter(filter);
+	    }
+	    resp = chooser.showOpenDialog(comp);
+	    switch (resp) {
+		case JFileChooser.APPROVE_OPTION:
+			return chooser.getSelectedFile();
+		case JFileChooser.CANCEL_OPTION:
+		case JFileChooser.ERROR_OPTION:
+		default:
+			return null;
+		}
+	}
+	
 	
 	public static final void showCustomColorMessageDialog(Component parentComponent, 
 			Object message, 
