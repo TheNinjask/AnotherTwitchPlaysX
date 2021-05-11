@@ -15,6 +15,7 @@ import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 import pt.theninjask.AnotherTwitchPlaysX.util.RobotSingleton;
 
+@Deprecated
 public class RobotCommandListener {
 
 	private CommandData data;
@@ -23,11 +24,11 @@ public class RobotCommandListener {
 	
 	public RobotCommandListener(CommandData data) {
 		this.data = data;
-		pattern = Pattern.compile(this.data.getRegex(), Pattern.CASE_INSENSITIVE);
 	}
 	
 	@Handler
 	public void onMessage(ChannelMessageEvent event){
+		pattern = Pattern.compile(this.data.getRegex(), Pattern.CASE_INSENSITIVE);
 		Matcher match = pattern.matcher(event.getMessage());
 		if(!match.matches())
 			return;

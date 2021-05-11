@@ -1,12 +1,23 @@
 package pt.theninjask.AnotherTwitchPlaysX.data;
 
+import java.awt.Robot;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoLeadDefinedException;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
+import pt.theninjask.AnotherTwitchPlaysX.util.RobotSingleton;
 
 public class CommandData implements Data {
 
@@ -20,7 +31,7 @@ public class CommandData implements Data {
 	
 	public CommandData() {
 		this.lead = "";
-		this.type = null;
+		this.type = CommandType.UNISON;
 		this.controls = new ArrayList<ControlData>();
 		this.vars = new ArrayList<Pair<String,CommandVarType>>();
 	}
@@ -68,6 +79,7 @@ public class CommandData implements Data {
 		return lead;
 	}
 	
+	@JsonIgnore
 	public String getRegex() {
 		if(lead==null)
 			throw new NoLeadDefinedException();
@@ -79,7 +91,7 @@ public class CommandData implements Data {
 		}
 		return regex.toString();
 	}
-	
+	@JsonIgnore
 	public String getRegexExample() {
 		if(lead==null)
 			throw new NoLeadDefinedException();
@@ -165,4 +177,70 @@ public class CommandData implements Data {
 		}
 		return copy;
 	}
+	
+	@Handler
+	public void onMessage(ChannelMessageEvent event){
+		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
+		Matcher match = pattern.matcher(event.getMessage());
+		if(!match.matches())
+			return;
+		Map<String, String> map = new HashMap<String, String>();
+		for (Pair<String, CommandVarType> elem : vars) {
+			String value = match.group(elem.getKey());
+			if(value!=null)
+				map.put(elem.getKey(), value);
+		}
+		switch (type) {
+			case QUEUE:
+				if(map.isEmpty())
+					executeQueue();
+				executeQueue(map);
+				break;
+			case UNISON:	
+			default:
+				if(map.isEmpty())
+					executeUnison();
+				executeUnison(map);
+				break;
+		}
+	}
+	
+	public void executeUnison() {
+		Robot robot = RobotSingleton.getUnisonInstance().getRobot();
+		for (ControlData elem : controls) {
+			synchronized (robot) {
+				elem.execute(robot);				
+			}
+		}
+		
+	}
+	
+	public void executeUnison(Map<String, String> map) {
+		Robot robot = RobotSingleton.getUnisonInstance().getRobot();
+		for (ControlData elem : controls) {
+			synchronized (robot) {
+				elem.execute(robot, map);				
+			}
+		}
+		
+	}
+	
+	public void executeQueue() {
+		Robot robot = RobotSingleton.getQueueInstance().getRobot();
+		synchronized (robot) {
+			for (ControlData elem : controls) {
+				elem.execute(robot);				
+			}
+		}
+	}
+	
+	public void executeQueue(Map<String, String> map) {
+		Robot robot = RobotSingleton.getQueueInstance().getRobot();
+		synchronized (robot) {
+			for (ControlData elem : controls) {
+				elem.execute(robot, map);				
+			}
+		}
+	}
+	
 }
