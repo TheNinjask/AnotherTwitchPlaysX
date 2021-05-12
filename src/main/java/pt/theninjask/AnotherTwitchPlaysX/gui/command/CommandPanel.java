@@ -346,7 +346,7 @@ public class CommandPanel extends JPanel {
 			msg.setOpaque(false);
 			msg.setFocusable(false);
 			msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-			String[] options = { "Keyboard", "Mouse", "Cancel" };
+			String[] options = { "Keyboard", "Mouse Click", "Mouse Drag" };
 			int resp = Constants.showCustomColorOptionDialog(null, msg, "Adding New Control",
 					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, null,
 					Constants.TWITCH_COLOR);
@@ -359,6 +359,8 @@ public class CommandPanel extends JPanel {
 				cData.setType(ControlType.KEY);
 				break;
 			case JOptionPane.CANCEL_OPTION:
+				cData.setType(ControlType.MOUSE_DRAG);
+				break;
 			case JOptionPane.CLOSED_OPTION:
 			default:
 				return;

@@ -106,8 +106,9 @@ public class ControlDataPanel extends JPanel {
 			});
 			inputPanel.add(key);
 			break;
-		//case MOUSE_CLICK:
+		// case MOUSE_CLICK:
 		case MOUSE:
+		case MOUSE_DRAG:
 			JComboBox<JComboItem<Integer>> opt = new JComboBox<JComboItem<Integer>>();
 			opt.setFocusable(false);
 			opt.addItem(new JComboItem<Integer>(null, "None"));
@@ -119,7 +120,7 @@ public class ControlDataPanel extends JPanel {
 			});
 			inputPanel.add(opt);
 			break;
-		//case MOUSE_MOV:
+		// case MOUSE_MOV:
 		case MOUSE_WHEEL:
 		default:
 			JLabel na = new JLabel("N/A");
@@ -136,85 +137,87 @@ public class ControlDataPanel extends JPanel {
 		 * DecimalFormat(); format.setDecimalFormatSymbols(symb);
 		 */
 		NumberFormat format = NumberFormat.getInstance();
-		;
 		format.setGroupingUsed(false);
 
-		NumberFormatter durationFormatter = new NumberFormatter(format);
-		durationFormatter.setValueClass(Integer.class);
-		durationFormatter.setMinimum(0);
-		durationFormatter.setMaximum(Integer.MAX_VALUE);
-		durationFormatter.setAllowsInvalid(false);
-		JPanel durationPanel = new JPanel();
-		durationPanel.setOpaque(false);
-		JLabel durationLabel = new JLabel("Duration (sec):");
-		durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		durationPanel.add(durationLabel);
-		JTextField duration = new JFormattedTextField(durationFormatter);
-		if (data.getDuration() != null)
-			duration.setText(data.getDuration().toString());
-		duration.getDocument().addDocumentListener(new DocumentListener() {
+		if (data.getType() != ControlType.MOUSE_DRAG) {
 
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				update();
-			}
+			NumberFormatter durationFormatter = new NumberFormatter(format);
+			durationFormatter.setValueClass(Integer.class);
+			durationFormatter.setMinimum(0);
+			durationFormatter.setMaximum(Integer.MAX_VALUE);
+			durationFormatter.setAllowsInvalid(false);
+			JPanel durationPanel = new JPanel();
+			durationPanel.setOpaque(false);
+			JLabel durationLabel = new JLabel("Duration (sec):");
+			durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			durationPanel.add(durationLabel);
+			JTextField duration = new JFormattedTextField(durationFormatter);
+			if (data.getDuration() != null)
+				duration.setText(data.getDuration().toString());
+			duration.getDocument().addDocumentListener(new DocumentListener() {
 
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				update();
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				update();
-			}
-
-			private void update() {
-				try {
-					data.setDuration(Integer.parseInt(duration.getText()));
-				} catch (NumberFormatException e) {
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					update();
 				}
-			}
-		});
-		/*
-		 * duration.addActionListener(l->{
-		 * data.setDuration(Integer.parseInt(duration.getText())); });
-		 */
-		duration.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				switch (e.getKeyCode()) {
-				default:
-					int updated;
-					Integer durationVal;
-					break;
-				case KeyEvent.VK_UP:
-				case KeyEvent.VK_KP_UP:
-					durationVal = data.getDuration();
-					if (durationVal == null)
-						break;
-					if (durationVal == Integer.MAX_VALUE)
-						break;
-					updated = durationVal + 1;
-					data.setDuration(updated);
-					duration.setText(Integer.toString(updated));
-					break;
-				case KeyEvent.VK_DOWN:
-				case KeyEvent.VK_KP_DOWN:
-					durationVal = data.getDuration();
-					if (durationVal == null)
-						break;
-					updated = durationVal - 1;
-					if (updated < 0)
-						break;
-					data.setDuration(updated);
-					duration.setText(Integer.toString(updated));
-					break;
+
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					update();
 				}
-			}
-		});
-		duration.setPreferredSize(new Dimension(50, 20));
-		durationPanel.add(duration);
-		center.add(durationPanel);
+
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					update();
+				}
+
+				private void update() {
+					try {
+						data.setDuration(Integer.parseInt(duration.getText()));
+					} catch (NumberFormatException e) {
+					}
+				}
+			});
+			/*
+			 * duration.addActionListener(l->{
+			 * data.setDuration(Integer.parseInt(duration.getText())); });
+			 */
+			duration.addKeyListener(new KeyAdapter() {
+				public void keyPressed(KeyEvent e) {
+					switch (e.getKeyCode()) {
+					default:
+						int updated;
+						Integer durationVal;
+						break;
+					case KeyEvent.VK_UP:
+					case KeyEvent.VK_KP_UP:
+						durationVal = data.getDuration();
+						if (durationVal == null)
+							break;
+						if (durationVal == Integer.MAX_VALUE)
+							break;
+						updated = durationVal + 1;
+						data.setDuration(updated);
+						duration.setText(Integer.toString(updated));
+						break;
+					case KeyEvent.VK_DOWN:
+					case KeyEvent.VK_KP_DOWN:
+						durationVal = data.getDuration();
+						if (durationVal == null)
+							break;
+						updated = durationVal - 1;
+						if (updated < 0)
+							break;
+						data.setDuration(updated);
+						duration.setText(Integer.toString(updated));
+						break;
+					}
+				}
+			});
+			duration.setPreferredSize(new Dimension(50, 20));
+			durationPanel.add(duration);
+			center.add(durationPanel);
+		}
 
 		JPanel aftermathPanel = new JPanel();
 		aftermathPanel.setOpaque(false);
@@ -288,9 +291,7 @@ public class ControlDataPanel extends JPanel {
 		});
 		aftermathPanel.add(aftermath);
 		center.add(aftermathPanel);
-
-		if (data.getType() == ControlType.MOUSE
-				&& data.getInDepthCursor() != null) {
+		if ((data.getType() == ControlType.MOUSE || data.getType()==ControlType.MOUSE_DRAG)&& data.getInDepthCursor() != null) {
 			NumberFormatter xFormatter = new NumberFormatter(format);
 			xFormatter.setValueClass(Integer.class);
 			xFormatter.setMinimum(Integer.MIN_VALUE);

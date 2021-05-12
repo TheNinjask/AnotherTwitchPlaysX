@@ -6,6 +6,7 @@ public enum ControlType {
 	//MOUSE_CLICK("mouse_click"),
 	MOUSE("mouse"),
 	KEY("key"),
+	MOUSE_DRAG("mouse_drag"),
 	MOUSE_WHEEL("mouse_wheel");
 	
 	private String type;

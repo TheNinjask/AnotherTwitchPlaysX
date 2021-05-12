@@ -1,6 +1,5 @@
 package pt.theninjask.AnotherTwitchPlaysX.data;
 
-import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,6 +64,7 @@ public class ControlData implements Data {
 		//case MOUSE_CLICK:
 		//case MOUSE_MOV:
 		case MOUSE:
+		case MOUSE_DRAG:
 		case MOUSE_WHEEL:
 			if(inDepthCursor==null)
 				inDepthCursor = new InDepthCursorData();
@@ -116,14 +116,24 @@ public class ControlData implements Data {
 			break;
 		case MOUSE_CLICK:*/
 		case MOUSE:
-			if(inDepthCursor!=null && inDepthCursor.getX()!=null && inDepthCursor.getY()!=null)
-				robot.mouseMove(inDepthCursor.getX(), inDepthCursor.getY());
-			if(key==null)
-				break;
-			robot.mousePress(key);
+			if(inDepthCursor!=null)
+				robot.mouseMove(inDepthCursor.getXorDefault(), inDepthCursor.getYorDefault());
+			if(key!=null)
+				robot.mousePress(key);
 			if(duration!=null);
 				robot.delay(duration);
-			robot.mouseRelease(key);
+			if(key!=null)
+				robot.mouseRelease(key);
+			break;
+		case MOUSE_DRAG:
+			if(inDepthCursor!=null)
+				robot.mouseMove(inDepthCursor.getXorDefault(), inDepthCursor.getYorDefault());
+			if(key==null)
+				robot.mousePress(key);
+			if(inDepthCursor!=null)
+				robot.mouseMove(inDepthCursor.getFinalXorDefault(), inDepthCursor.getFinalYorDefault());
+			if(key!=null)
+				robot.mouseRelease(key);
 			break;
 		case MOUSE_WHEEL:
 			if(inDepthCursor!=null && inDepthCursor.getScroll()!=null)
@@ -198,37 +208,44 @@ public class ControlData implements Data {
 		case MOUSE_CLICK:*/
 		case MOUSE:
 			tmp = getValueFromMap("x", vars);
-			//deprecated comment
+			//deprecated comment x2 xD
 			//this is implying dead code in x==null even tho it is the same
-			//x = tmp==null? inDepthCursor.getX() : Integer.parseInt(tmp);
-			if(tmp==null){
-				if(inDepthCursor!=null)
-					x=inDepthCursor.getX();
-				else
-					x=null;
-			}else x=Integer.parseInt(tmp);
-			if(x==null)
-				x=MouseInfo.getPointerInfo().getLocation().x;
+			x= tmp==null? inDepthCursor.getXorDefault() : Integer.parseInt(tmp);
 			tmp = getValueFromMap("y", vars);
-			//deprecated comment
+			//deprecated comment x2
 			//this is implying dead code in y==null even tho it is the same
-			//y = tmp==null ? inDepthCursor.getY() : Integer.parseInt(tmp);
-			if(tmp==null){
-				if(inDepthCursor!=null)
-					y=inDepthCursor.getY();
-				else
-					y=null;
-			}else y=Integer.parseInt(tmp);
-			if(y==null)
-				y=MouseInfo.getPointerInfo().getLocation().y;
+			y = tmp==null ? inDepthCursor.getYorDefault() : Integer.parseInt(tmp);
 			robot.mouseMove(x,y);
-			robot.mousePress(key);
+			if(key!=null)
+				robot.mousePress(key);
 			tmp = getValueFromMap("duration", vars);
-			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
-			robot.delay(duration);
-			robot.mouseRelease(key);
+			duration = tmp==null ? null : Integer.parseInt(tmp);
+			if(duration!=null)
+				robot.delay(duration);
+			if(key!=null)
+				robot.mouseRelease(key);
 			break;
-		
+			
+		case MOUSE_DRAG:
+			tmp = getValueFromMap("x", vars);
+			x= tmp==null? inDepthCursor.getXorDefault() : Integer.parseInt(tmp);
+			tmp = getValueFromMap("y", vars);
+			y = tmp==null ? inDepthCursor.getYorDefault() : Integer.parseInt(tmp);
+			robot.mouseMove(x,y);
+			if(key!=null)
+				robot.mousePress(key);
+			/*tmp = getValueFromMap("duration", vars);
+			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
+			robot.delay(duration);*/
+			tmp = getValueFromMap("final_x", vars);
+			x= tmp==null? inDepthCursor.getFinalXorDefault() : Integer.parseInt(tmp);
+			tmp = getValueFromMap("final_y", vars);
+			y = tmp==null ? inDepthCursor.getFinalYorDefault() : Integer.parseInt(tmp);
+			robot.mouseMove(x,y);
+			if(key!=null)
+				robot.mouseRelease(key);
+			break;
+			
 		case MOUSE_WHEEL:
 			tmp = getValueFromMap("scroll", vars);
 			if(tmp==null){
