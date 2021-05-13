@@ -157,7 +157,7 @@ public class ControlData implements Data {
 	private String getValueFromMap(String key, Map<String, String> vars, String defaultValue) {
 		String var = this.map.get(key);
 		if(var==null)
-			return null;
+			return defaultValue;
 		String value = vars.getOrDefault(key, defaultValue);
 		return value;
 	}

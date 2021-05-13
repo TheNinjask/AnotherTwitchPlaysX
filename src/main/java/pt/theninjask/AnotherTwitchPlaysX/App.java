@@ -5,6 +5,9 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import org.jnativehook.GlobalScreen;
 
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
@@ -15,10 +18,18 @@ public class App {
 	public static void main(String[] args) {
 		try {
 			globalSetUp();
+			MainFrame.getInstance();
 		} catch (Exception e) {
 			Constants.showExpectedExceptionDialog(e);
+		}catch (UnsatisfiedLinkError e) {
+			//TODO change
+			JLabel exception = new JLabel(e.getMessage());
+			exception.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			Constants.showCustomColorMessageDialog(null,
+					e.getMessage(),
+					e.getClass().getName(), 
+					JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
 		}
-		MainFrame.getInstance();
 	}
 
 	private static void globalSetUp() throws Exception {

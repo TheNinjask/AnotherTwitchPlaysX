@@ -48,6 +48,8 @@ public class ControlDataPanel extends JPanel {
 	private AtomicBoolean isRefreshActive;
 
 	private MouseCoordsListener listener = null;
+	
+	private MouseCoordsListener listenerFinal = null;
 
 	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
 		this.data = newData;
@@ -297,13 +299,12 @@ public class ControlDataPanel extends JPanel {
 			xFormatter.setMinimum(Integer.MIN_VALUE);
 			xFormatter.setMaximum(Integer.MAX_VALUE);
 			xFormatter.setAllowsInvalid(false);
-
 			JPanel xPanel = new JPanel();
 			xPanel.setOpaque(false);
-			JLabel xLabel = new JLabel(String.format("X (%s) stay:", MouseCoords.getInstance().getX().get()));
+			JLabel xLabel = new JLabel(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
 			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			xPanel.add(xLabel);
-			JTextField x = new JFormattedTextField(xFormatter);
+			JFormattedTextField x = new JFormattedTextField(xFormatter);
 			if (data.getInDepthCursor().getX() != null)
 				x.setText(data.getInDepthCursor().getX().toString());
 			x.getDocument().addDocumentListener(new DocumentListener() {
@@ -363,12 +364,19 @@ public class ControlDataPanel extends JPanel {
 					}
 				}
 			});
+			JButton xClear = new JButton("[x]");
+			xClear.setFocusable(false);
+			xClear.addActionListener(l->{
+				x.setValue(null);
+				data.getInDepthCursor().setX(null);
+			});
+			xPanel.add(xClear);
 			xPanel.add(x);
 			center.add(xPanel);
 
 			JPanel yPanel = new JPanel();
 			yPanel.setOpaque(false);
-			JLabel yLabel = new JLabel(String.format("Y (%s) stay:", MouseCoords.getInstance().getY().get()));
+			JLabel yLabel = new JLabel(String.format("Y (%s):", MouseCoords.getInstance().getY().get()));
 			yLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			yPanel.add(yLabel);
 			NumberFormatter yFormatter = new NumberFormatter(format);
@@ -376,7 +384,7 @@ public class ControlDataPanel extends JPanel {
 			yFormatter.setMinimum(Integer.MIN_VALUE);
 			yFormatter.setMaximum(Integer.MAX_VALUE);
 			yFormatter.setAllowsInvalid(false);
-			JTextField y = new JFormattedTextField(yFormatter);
+			JFormattedTextField y = new JFormattedTextField(yFormatter);
 			if (data.getInDepthCursor().getY() != null)
 				y.setText(data.getInDepthCursor().getY().toString());
 			y.getDocument().addDocumentListener(new DocumentListener() {
@@ -436,17 +444,229 @@ public class ControlDataPanel extends JPanel {
 					}
 				}
 			});
+			JButton yClear = new JButton("[x]");
+			yClear.setFocusable(false);
+			yClear.addActionListener(l->{
+				y.setValue(null);
+				data.getInDepthCursor().setY(null);
+			});
+			yPanel.add(yClear);
 			yPanel.add(y);
 			center.add(yPanel);
 			listener = (eX, eY) -> {
-				xLabel.setText(String.format("X (%s) stay:", MouseCoords.getInstance().getX().get()));
-				yLabel.setText(String.format("Y (%s) stay:", MouseCoords.getInstance().getY().get()));
+				xLabel.setText(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
+				yLabel.setText(String.format("Y (%s):", MouseCoords.getInstance().getY().get()));
 			};
 			MouseCoords.getInstance().registerListener(listener);
+			if(data.getType()==ControlType.MOUSE_DRAG) {
+				JPanel cyclePanel = new JPanel(new BorderLayout());
+				cyclePanel.setOpaque(false);
+				JLabel cycleLabel = new JLabel("Initial Coords");
+				cycleLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				cycleLabel.setHorizontalAlignment(JLabel.CENTER);
+				cyclePanel.add(cycleLabel,BorderLayout.CENTER);
+				/*
+				 * 
+				 */
+				NumberFormatter finalXFormatter = new NumberFormatter(format);
+				finalXFormatter.setValueClass(Integer.class);
+				finalXFormatter.setMinimum(Integer.MIN_VALUE);
+				finalXFormatter.setMaximum(Integer.MAX_VALUE);
+				finalXFormatter.setAllowsInvalid(false);
+				JPanel finalXPanel = new JPanel();
+				finalXPanel.setOpaque(false);
+				JLabel finalXLabel = new JLabel(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
+				finalXLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				finalXPanel.add(finalXLabel);
+				JFormattedTextField finalX = new JFormattedTextField(finalXFormatter);
+				if (data.getInDepthCursor().getFinalX() != null)
+					finalX.setText(data.getInDepthCursor().getX().toString());
+				finalX.getDocument().addDocumentListener(new DocumentListener() {
 
+					@Override
+					public void removeUpdate(DocumentEvent e) {
+						update();
+					}
+
+					@Override
+					public void insertUpdate(DocumentEvent e) {
+						update();
+					}
+
+					@Override
+					public void changedUpdate(DocumentEvent e) {
+						update();
+					}
+
+					private void update() {
+						try {
+							data.getInDepthCursor().setFinalX(Integer.parseInt(finalX.getText()));
+						} catch (NumberFormatException e) {
+						}
+					}
+				});
+				finalX.setPreferredSize(new Dimension(50, 20));
+				finalX.addKeyListener(new KeyAdapter() {
+					public void keyPressed(KeyEvent e) {
+						switch (e.getKeyCode()) {
+						default:
+							int updated;
+							Integer xVal;
+							break;
+						case KeyEvent.VK_UP:
+						case KeyEvent.VK_KP_UP:
+							xVal = data.getInDepthCursor().getFinalX();
+							if (xVal == null)
+								break;
+							if (xVal == Integer.MAX_VALUE)
+								break;
+							updated = xVal + 1;
+							data.getInDepthCursor().setFinalX(updated);
+							finalX.setText(Integer.toString(updated));
+							break;
+						case KeyEvent.VK_DOWN:
+						case KeyEvent.VK_KP_DOWN:
+							xVal = data.getInDepthCursor().getFinalX();
+							if (xVal == null)
+								break;
+							if (xVal == Integer.MIN_VALUE)
+								break;
+							updated = xVal - 1;
+							data.getInDepthCursor().setFinalX(updated);
+							finalX.setText(Integer.toString(updated));
+							break;
+						}
+					}
+				});
+				JButton finalXClear = new JButton("[x]");
+				finalXClear.setFocusable(false);
+				finalXClear.addActionListener(l->{
+					finalX.setValue(null);
+					data.getInDepthCursor().setFinalX(null);
+				});
+				finalXPanel.add(finalXClear);
+				finalXPanel.add(finalX);
+				//center.add(finalXPanel);
+
+				JPanel finalYPanel = new JPanel();
+				finalYPanel.setOpaque(false);
+				JLabel finalYLabel = new JLabel(String.format("Y (%s):", MouseCoords.getInstance().getY().get()));
+				finalYLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				finalYPanel.add(finalYLabel);
+				NumberFormatter finalYFormatter = new NumberFormatter(format);
+				finalYFormatter.setValueClass(Integer.class);
+				finalYFormatter.setMinimum(Integer.MIN_VALUE);
+				finalYFormatter.setMaximum(Integer.MAX_VALUE);
+				finalYFormatter.setAllowsInvalid(false);
+				JFormattedTextField finalY = new JFormattedTextField(finalYFormatter);
+				if (data.getInDepthCursor().getFinalY() != null)
+					finalY.setText(data.getInDepthCursor().getFinalY().toString());
+				finalY.getDocument().addDocumentListener(new DocumentListener() {
+
+					@Override
+					public void removeUpdate(DocumentEvent e) {
+						update();
+					}
+
+					@Override
+					public void insertUpdate(DocumentEvent e) {
+						update();
+					}
+
+					@Override
+					public void changedUpdate(DocumentEvent e) {
+						update();
+					}
+
+					private void update() {
+						try {
+							data.getInDepthCursor().setFinalY(Integer.parseInt(finalY.getText()));
+						} catch (NumberFormatException e) {
+						}
+					}
+				});
+				finalY.setPreferredSize(new Dimension(50, 20));
+				finalY.addKeyListener(new KeyAdapter() {
+					public void keyPressed(KeyEvent e) {
+						switch (e.getKeyCode()) {
+						default:
+							int updated;
+							Integer yVal;
+							break;
+						case KeyEvent.VK_UP:
+						case KeyEvent.VK_KP_UP:
+							yVal = data.getInDepthCursor().getFinalY();
+							if (yVal == null)
+								break;
+							if (yVal == Integer.MAX_VALUE)
+								break;
+							updated = yVal + 1;
+							data.getInDepthCursor().setFinalY(updated);
+							finalY.setText(Integer.toString(updated));
+							break;
+						case KeyEvent.VK_DOWN:
+						case KeyEvent.VK_KP_DOWN:
+							yVal = data.getInDepthCursor().getFinalY();
+							if (yVal == null)
+								break;
+							if (yVal == Integer.MIN_VALUE)
+								break;
+							updated = yVal - 1;
+							data.getInDepthCursor().setY(updated);
+							finalY.setText(Integer.toString(updated));
+							break;
+						}
+					}
+				});
+				JButton finalYClear = new JButton("[x]");
+				finalYClear.setFocusable(false);
+				finalYClear.addActionListener(l->{
+					finalY.setValue(null);
+					data.getInDepthCursor().setFinalY(null);
+				});
+				finalYPanel.add(finalYClear);
+				finalYPanel.add(finalY);
+				//center.add(yPanel);
+				listenerFinal = (eX, eY) -> {
+					finalXLabel.setText(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
+					finalYLabel.setText(String.format("Y (%s):", MouseCoords.getInstance().getY().get()));
+				};
+				MouseCoords.getInstance().registerListener(listenerFinal);
+				/*
+				 * 
+				 */
+				JButton cycle = new JButton(">");
+				cycle.setFocusable(false);
+				cycle.addActionListener(l->{
+					switch (cycle.getText()) {
+					case ">":
+						cycleLabel.setText("Final Coords");
+						center.remove(xPanel);
+						center.remove(yPanel);
+						center.add(finalXPanel);
+						center.add(finalYPanel);
+						cycle.setText("<");
+						break;
+					case "<":
+						cycleLabel.setText("Initial Coords");
+						center.remove(finalXPanel);
+						center.remove(finalYPanel);
+						center.add(xPanel);
+						center.add(yPanel);
+						cycle.setText(">");
+						break;
+					default:
+						//NEVER
+						break;
+					}
+					center.revalidate();
+					center.repaint();
+				});
+				cyclePanel.add(cycle, BorderLayout.EAST);
+				center.add(cyclePanel, center.getComponentCount()-2);
+			}
 		}
 		this.add(center, BorderLayout.CENTER);
-
 		JPanel left = new JPanel(new GridLayout(5, 1));
 		left.setOpaque(false);
 
@@ -471,7 +691,7 @@ public class ControlDataPanel extends JPanel {
 		left.add(index);
 		// left.add(indexPanel);
 		// JButton help = new JButton("Help");
-		JButton remove = new JButton("[X]");
+		JButton remove = new JButton("[x]");
 		remove.setFocusable(false);
 		remove.addActionListener(l -> {
 			this.in.remove(this);
@@ -481,6 +701,8 @@ public class ControlDataPanel extends JPanel {
 				this.parent.moveControlDisplay(false);
 			if (listener != null)
 				MouseCoords.getInstance().unregisterListener(listener);
+			if (listenerFinal != null)
+				MouseCoords.getInstance().unregisterListener(listenerFinal);
 			this.parent.revalidate();
 			this.parent.repaint();
 		});

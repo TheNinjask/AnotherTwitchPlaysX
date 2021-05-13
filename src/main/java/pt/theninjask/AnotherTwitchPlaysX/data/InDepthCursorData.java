@@ -2,6 +2,8 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 
 import java.awt.MouseInfo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class InDepthCursorData implements Data {
 
 	private Integer x;
@@ -31,6 +33,7 @@ public class InDepthCursorData implements Data {
 		return x;
 	}
 
+	@JsonIgnore
 	public int getXorDefault() {
 		if(x==null)
 			return MouseInfo.getPointerInfo().getLocation().x;
@@ -45,6 +48,7 @@ public class InDepthCursorData implements Data {
 		return y;
 	}
 	
+	@JsonIgnore
 	public int getYorDefault() {
 		if(y==null)
 			return MouseInfo.getPointerInfo().getLocation().y;
@@ -59,6 +63,7 @@ public class InDepthCursorData implements Data {
 		return finalX;
 	}
 
+	@JsonIgnore
 	public int getFinalXorDefault() {
 		if(finalX==null)
 			return MouseInfo.getPointerInfo().getLocation().x;
@@ -73,6 +78,7 @@ public class InDepthCursorData implements Data {
 		return finalY;
 	}
 	
+	@JsonIgnore
 	public int getFinalYorDefault() {
 		if(finalY==null)
 			return MouseInfo.getPointerInfo().getLocation().y;
