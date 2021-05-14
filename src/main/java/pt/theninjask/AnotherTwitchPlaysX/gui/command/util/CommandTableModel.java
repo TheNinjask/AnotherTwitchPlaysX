@@ -1,6 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui.command.util;
 
 import java.awt.GridLayout;
+import java.awt.Insets;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -31,6 +32,7 @@ public class CommandTableModel{
 	public void addRow(CommandData data) {
 		data.setLead(data.getLead());
 		JButton syntax = new JButton("Syntax");
+		syntax.setMargin(new Insets(0, 0, 0, 0));
 		syntax.addActionListener(l->{
 			try {
 				JPanel tmp = new JPanel(new GridLayout(2, 1));
@@ -54,10 +56,12 @@ public class CommandTableModel{
 				}
 		});
 		JButton edit = new JButton("Edit");
+		edit.setMargin(new Insets(0, 0, 0, 0));
 		edit.addActionListener(l->{
 			MainFrame.getInstance().replacePanel(new CommandPanel(data));
 		});
 		JButton remove = new JButton("Remove");
+		remove.setMargin(new Insets(0, 0, 0, 0));
 		remove.addActionListener(l->{
 			DataManager.getInstance().getCommands().remove(data);
 			for(int i=0;i<table.getRowCount();i++) {
