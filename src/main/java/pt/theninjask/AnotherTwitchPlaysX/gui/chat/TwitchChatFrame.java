@@ -36,14 +36,40 @@ public class TwitchChatFrame extends JFrame {
 	
 	public static final int MSG_DISPLAY_INFINITE = 51;
 	
+	public enum Type{
+		MINECRAFT("Minecraft Style", "<%s> %s\n"),
+		TWITCH("Twitch Style", "%s: %s\n");
+		
+		private String type;
+		
+		private String format;
+		
+		private Type(String type, String format) {
+			this.type = type;
+			this.format = format;
+		}
+
+		public String getType() {
+			return type;
+		}
+		
+		public String getFormat() {
+			return format;
+		}
+		
+	}
+	
 	private JTextArea chat;
 	
 	private JScrollPane scroll;
 	
 	private int messageCap = 5;
 	
+	private Type type;
+	
 	private TwitchChatFrame() {
-		this.setTitle(String.format("%s's Twitch Chat", DataManager.getInstance().getSession().getChannel().substring(1)));
+		this.type = Type.MINECRAFT;
+		//this.setTitle(String.format("%s's Twitch Chat", DataManager.getInstance().getSession().getChannel().substring(1)));
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
@@ -51,6 +77,7 @@ public class TwitchChatFrame extends JFrame {
 	}
 
 	public static TwitchChatFrame getInstance() {
+		singleton.setTitle(String.format("%s's Twitch Chat", DataManager.getInstance().getSession().getChannel().substring(1)));
 		return singleton;
 	}
 	
@@ -93,7 +120,7 @@ public class TwitchChatFrame extends JFrame {
 	@Handler
 	public void onMessage(ChannelMessageEvent event){
 		updateChatSize();
-		chat.append(String.format("<%s> %s\n",
+		chat.append(String.format(type.getFormat(),
 					event.getActor().getNick(), event.getMessage()));
 	}
 	
@@ -142,4 +169,13 @@ public class TwitchChatFrame extends JFrame {
 	public Font getCurrentFont() {
 		return chat.getFont();
 	}
+	
+	public Type getChatType() {
+		return type;
+	}
+	
+	public void setChatType(Type type) {
+		this.type = type;
+	}
+	
 }

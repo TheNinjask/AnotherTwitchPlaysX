@@ -32,6 +32,7 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.Type;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
@@ -390,26 +391,25 @@ public class MainMenuPanel extends JPanel {
 		twitchChatMode = new JPanel(new FlowLayout());
 		twitchChatMode.setOpaque(false);
 		ButtonGroup group = new ButtonGroup();
-		JRadioButton plain = new JRadioButton("All Mode");
-		JRadioButton cmd = new JRadioButton("Cmd Only Mode");
-		plain.setOpaque(false);
-		plain.setFocusable(false);
-		plain.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		plain.addActionListener(i -> {
-			TwitchChatFrame.getInstance().setColor(Color.BLACK, Color.WHITE);
+		JRadioButton mine = new JRadioButton(Type.MINECRAFT.getType());
+		mine.setOpaque(false);
+		mine.setFocusable(false);
+		mine.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		mine.addActionListener(i -> {
+			TwitchChatFrame.getInstance().setChatType(Type.MINECRAFT);
 		});
-		cmd.setOpaque(false);
-		cmd.setFocusable(false);
-		cmd.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		cmd.addActionListener(i -> {
-			TwitchChatFrame.getInstance().setColor(Color.WHITE, Color.BLACK);
+		JRadioButton twitch = new JRadioButton(Type.TWITCH.getType());
+		twitch.setOpaque(false);
+		twitch.setFocusable(false);
+		twitch.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitch.addActionListener(i -> {
+			TwitchChatFrame.getInstance().setChatType(Type.TWITCH);
 		});
-		group.add(plain);
-		group.add(cmd);
-		twitchChatMode.add(plain);
-		twitchChatMode.add(cmd);
-		plain.setEnabled(false);
-		cmd.setEnabled(false);
+		mine.setSelected(true);
+		group.add(mine);
+		group.add(twitch);
+		twitchChatMode.add(mine);
+		twitchChatMode.add(twitch);
 		return twitchChatMode;
 	}
 
