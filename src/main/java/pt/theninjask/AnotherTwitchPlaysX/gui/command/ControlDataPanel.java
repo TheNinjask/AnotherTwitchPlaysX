@@ -155,6 +155,7 @@ public class ControlDataPanel extends JPanel {
 			durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			durationPanel.add(durationLabel);
 			JTextField duration = new JFormattedTextField(durationFormatter);
+			duration.setBorder(null);
 			if (data.getDuration() != null)
 				duration.setText(data.getDuration().toString());
 			duration.getDocument().addDocumentListener(new DocumentListener() {
@@ -233,6 +234,7 @@ public class ControlDataPanel extends JPanel {
 		aftermathFormatter.setMaximum(Integer.MAX_VALUE);
 		aftermathFormatter.setAllowsInvalid(false);
 		JTextField aftermath = new JFormattedTextField(aftermathFormatter);
+		aftermath.setBorder(null);
 		if (data.getAftermathDelay() != null)
 			aftermath.setText(data.getAftermathDelay().toString());
 		aftermath.getDocument().addDocumentListener(new DocumentListener() {
@@ -306,6 +308,7 @@ public class ControlDataPanel extends JPanel {
 			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			xPanel.add(xLabel);
 			JFormattedTextField x = new JFormattedTextField(xFormatter);
+			x.setBorder(null);
 			if (data.getInDepthCursor().getX() != null)
 				x.setText(data.getInDepthCursor().getX().toString());
 			x.getDocument().addDocumentListener(new DocumentListener() {
@@ -388,6 +391,7 @@ public class ControlDataPanel extends JPanel {
 			yFormatter.setMaximum(Integer.MAX_VALUE);
 			yFormatter.setAllowsInvalid(false);
 			JFormattedTextField y = new JFormattedTextField(yFormatter);
+			y.setBorder(null);
 			if (data.getInDepthCursor().getY() != null)
 				y.setText(data.getInDepthCursor().getY().toString());
 			y.getDocument().addDocumentListener(new DocumentListener() {
@@ -484,6 +488,7 @@ public class ControlDataPanel extends JPanel {
 				finalXLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				finalXPanel.add(finalXLabel);
 				JFormattedTextField finalX = new JFormattedTextField(finalXFormatter);
+				finalX.setBorder(null);
 				if (data.getInDepthCursor().getFinalX() != null)
 					finalX.setText(data.getInDepthCursor().getX().toString());
 				finalX.getDocument().addDocumentListener(new DocumentListener() {
@@ -566,6 +571,7 @@ public class ControlDataPanel extends JPanel {
 				finalYFormatter.setMaximum(Integer.MAX_VALUE);
 				finalYFormatter.setAllowsInvalid(false);
 				JFormattedTextField finalY = new JFormattedTextField(finalYFormatter);
+				finalY.setBorder(null);
 				if (data.getInDepthCursor().getFinalY() != null)
 					finalY.setText(data.getInDepthCursor().getFinalY().toString());
 				finalY.getDocument().addDocumentListener(new DocumentListener() {
