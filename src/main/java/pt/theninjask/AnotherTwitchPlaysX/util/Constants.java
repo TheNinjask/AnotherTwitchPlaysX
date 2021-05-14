@@ -67,6 +67,7 @@ import static java.awt.event.KeyEvent.VK_Z;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -123,6 +124,8 @@ public final class Constants {
 	public static final int TITLE_SCREEN_ICON_WIDTH = 25;
 	
 	public static final int TITLE_SCREEN_ICON_HEIGHT = 25;
+	
+	public static final Dimension X_BUTTON = new Dimension(23, 23);
 	
 	//MAYBE RECOMENDED
 	public static final Color TWITCH_COLOR = new Color(123, 50, 250);

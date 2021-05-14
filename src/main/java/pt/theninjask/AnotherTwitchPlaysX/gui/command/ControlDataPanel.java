@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -348,7 +349,7 @@ public class ControlDataPanel extends JPanel {
 							break;
 						updated = xVal + 1;
 						data.getInDepthCursor().setX(updated);
-						x.setText(Integer.toString(updated));
+						x.setValue(updated);
 						break;
 					case KeyEvent.VK_DOWN:
 					case KeyEvent.VK_KP_DOWN:
@@ -359,13 +360,15 @@ public class ControlDataPanel extends JPanel {
 							break;
 						updated = xVal - 1;
 						data.getInDepthCursor().setX(updated);
-						x.setText(Integer.toString(updated));
+						x.setValue(updated);
 						break;
 					}
 				}
 			});
 			JButton xClear = new JButton("[x]");
 			xClear.setFocusable(false);
+			xClear.setMargin(new Insets(0, 0, 0, 0));
+			xClear.setPreferredSize(Constants.X_BUTTON);
 			xClear.addActionListener(l->{
 				x.setValue(null);
 				data.getInDepthCursor().setX(null);
@@ -428,7 +431,7 @@ public class ControlDataPanel extends JPanel {
 							break;
 						updated = yVal + 1;
 						data.getInDepthCursor().setY(updated);
-						y.setText(Integer.toString(updated));
+						y.setValue(updated);
 						break;
 					case KeyEvent.VK_DOWN:
 					case KeyEvent.VK_KP_DOWN:
@@ -439,13 +442,15 @@ public class ControlDataPanel extends JPanel {
 							break;
 						updated = yVal - 1;
 						data.getInDepthCursor().setY(updated);
-						y.setText(Integer.toString(updated));
+						y.setValue(updated);
 						break;
 					}
 				}
 			});
 			JButton yClear = new JButton("[x]");
 			yClear.setFocusable(false);
+			yClear.setMargin(new Insets(0, 0, 0, 0));
+			yClear.setPreferredSize(Constants.X_BUTTON);
 			yClear.addActionListener(l->{
 				y.setValue(null);
 				data.getInDepthCursor().setY(null);
@@ -522,7 +527,7 @@ public class ControlDataPanel extends JPanel {
 								break;
 							updated = xVal + 1;
 							data.getInDepthCursor().setFinalX(updated);
-							finalX.setText(Integer.toString(updated));
+							finalX.setValue(updated);
 							break;
 						case KeyEvent.VK_DOWN:
 						case KeyEvent.VK_KP_DOWN:
@@ -533,13 +538,15 @@ public class ControlDataPanel extends JPanel {
 								break;
 							updated = xVal - 1;
 							data.getInDepthCursor().setFinalX(updated);
-							finalX.setText(Integer.toString(updated));
+							finalX.setValue(updated);
 							break;
 						}
 					}
 				});
 				JButton finalXClear = new JButton("[x]");
 				finalXClear.setFocusable(false);
+				finalXClear.setMargin(new Insets(0, 0, 0, 0));
+				finalXClear.setPreferredSize(Constants.X_BUTTON);
 				finalXClear.addActionListener(l->{
 					finalX.setValue(null);
 					data.getInDepthCursor().setFinalX(null);
@@ -602,7 +609,7 @@ public class ControlDataPanel extends JPanel {
 								break;
 							updated = yVal + 1;
 							data.getInDepthCursor().setFinalY(updated);
-							finalY.setText(Integer.toString(updated));
+							finalY.setValue(updated);
 							break;
 						case KeyEvent.VK_DOWN:
 						case KeyEvent.VK_KP_DOWN:
@@ -613,13 +620,15 @@ public class ControlDataPanel extends JPanel {
 								break;
 							updated = yVal - 1;
 							data.getInDepthCursor().setY(updated);
-							finalY.setText(Integer.toString(updated));
+							finalY.setValue(updated);
 							break;
 						}
 					}
 				});
 				JButton finalYClear = new JButton("[x]");
 				finalYClear.setFocusable(false);
+				finalYClear.setMargin(new Insets(0, 0, 0, 0));
+				finalYClear.setPreferredSize(Constants.X_BUTTON);
 				finalYClear.addActionListener(l->{
 					finalY.setValue(null);
 					data.getInDepthCursor().setFinalY(null);
