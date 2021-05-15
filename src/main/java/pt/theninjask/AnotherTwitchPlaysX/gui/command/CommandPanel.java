@@ -6,8 +6,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -19,12 +25,15 @@ import javax.swing.JTextField;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandType;
+import pt.theninjask.AnotherTwitchPlaysX.data.CommandVarType;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
+import pt.theninjask.AnotherTwitchPlaysX.gui.command.ControlDataPanel.Type;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
+import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
 public class CommandPanel extends JPanel {
 
@@ -46,6 +55,11 @@ public class CommandPanel extends JPanel {
 	private JButton left;
 
 	private JButton right;
+	
+	private Set<String> varsBag = new HashSet<String>(Arrays.asList(
+			"Q","W","E","R","T","Y","U","I","O","P",
+			"A","S","D","F","G","H","J","K","L",
+			"Z","X","C","V","B","N","M"));
 
 	public CommandPanel() {
 		this.current = new CommandData();
@@ -76,7 +90,7 @@ public class CommandPanel extends JPanel {
 	}
 
 	private JPanel buildPanelString() {
-		JPanel mainPanel = new JPanel(new GridLayout(4, 1));
+		JPanel mainPanel = new JPanel(new GridLayout(5, 1));
 		mainPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 		mainPanel.setOpaque(false);
 
@@ -129,10 +143,108 @@ public class CommandPanel extends JPanel {
 		vars.addItem("ADD");
 		vars.setSelectedItem(null);
 		vars.setFocusable(false);
-		vars.setEnabled(false);
+		for (Pair<String, CommandVarType> elem : current.getVars()) {
+			if(!elem.getKey().equals("ADD")) {
+				vars.addItem(elem.getKey());
+				varsBag.remove(elem.getKey());
+			}
+		}
+		
+		JButton varsAction = new JButton("Remove");
+		varsAction.setMargin(new Insets(0, 0, 0, 0));
+		varsAction.setVisible(false);
+		varsAction.setEnabled(false);
+		varsAction.setFocusable(false);
+		AtomicBoolean disableVars = new AtomicBoolean(false);
+		varsAction.addActionListener(l->{
+			switch(vars.getItemAt(vars.getSelectedIndex())) {
+				default:
+					disableVars.set(true);
+					varsBag.add(vars.getItemAt(vars.getSelectedIndex()));
+					vars.removeItemAt(vars.getSelectedIndex());
+					vars.setSelectedItem(null);
+					varsAction.setVisible(false);
+					varsAction.setEnabled(false);
+					disableVars.set(false);
+					break;
+				case "ADD":
+					break;
+			}
+		});
+		
+		vars.addActionListener(l->{
+			if(vars.getItemAt(vars.getSelectedIndex())==null)
+				return;
+			if(disableVars.get())
+				return;
+			switch (vars.getItemAt(vars.getSelectedIndex())) {
+			case "ADD":
+				Optional<String> var = varsBag.stream().findAny();
+				if(!var.isPresent()) {
+					JLabel msg = new JLabel("Standard (and Already In) Variables Ran Out!");
+					msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+					Constants.showCustomColorMessageDialog(
+							null, 
+							msg, 
+							"Syntax of command", 
+							JOptionPane.WARNING_MESSAGE, 
+							null, 
+							Constants.TWITCH_COLOR
+							);
+					vars.setSelectedItem(null);
+					varsAction.setVisible(false);
+					varsAction.setEnabled(false);
+					break;
+				}
+				vars.addItem(var.get());
+				vars.setSelectedIndex(vars.getItemCount()-1);
+				varsBag.remove(var.get());
+				current.getVars().add(new Pair<String, CommandVarType>(var.get(), CommandVarType.DIGIT));
+				varsAction.setVisible(true);
+				varsAction.setEnabled(true);
+				break;
+			default:
+				varsAction.setVisible(true);
+				varsAction.setEnabled(true);
+				break;
+			}
+		});
+		//vars.setEnabled(false);
 		varsPanel.add(vars);
-
+		varsPanel.add(varsAction);
 		mainPanel.add(varsPanel);
+
+		JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		modePanel.setOpaque(false);
+		JLabel modeLabel = new JLabel("View Mode: ");
+		modeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		modePanel.add(modeLabel);
+		JButton mode = new JButton("Normal");
+		mode.setMargin(new Insets(0, 0, 0, 0));
+		mode.setFocusable(false);
+		mode.addActionListener(l->{
+			switch(mode.getText()) {
+				case "Normal":
+					for (ControlDataPanel elem : controls) {
+						elem.setMode(Type.VAR);
+					}
+					mode.setText("Vars");
+					break;
+				case "Vars":
+					for (ControlDataPanel elem : controls) {
+						elem.setMode(Type.NORMAL);
+					}
+					mode.setText("Normal");
+					break;
+				default:
+					break;
+			}
+		});
+		
+		modePanel.add(mode);
+		mainPanel.add(modePanel);
+		
+		
 
 		return mainPanel;
 	}

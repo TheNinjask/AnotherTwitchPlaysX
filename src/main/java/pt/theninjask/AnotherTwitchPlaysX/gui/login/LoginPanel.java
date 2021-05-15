@@ -3,6 +3,7 @@ package pt.theninjask.AnotherTwitchPlaysX.gui.login;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -152,6 +153,7 @@ public class LoginPanel extends JPanel {
 	private JButton openTwitchOauth() {
 		openOauth = new JButton(Constants.TWITCH_CHAT_OAUTH_BUTTON);
 		openOauth.setFocusable(false);
+		openOauth.setMargin(new Insets(2,10,2,10));
 		openOauth.addActionListener(e->{
 			Constants.openWebsite(Constants.TWITCH_CHAT_OAUTH);
 		});

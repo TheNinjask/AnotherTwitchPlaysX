@@ -1,6 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui.command;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -9,6 +10,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -51,7 +53,16 @@ public class ControlDataPanel extends JPanel {
 	private MouseCoordsListener listener = null;
 	
 	private MouseCoordsListener listenerFinal = null;
+	
+	public enum Type{
+		NORMAL,
+		VAR
+	}
 
+	private List<Component> normal = new ArrayList<Component>();
+	
+	private List<Component> var = new ArrayList<Component>();
+	
 	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
 		this.data = newData;
 		this.parent = parent;
@@ -79,6 +90,7 @@ public class ControlDataPanel extends JPanel {
 		switch (data.getType()) {
 		case KEY:
 			JButton key = new JButton("None");
+			normal.add(key);
 			key.setFocusable(false);
 			key.addActionListener(l -> {
 				JPanel pressPanel = new JPanel(new GridLayout(2, 1));
@@ -113,6 +125,7 @@ public class ControlDataPanel extends JPanel {
 		case MOUSE:
 		case MOUSE_DRAG:
 			JComboBox<JComboItem<Integer>> opt = new JComboBox<JComboItem<Integer>>();
+			normal.add(opt);
 			opt.setFocusable(false);
 			opt.addItem(new JComboItem<Integer>(null, "None"));
 			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON1_DOWN_MASK, "Left"));
@@ -127,6 +140,7 @@ public class ControlDataPanel extends JPanel {
 		case MOUSE_WHEEL:
 		default:
 			JLabel na = new JLabel("N/A");
+			normal.add(na);
 			na.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			inputPanel.add(na);
 			break;
@@ -155,6 +169,7 @@ public class ControlDataPanel extends JPanel {
 			durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			durationPanel.add(durationLabel);
 			JTextField duration = new JFormattedTextField(durationFormatter);
+			normal.add(duration);
 			duration.setBorder(null);
 			if (data.getDuration() != null)
 				duration.setText(data.getDuration().toString());
@@ -234,6 +249,7 @@ public class ControlDataPanel extends JPanel {
 		aftermathFormatter.setMaximum(Integer.MAX_VALUE);
 		aftermathFormatter.setAllowsInvalid(false);
 		JTextField aftermath = new JFormattedTextField(aftermathFormatter);
+		normal.add(aftermath);
 		aftermath.setBorder(null);
 		if (data.getAftermathDelay() != null)
 			aftermath.setText(data.getAftermathDelay().toString());
@@ -308,6 +324,7 @@ public class ControlDataPanel extends JPanel {
 			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			xPanel.add(xLabel);
 			JFormattedTextField x = new JFormattedTextField(xFormatter);
+			normal.add(x);
 			x.setBorder(null);
 			if (data.getInDepthCursor().getX() != null)
 				x.setText(data.getInDepthCursor().getX().toString());
@@ -369,6 +386,7 @@ public class ControlDataPanel extends JPanel {
 				}
 			});
 			JButton xClear = new JButton("[x]");
+			normal.add(xClear);
 			xClear.setFocusable(false);
 			xClear.setMargin(new Insets(0, 0, 0, 0));
 			xClear.setPreferredSize(Constants.X_BUTTON);
@@ -391,6 +409,7 @@ public class ControlDataPanel extends JPanel {
 			yFormatter.setMaximum(Integer.MAX_VALUE);
 			yFormatter.setAllowsInvalid(false);
 			JFormattedTextField y = new JFormattedTextField(yFormatter);
+			normal.add(y);
 			y.setBorder(null);
 			if (data.getInDepthCursor().getY() != null)
 				y.setText(data.getInDepthCursor().getY().toString());
@@ -452,6 +471,7 @@ public class ControlDataPanel extends JPanel {
 				}
 			});
 			JButton yClear = new JButton("[x]");
+			normal.add(yClear);
 			yClear.setFocusable(false);
 			yClear.setMargin(new Insets(0, 0, 0, 0));
 			yClear.setPreferredSize(Constants.X_BUTTON);
@@ -488,6 +508,7 @@ public class ControlDataPanel extends JPanel {
 				finalXLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				finalXPanel.add(finalXLabel);
 				JFormattedTextField finalX = new JFormattedTextField(finalXFormatter);
+				normal.add(finalX);
 				finalX.setBorder(null);
 				if (data.getInDepthCursor().getFinalX() != null)
 					finalX.setText(data.getInDepthCursor().getX().toString());
@@ -549,6 +570,7 @@ public class ControlDataPanel extends JPanel {
 					}
 				});
 				JButton finalXClear = new JButton("[x]");
+				normal.add(finalXClear);
 				finalXClear.setFocusable(false);
 				finalXClear.setMargin(new Insets(0, 0, 0, 0));
 				finalXClear.setPreferredSize(Constants.X_BUTTON);
@@ -571,6 +593,7 @@ public class ControlDataPanel extends JPanel {
 				finalYFormatter.setMaximum(Integer.MAX_VALUE);
 				finalYFormatter.setAllowsInvalid(false);
 				JFormattedTextField finalY = new JFormattedTextField(finalYFormatter);
+				normal.add(finalY);		
 				finalY.setBorder(null);
 				if (data.getInDepthCursor().getFinalY() != null)
 					finalY.setText(data.getInDepthCursor().getFinalY().toString());
@@ -632,6 +655,7 @@ public class ControlDataPanel extends JPanel {
 					}
 				});
 				JButton finalYClear = new JButton("[x]");
+				normal.add(finalYClear);
 				finalYClear.setFocusable(false);
 				finalYClear.setMargin(new Insets(0, 0, 0, 0));
 				finalYClear.setPreferredSize(Constants.X_BUTTON);
@@ -738,6 +762,30 @@ public class ControlDataPanel extends JPanel {
 		isRefreshActive.set(false);
 	}
 
+	public void setMode(Type type) {
+		switch (type) {
+			case NORMAL:
+				for (Component elem : var) {
+					elem.setVisible(false);
+				}
+				for (Component elem : normal) {
+					elem.setVisible(true);
+				}
+				break;
+			case VAR:
+				for (Component elem : normal) {
+					elem.setVisible(false);
+				}
+				for (Component elem : var) {
+					elem.setVisible(true);
+				}
+				break;
+			default:
+				break;
+		}
+		
+	}
+	
 	public ControlData getControlData() {
 		return data;
 	}
