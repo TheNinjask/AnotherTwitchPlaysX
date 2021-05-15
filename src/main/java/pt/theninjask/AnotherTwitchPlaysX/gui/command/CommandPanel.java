@@ -32,6 +32,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.ControlDataPanel.Type;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
@@ -55,6 +56,8 @@ public class CommandPanel extends JPanel {
 	private JButton left;
 
 	private JButton right;
+	
+	private JButton mode;
 	
 	private Set<String> varsBag = new HashSet<String>(Arrays.asList(
 			"Q","W","E","R","T","Y","U","I","O","P",
@@ -139,13 +142,13 @@ public class CommandPanel extends JPanel {
 		varsPanel.add(varsLabel);
 
 		//TODO
-		JComboBox<String> vars = new JComboBox<String>();
-		vars.addItem("ADD");
+		JComboBox<JComboItem<Pair<String, CommandVarType>>> vars = new JComboBox<JComboItem<Pair<String, CommandVarType>>>();
+		vars.addItem(new JComboItem<Pair<String,CommandVarType>>(null, "ADD"));
 		vars.setSelectedItem(null);
 		vars.setFocusable(false);
 		for (Pair<String, CommandVarType> elem : current.getVars()) {
 			if(!elem.getKey().equals("ADD")) {
-				vars.addItem(elem.getKey());
+				vars.addItem(new JComboItem<Pair<String,CommandVarType>>(elem, elem.getKey()));
 				varsBag.remove(elem.getKey());
 			}
 		}
@@ -157,14 +160,17 @@ public class CommandPanel extends JPanel {
 		varsAction.setFocusable(false);
 		AtomicBoolean disableVars = new AtomicBoolean(false);
 		varsAction.addActionListener(l->{
-			switch(vars.getItemAt(vars.getSelectedIndex())) {
+			switch(vars.getItemAt(vars.getSelectedIndex()).toString()) {
 				default:
 					disableVars.set(true);
-					varsBag.add(vars.getItemAt(vars.getSelectedIndex()));
-					vars.removeItemAt(vars.getSelectedIndex());
-					vars.setSelectedItem(null);
+					varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getKey());
 					varsAction.setVisible(false);
 					varsAction.setEnabled(false);
+					controls.forEach(c->{
+						c.removeVar(vars.getItemAt(vars.getSelectedIndex()).get());
+					});
+					vars.removeItemAt(vars.getSelectedIndex());
+					vars.setSelectedItem(null);
 					disableVars.set(false);
 					break;
 				case "ADD":
@@ -177,7 +183,7 @@ public class CommandPanel extends JPanel {
 				return;
 			if(disableVars.get())
 				return;
-			switch (vars.getItemAt(vars.getSelectedIndex())) {
+			switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
 			case "ADD":
 				Optional<String> var = varsBag.stream().findAny();
 				if(!var.isPresent()) {
@@ -196,10 +202,14 @@ public class CommandPanel extends JPanel {
 					varsAction.setEnabled(false);
 					break;
 				}
-				vars.addItem(var.get());
+				Pair<String, CommandVarType> tmp = new Pair<String, CommandVarType>(var.get(), CommandVarType.DIGIT);
+				vars.addItem(new JComboItem<Pair<String,CommandVarType>>(tmp, tmp.getKey()));
 				vars.setSelectedIndex(vars.getItemCount()-1);
 				varsBag.remove(var.get());
-				current.getVars().add(new Pair<String, CommandVarType>(var.get(), CommandVarType.DIGIT));
+				current.getVars().add(tmp);
+				controls.forEach(c->{
+					c.addVar(tmp);
+				});
 				varsAction.setVisible(true);
 				varsAction.setEnabled(true);
 				break;
@@ -219,7 +229,7 @@ public class CommandPanel extends JPanel {
 		JLabel modeLabel = new JLabel("View Mode: ");
 		modeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		modePanel.add(modeLabel);
-		JButton mode = new JButton("Normal");
+		mode = new JButton("Normal");
 		mode.setMargin(new Insets(0, 0, 0, 0));
 		mode.setFocusable(false);
 		mode.addActionListener(l->{
@@ -478,7 +488,10 @@ public class CommandPanel extends JPanel {
 				return;
 			}
 			controlsPanel.removeAll();
-			controlsPanel.add(new ControlDataPanel(cData, controls, this));
+			ControlDataPanel tmp = new ControlDataPanel(cData, controls, this);
+			if(mode.getText().equals("Vars"))
+				tmp.setMode(Type.VAR);
+			controlsPanel.add(tmp);
 			controlsPanel.revalidate();
 			controlsPanel.repaint();
 			right.setEnabled(true);

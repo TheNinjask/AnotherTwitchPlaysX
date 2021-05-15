@@ -11,7 +11,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JButton;
@@ -24,6 +26,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
 
+import pt.theninjask.AnotherTwitchPlaysX.data.CommandVarType;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
@@ -32,6 +35,7 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoordsListener;
+import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
 public class ControlDataPanel extends JPanel {
 
@@ -62,6 +66,62 @@ public class ControlDataPanel extends JPanel {
 	private List<Component> normal = new ArrayList<Component>();
 	
 	private List<Component> var = new ArrayList<Component>();
+	
+	private class JComboBoxVar extends JComboBox<JComboItem<Pair<String, CommandVarType>>>{
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		private CommandVarType type;
+		
+		private Map<String, JComboItem<Pair<String, CommandVarType>>> vars;
+		
+		public JComboBoxVar(CommandVarType type, String varOf) {
+			super();
+			this.vars = new HashMap<String, JComboItem<Pair<String,CommandVarType>>>();
+			this.addItem(new JComboItem<Pair<String, CommandVarType>>(null, "NONE"));
+			this.setSelectedIndex(0);
+			this.type = type;
+			this.addActionListener(l->{
+				switch (getItemAt(getSelectedIndex()).toString()) {
+				case "NONE":
+					data.getMap().remove(varOf);
+					break;
+				default:
+					data.getMap().put(varOf, getItemAt(getSelectedIndex()).get().getKey());
+					break;
+				}
+			});
+		}
+		
+		public void addItem(Pair<String, CommandVarType> var) {
+			if(var==null || var.getValue()!=type || "NONE".equals(var.getKey()) || vars.containsKey(var.getKey()))
+				return;
+			JComboItem<Pair<String, CommandVarType>> tmp = new JComboItem<Pair<String, CommandVarType>>(var, var.getKey());
+			this.vars.put(var.getKey(), tmp);
+			this.addItem(tmp);
+		}
+
+		public void removeItem(Pair<String, CommandVarType> var) {
+			if(var==null || var.getValue()!=type || "NONE".equals(var.getKey()) || !vars.containsKey(var.getKey()))
+				return;
+			this.removeItem(vars.get(var.getKey()));
+		}
+		
+		@Override
+		public void removeAllItems() {
+			vars.clear();
+			super.removeAllItems();
+			this.addItem(new JComboItem<Pair<String, CommandVarType>>(null, "NONE"));
+			this.setSelectedIndex(0);
+		}
+		
+		public void setSelectedDefault() {
+			this.setSelectedIndex(0);
+		}
+	}
 	
 	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
 		this.data = newData;
@@ -145,7 +205,12 @@ public class ControlDataPanel extends JPanel {
 			inputPanel.add(na);
 			break;
 		}
-
+		JComboBoxVar inputVar = new JComboBoxVar(CommandVarType.STRING, "key");
+		inputVar.setVisible(false);
+		inputVar.setEnabled(false);
+		var.add(inputVar);
+		inputPanel.add(inputVar);
+		
 		center.add(inputPanel);
 
 		/*
@@ -235,6 +300,12 @@ public class ControlDataPanel extends JPanel {
 			});
 			duration.setPreferredSize(new Dimension(50, 20));
 			durationPanel.add(duration);
+			
+			JComboBoxVar durationVar = new JComboBoxVar(CommandVarType.DIGIT,"duration");
+			durationVar.setVisible(false);
+			var.add(durationVar);
+			durationPanel.add(durationVar);
+			
 			center.add(durationPanel);
 		}
 
@@ -311,6 +382,12 @@ public class ControlDataPanel extends JPanel {
 			}
 		});
 		aftermathPanel.add(aftermath);
+		
+		JComboBoxVar aftermathVar = new JComboBoxVar(CommandVarType.DIGIT,"aftermathDelay");
+		aftermathVar.setVisible(false);
+		var.add(aftermathVar);
+		aftermathPanel.add(aftermathVar);
+		
 		center.add(aftermathPanel);
 		if ((data.getType() == ControlType.MOUSE || data.getType()==ControlType.MOUSE_DRAG)&& data.getInDepthCursor() != null) {
 			NumberFormatter xFormatter = new NumberFormatter(format);
@@ -396,6 +473,12 @@ public class ControlDataPanel extends JPanel {
 			});
 			xPanel.add(xClear);
 			xPanel.add(x);
+			
+			JComboBoxVar xVar = new JComboBoxVar(CommandVarType.DIGIT,"x");
+			xVar.setVisible(false);
+			var.add(xVar);
+			xPanel.add(xVar);
+			
 			center.add(xPanel);
 
 			JPanel yPanel = new JPanel();
@@ -481,6 +564,12 @@ public class ControlDataPanel extends JPanel {
 			});
 			yPanel.add(yClear);
 			yPanel.add(y);
+			
+			JComboBoxVar yVar = new JComboBoxVar(CommandVarType.DIGIT,"y");
+			yVar.setVisible(false);
+			var.add(yVar);
+			yPanel.add(yVar);
+			
 			center.add(yPanel);
 			listener = (eX, eY) -> {
 				xLabel.setText(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
@@ -580,6 +669,12 @@ public class ControlDataPanel extends JPanel {
 				});
 				finalXPanel.add(finalXClear);
 				finalXPanel.add(finalX);
+				
+				JComboBoxVar finalXVar = new JComboBoxVar(CommandVarType.DIGIT,"final_x");
+				finalXVar.setVisible(false);
+				var.add(finalXVar);
+				finalXPanel.add(finalXVar);
+				
 				//center.add(finalXPanel);
 
 				JPanel finalYPanel = new JPanel();
@@ -665,6 +760,12 @@ public class ControlDataPanel extends JPanel {
 				});
 				finalYPanel.add(finalYClear);
 				finalYPanel.add(finalY);
+				
+				JComboBoxVar finalYVar = new JComboBoxVar(CommandVarType.DIGIT,"final_y");
+				finalYVar.setVisible(false);
+				var.add(finalYVar);
+				finalYPanel.add(finalYVar);
+				
 				//center.add(yPanel);
 				listenerFinal = (eX, eY) -> {
 					finalXLabel.setText(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
@@ -761,7 +862,7 @@ public class ControlDataPanel extends JPanel {
 		index.setSelectedIndex(in.indexOf(this));
 		isRefreshActive.set(false);
 	}
-
+	
 	public void setMode(Type type) {
 		switch (type) {
 			case NORMAL:
@@ -777,6 +878,14 @@ public class ControlDataPanel extends JPanel {
 					elem.setVisible(false);
 				}
 				for (Component elem : var) {
+					if(elem instanceof JComboBoxVar) {
+						JComboBoxVar cast = (JComboBoxVar)elem;
+						cast.removeAllItems();
+						parent.getCurrentCommandData().getVars().forEach(e->{							
+							addVar(e);
+						}
+								);
+					}
 					elem.setVisible(true);
 				}
 				break;
@@ -784,6 +893,35 @@ public class ControlDataPanel extends JPanel {
 				break;
 		}
 		
+	}
+	
+	public void addVar(Pair<String, CommandVarType> var) {
+		if(var==null)
+			return;
+		for (Component elem : this.var) {
+			if(elem instanceof JComboBoxVar) {
+				JComboBoxVar selec = ((JComboBoxVar)elem);
+				selec.addItem(var);
+			}
+		}
+	}
+	
+	public void removeVar(Pair<String, CommandVarType> var) {
+		if(var==null)
+			return;
+		for (Component elem : this.var) {
+			if(elem instanceof JComboBoxVar) {
+				JComboBoxVar selec = ((JComboBoxVar)elem);
+				if(var.equals(selec.getItemAt(selec.getSelectedIndex()).get())) {
+					selec.setSelectedDefault();
+				}
+				selec.removeItem(var);
+			}
+		}
+		data.getMap().forEach((k,v)->{
+			if(var.getKey().equals(v))
+				data.getMap().remove(k);
+		});
 	}
 	
 	public ControlData getControlData() {
