@@ -78,19 +78,28 @@ public class ControlDataPanel extends JPanel {
 		
 		private Map<String, JComboItem<Pair<String, CommandVarType>>> vars;
 		
+		private AtomicBoolean disable = new AtomicBoolean(false);
+		
+		private String varOf;
+		
 		public JComboBoxVar(CommandVarType type, String varOf) {
 			super();
 			this.vars = new HashMap<String, JComboItem<Pair<String,CommandVarType>>>();
 			this.addItem(new JComboItem<Pair<String, CommandVarType>>(null, "NONE"));
 			this.setSelectedIndex(0);
 			this.type = type;
+			this.varOf = varOf;
 			this.addActionListener(l->{
+				if(disable.get())
+					return;
+				if(getSelectedIndex()<0)
+					return;
 				switch (getItemAt(getSelectedIndex()).toString()) {
 				case "NONE":
-					data.getMap().remove(varOf);
+					data.getMap().remove(this.varOf);
 					break;
 				default:
-					data.getMap().put(varOf, getItemAt(getSelectedIndex()).get().getKey());
+					data.getMap().put(this.varOf, getItemAt(getSelectedIndex()).get().getKey());
 					break;
 				}
 			});
@@ -100,26 +109,36 @@ public class ControlDataPanel extends JPanel {
 			if(var==null || var.getValue()!=type || "NONE".equals(var.getKey()) || vars.containsKey(var.getKey()))
 				return;
 			JComboItem<Pair<String, CommandVarType>> tmp = new JComboItem<Pair<String, CommandVarType>>(var, var.getKey());
-			this.vars.put(var.getKey(), tmp);
-			this.addItem(tmp);
+			vars.put(var.getKey(), tmp);
+			addItem(tmp);
 		}
 
 		public void removeItem(Pair<String, CommandVarType> var) {
 			if(var==null || var.getValue()!=type || "NONE".equals(var.getKey()) || !vars.containsKey(var.getKey()))
 				return;
-			this.removeItem(vars.get(var.getKey()));
-		}
-		
-		@Override
-		public void removeAllItems() {
-			vars.clear();
-			super.removeAllItems();
-			this.addItem(new JComboItem<Pair<String, CommandVarType>>(null, "NONE"));
-			this.setSelectedIndex(0);
+			if(getItemAt(getSelectedIndex()).get().equals(var))
+				setSelectedDefault();
+			removeItem(vars.get(var.getKey()));
 		}
 		
 		public void setSelectedDefault() {
 			this.setSelectedIndex(0);
+		}
+		
+		public void refresh() {
+			disable.set(true);
+			vars.clear();
+			super.removeAllItems();
+			addItem(new JComboItem<Pair<String, CommandVarType>>(null, "NONE"));
+			parent.getCurrentCommandData().getVars().forEach(e->{							
+				addVar(e);
+			});
+			String tmp = data.getMap().get(varOf);
+			if(tmp!=null)
+				setSelectedItem(vars.get(tmp));
+			else
+				setSelectedDefault();
+			disable.set(false);
 		}
 	}
 	
@@ -880,11 +899,7 @@ public class ControlDataPanel extends JPanel {
 				for (Component elem : var) {
 					if(elem instanceof JComboBoxVar) {
 						JComboBoxVar cast = (JComboBoxVar)elem;
-						cast.removeAllItems();
-						parent.getCurrentCommandData().getVars().forEach(e->{							
-							addVar(e);
-						}
-								);
+						cast.refresh();
 					}
 					elem.setVisible(true);
 				}
@@ -911,10 +926,7 @@ public class ControlDataPanel extends JPanel {
 			return;
 		for (Component elem : this.var) {
 			if(elem instanceof JComboBoxVar) {
-				JComboBoxVar selec = ((JComboBoxVar)elem);
-				if(var.equals(selec.getItemAt(selec.getSelectedIndex()).get())) {
-					selec.setSelectedDefault();
-				}
+				JComboBoxVar selec = ((JComboBoxVar)elem);				
 				selec.removeItem(var);
 			}
 		}

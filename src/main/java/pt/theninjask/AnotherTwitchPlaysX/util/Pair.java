@@ -6,15 +6,25 @@ public class Pair<X,Y> {
 	
 	private Y value;
 	
+	public Pair() {}
+	
 	public Pair(X key, Y value) {
 		this.key = key;
 		this.value = value;
 	}
 
+	public void setKey(X key) {
+		this.key = key;
+	}
+	
 	public X getKey() {
 		return key;
 	}
 
+	public void setValue(Y value) {
+		this.value = value;
+	}
+	
 	public Y getValue() {
 		return value;
 	}

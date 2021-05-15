@@ -180,6 +180,8 @@ public class CommandData implements Data {
 	
 	@Handler
 	public void onMessage(ChannelMessageEvent event){
+		//if(!event.getActor().getNick().equalsIgnoreCase("mytwitchusername69420"))
+		//	return;
 		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
 		Matcher match = pattern.matcher(event.getMessage());
 		if(!match.matches())
@@ -187,6 +189,8 @@ public class CommandData implements Data {
 		Map<String, String> map = new HashMap<String, String>();
 		for (Pair<String, CommandVarType> elem : vars) {
 			String value = match.group(elem.getKey());
+			if(value!=null && value.isEmpty())
+				value = null;
 			if(value!=null)
 				map.put(elem.getKey(), value);
 		}
