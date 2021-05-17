@@ -9,4 +9,6 @@ public @interface Mod {
 	public boolean main() default true;
 	
 	public boolean hasPanel() default true;
+	
+	public int version() default 0;
 }

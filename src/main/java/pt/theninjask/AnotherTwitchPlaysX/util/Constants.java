@@ -83,6 +83,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -143,14 +144,59 @@ public final class Constants {
 	public static final Color TWITCH_COLOR_COMPLEMENT = new Color(0xe5e5e5);
 
 	// JUST FOR ME :) BUT NOT RECOMENDED
+	@Deprecated
 	public static final Color BLUE_COLOR = new Color(0x123456);
-
+	
+	public static final String MOD_WARN = "You are loading a mod that was not made by the creator of this app nor verified by them!\nProceed at your own risk.";
+	
+	public static final String MOD_INFO = "You are loading a third party mod that was validated by the creator of this app!";
+	
 	public static ModPanel loadMod(File modFile) throws Exception {
 		ModPanel mod = null;
 		try {
+			switch(JarVerifier.getInstance().verifyJar(modFile)) {
+				case MAIN:
+					break;
+				case THIRD_PARTY:
+					JTextArea msg = new JTextArea(MOD_INFO);
+					msg.setForeground(TWITCH_COLOR_COMPLEMENT);
+					msg.setOpaque(false);
+					showCustomColorMessageDialog(
+							null, 
+							msg, 
+							"Mod Info", 
+							JOptionPane.INFORMATION_MESSAGE, 
+							null, 
+							TWITCH_COLOR);
+					break;
+				case UNKNOWN:
+				default:
+					msg = new JTextArea(MOD_WARN);
+					msg.setForeground(TWITCH_COLOR_COMPLEMENT);
+					msg.setOpaque(false);
+					int resp = showCustomColorOptionDialog(
+							null, 
+							msg, 
+							"Mod Warning", 
+							JOptionPane.OK_CANCEL_OPTION, 
+							JOptionPane.WARNING_MESSAGE, 
+							null, 
+							null, 
+							null, 
+							TWITCH_COLOR);
+					switch (resp) {
+						case JOptionPane.OK_OPTION:
+							break;
+						case JOptionPane.CLOSED_OPTION:
+						case JOptionPane.CANCEL_OPTION:
+						default:
+							throw new ModNotLoadedException();
+					}
+					break;
+			};
 			JarFile jarFile = new JarFile(modFile.getAbsolutePath());
 			Enumeration<JarEntry> e = jarFile.entries();
-
+			
 			URLClassLoader cl = URLClassLoader.newInstance(new URL[] { modFile.toURI().toURL() },
 					ModPanel.class.getClassLoader());
 
