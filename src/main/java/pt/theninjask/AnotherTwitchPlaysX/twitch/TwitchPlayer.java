@@ -2,7 +2,7 @@ package pt.theninjask.AnotherTwitchPlaysX.twitch;
 
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
-import org.kitteh.irc.client.library.feature.twitch.TwitchListener;
+import org.kitteh.irc.client.library.feature.twitch.TwitchSupport;
 import org.kitteh.irc.client.library.util.StsUtil;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
@@ -50,7 +50,7 @@ public class TwitchPlayer {
 				.server().host(SERVER).port(PORT, SecurityType.SECURE).password(session.getOauth()).then()
 				.management().stsStorageManager(StsUtil.getDefaultStorageManager()).then()
 				.build();
-		client.getEventManager().registerEventListener(new TwitchListener(client));
+		TwitchSupport.addSupport(client);
 		client.addChannel(session.getChannel());
 	}
 	
@@ -63,7 +63,7 @@ public class TwitchPlayer {
 					.server().host(SERVER).port(PORT, SecurityType.SECURE).password(session.getOauth()).then()
 					.management().stsStorageManager(StsUtil.getDefaultStorageManager()).then()
 					.build();
-		client.getEventManager().registerEventListener(new TwitchListener(client));
+		TwitchSupport.addSupport(client);
 		client.addChannel(session.getChannel());
 		client.connect();
 		connected = true;
