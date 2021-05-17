@@ -7,6 +7,7 @@ import java.awt.Insets;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -174,24 +175,31 @@ public class LoginPanel extends JPanel {
 		tmp.setFocusable(false);
 		tmp.addActionListener(e->{
 			if(!(nickname.getText().length()>0)) {
-				JOptionPane.showMessageDialog(null, "Please insert your twitch username.", "Missing Username", JOptionPane.WARNING_MESSAGE);
+				JLabel msg = new JLabel("Please insert your twitch username.");
+				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				Constants.showCustomColorMessageDialog(null, msg, "Missing Username", JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
 				return;
 			}
 			if(!(channel.getText().length()>0)) {
-				JOptionPane.showMessageDialog(null, "Please insert your twitch channel name.", "Missing Channel Name", JOptionPane.WARNING_MESSAGE);
+				JLabel msg = new JLabel("Please insert your twitch channel name.");
+				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				Constants.showCustomColorMessageDialog(null, msg, "Missing Channel Name", JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
 				return;
 			}
 			if(!(oauth.getPassword().length>0)) {
 				String[] options = {"Ok", "Go to get OAuth Token"};
-				switch(JOptionPane.showOptionDialog(
+				JLabel msg = new JLabel("Please insert your OAuth Token");
+				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				switch(Constants.showCustomColorOptionDialog(
 						null,
-						"Please insert your OAuth Token", 
+						msg, 
 						"Missing OAuth", 
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE,
 						null,
 						options,
-						0)) {
+						null,
+						Constants.TWITCH_COLOR)) {
 						case JOptionPane.NO_OPTION:
 							Constants.openWebsite(Constants.TWITCH_CHAT_OAUTH);
 							break;
