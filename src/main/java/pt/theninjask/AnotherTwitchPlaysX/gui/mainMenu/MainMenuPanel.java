@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -35,6 +37,8 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.Type;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.Mod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ModPanel;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.SponsorBot;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
@@ -82,6 +86,8 @@ public class MainMenuPanel extends JPanel {
 	private JPanel twitchChatFontSizePanel;
 
 	private AtomicBoolean isAppStarted;
+
+	private ModPanel mod = null;
 
 	private MainMenuPanel() {
 		this.isAppStarted = new AtomicBoolean(false);
@@ -151,13 +157,29 @@ public class MainMenuPanel extends JPanel {
 			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
 		});
 		tmp.add(commandsButton, BorderLayout.CENTER);
-		/*
-		 * commandsStartButton = new JButton("Start");
-		 * commandsStartButton.setFocusable(false);
-		 * commandsStartButton.setEnabled(false);
-		 * commandsStartButton.addActionListener(l->{ //TODO });
-		 * tmp.add(commandsStartButton,BorderLayout.EAST);
-		 */
+		JButton modButton = new JButton("Mod");
+		modButton.setFocusable(false);
+		//modButton.setEnabled(false);
+		modButton.addActionListener(l -> {
+			if (mod == null) {
+				try {
+					File file = Constants.showOpenFile(new FileNameExtensionFilter("JAR", "jar"), this);
+					mod = Constants.loadMod(file);	
+					mod.refresh();
+					if(mod.getClass().getDeclaredAnnotation(Mod.class).hasPanel())
+						MainFrame.getInstance().replacePanel(mod.getJPanelInstance());
+				} catch (Exception e) {
+					Constants.showExpectedExceptionDialog(e);
+					mod = null;
+				}
+			} else {
+				mod.refresh();
+				if(mod.getClass().getDeclaredAnnotation(Mod.class).hasPanel())
+					MainFrame.getInstance().replacePanel(mod.getJPanelInstance());
+			}
+		});
+		tmp.add(modButton, BorderLayout.EAST);
+
 		return tmp;
 	}
 
