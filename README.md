@@ -93,6 +93,10 @@ public class HelloWorld implements ModPanel {
 ### Why is the UI so small?
 
 Because I actually kinda liked it but I hid behind the excuse of to make me think to use the space more carefully. For example, I ran out of space for more twitch chat options, so I made that slider to preserve the size and still be intuitive enough for users!
+<!-- omit in toc -->
+### Why is there no support for controllers
+
+The first intention of this project (even tho it can't be seen through the commits) was to have controller support. But arised the problem that it would require for the user to install another requirement (I had and still have the objective to not have to many requirements) and if there would be an external requirement, I would like that the app itself installed it. `Then why are you using Java if you want the least requirements possible?` Well because is the language I am most used to and I kinda like it, I still like C and Python and at some point in the beginning thought of using Python but I decided to go for Java.
 
 ## Bugs
 
