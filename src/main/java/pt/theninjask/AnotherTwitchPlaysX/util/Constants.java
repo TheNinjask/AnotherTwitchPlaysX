@@ -169,7 +169,7 @@ public final class Constants {
 				}
 
 			}
-		} catch (Exception e) {
+		} catch (Exception | Error e) {
 			throw new ModNotLoadedException();
 		}
 		if (mod == null)

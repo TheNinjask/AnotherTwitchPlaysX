@@ -173,6 +173,8 @@ public class MainMenuPanel extends JPanel {
 					mod.refresh();
 					if(mod.getClass().getDeclaredAnnotation(Mod.class).hasPanel())
 						MainFrame.getInstance().replacePanel(mod.getJPanelInstance());
+					else
+						modButton.setEnabled(false);
 				} catch (Exception e) {
 					Constants.showExpectedExceptionDialog(e);
 					mod = null;
