@@ -26,7 +26,7 @@ public class App {
 			JLabel exception = new JLabel(e.getMessage());
 			exception.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			Constants.showCustomColorMessageDialog(null,
-					e.getMessage(),
+					exception,
 					e.getClass().getName(), 
 					JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
 		}

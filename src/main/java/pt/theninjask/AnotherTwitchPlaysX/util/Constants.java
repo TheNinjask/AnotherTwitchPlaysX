@@ -151,23 +151,26 @@ public final class Constants {
 			JarFile jarFile = new JarFile(modFile.getAbsolutePath());
 			Enumeration<JarEntry> e = jarFile.entries();
 
-			URLClassLoader cl = URLClassLoader.newInstance(new URL[] { modFile.toURI().toURL() },ModPanel.class.getClassLoader());
+			URLClassLoader cl = URLClassLoader.newInstance(new URL[] { modFile.toURI().toURL() },
+					ModPanel.class.getClassLoader());
 
 			while (e.hasMoreElements()) {
 				JarEntry je = e.nextElement();
 				if (je.isDirectory() || !je.getName().endsWith(".class")) {
 					continue;
 				}
-				
-				String className = je.getName().substring(0, je.getName().lastIndexOf("."))	;
+
+				String className = je.getName().substring(0, je.getName().lastIndexOf("."));
 				className = className.replace('/', '.');
 				Class<?> c = cl.loadClass(className);
-				Mod annotation = c.getDeclaredAnnotation(Mod.class);
-				
-				Object tmp = c.getConstructor().newInstance();
-				
-				if (mod==null && annotation != null && annotation.main() && tmp instanceof ModPanel) {
-					mod = (ModPanel) tmp;
+				if (ModPanel.class.isAssignableFrom(c)) {
+					Mod annotation = c.getDeclaredAnnotation(Mod.class);
+					Object tmp = c.getConstructor().newInstance();
+
+					if (mod == null && annotation != null && annotation.main()) {
+						mod = (ModPanel) tmp;
+						break;
+					}
 				}
 
 			}
