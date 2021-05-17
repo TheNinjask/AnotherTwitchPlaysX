@@ -66,7 +66,45 @@ public class ControlDataPanel extends JPanel {
 	private List<Component> normal = new ArrayList<Component>();
 	
 	private List<Component> var = new ArrayList<Component>();
-	
+
+	private JButton key;
+
+	private JComboBox<JComboItem<Integer>> opt;
+
+	private JComboBoxVar inputVar;
+
+	private JTextField duration;
+
+	private JTextField aftermath;
+
+	private JComboBoxVar aftermathVar;
+
+	private JFormattedTextField x;
+
+	private JButton xClear;
+
+	private JComboBoxVar xVar;
+
+	private JFormattedTextField y;
+
+	private JButton yClear;
+
+	private JComboBoxVar yVar;
+
+	private JFormattedTextField finalX;
+
+	private JButton finalXClear;
+
+	private JComboBoxVar finalXVar;
+
+	private JFormattedTextField finalY;
+
+	private JButton finalYClear;
+
+	private JComboBoxVar finalYVar;
+
+	private JButton remove;
+
 	private class JComboBoxVar extends JComboBox<JComboItem<Pair<String, CommandVarType>>>{
 		
 		/**
@@ -168,7 +206,7 @@ public class ControlDataPanel extends JPanel {
 		inputPanel.add(inputLabel);
 		switch (data.getType()) {
 		case KEY:
-			JButton key = new JButton("None");
+			key = new JButton("None");
 			normal.add(key);
 			key.setFocusable(false);
 			key.addActionListener(l -> {
@@ -203,7 +241,7 @@ public class ControlDataPanel extends JPanel {
 		// case MOUSE_CLICK:
 		case MOUSE:
 		case MOUSE_DRAG:
-			JComboBox<JComboItem<Integer>> opt = new JComboBox<JComboItem<Integer>>();
+			opt = new JComboBox<JComboItem<Integer>>();
 			normal.add(opt);
 			opt.setFocusable(false);
 			opt.addItem(new JComboItem<Integer>(null, "None"));
@@ -224,7 +262,7 @@ public class ControlDataPanel extends JPanel {
 			inputPanel.add(na);
 			break;
 		}
-		JComboBoxVar inputVar = new JComboBoxVar(CommandVarType.STRING, "key");
+		inputVar = new JComboBoxVar(CommandVarType.STRING, "key");
 		inputVar.setVisible(false);
 		inputVar.setEnabled(false);
 		var.add(inputVar);
@@ -252,7 +290,7 @@ public class ControlDataPanel extends JPanel {
 			JLabel durationLabel = new JLabel("Duration (sec):");
 			durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			durationPanel.add(durationLabel);
-			JTextField duration = new JFormattedTextField(durationFormatter);
+			duration = new JFormattedTextField(durationFormatter);
 			normal.add(duration);
 			duration.setBorder(null);
 			if (data.getDuration() != null)
@@ -338,7 +376,7 @@ public class ControlDataPanel extends JPanel {
 		aftermathFormatter.setMinimum(0);
 		aftermathFormatter.setMaximum(Integer.MAX_VALUE);
 		aftermathFormatter.setAllowsInvalid(false);
-		JTextField aftermath = new JFormattedTextField(aftermathFormatter);
+		aftermath = new JFormattedTextField(aftermathFormatter);
 		normal.add(aftermath);
 		aftermath.setBorder(null);
 		if (data.getAftermathDelay() != null)
@@ -402,7 +440,7 @@ public class ControlDataPanel extends JPanel {
 		});
 		aftermathPanel.add(aftermath);
 		
-		JComboBoxVar aftermathVar = new JComboBoxVar(CommandVarType.DIGIT,"aftermathDelay");
+		aftermathVar = new JComboBoxVar(CommandVarType.DIGIT,"aftermathDelay");
 		aftermathVar.setVisible(false);
 		var.add(aftermathVar);
 		aftermathPanel.add(aftermathVar);
@@ -419,7 +457,7 @@ public class ControlDataPanel extends JPanel {
 			JLabel xLabel = new JLabel(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
 			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			xPanel.add(xLabel);
-			JFormattedTextField x = new JFormattedTextField(xFormatter);
+			x = new JFormattedTextField(xFormatter);
 			normal.add(x);
 			x.setBorder(null);
 			if (data.getInDepthCursor().getX() != null)
@@ -481,7 +519,7 @@ public class ControlDataPanel extends JPanel {
 					}
 				}
 			});
-			JButton xClear = new JButton("[x]");
+			xClear = new JButton("[x]");
 			normal.add(xClear);
 			xClear.setFocusable(false);
 			xClear.setMargin(new Insets(0, 0, 0, 0));
@@ -493,7 +531,7 @@ public class ControlDataPanel extends JPanel {
 			xPanel.add(xClear);
 			xPanel.add(x);
 			
-			JComboBoxVar xVar = new JComboBoxVar(CommandVarType.DIGIT,"x");
+			xVar = new JComboBoxVar(CommandVarType.DIGIT,"x");
 			xVar.setVisible(false);
 			var.add(xVar);
 			xPanel.add(xVar);
@@ -510,7 +548,7 @@ public class ControlDataPanel extends JPanel {
 			yFormatter.setMinimum(Integer.MIN_VALUE);
 			yFormatter.setMaximum(Integer.MAX_VALUE);
 			yFormatter.setAllowsInvalid(false);
-			JFormattedTextField y = new JFormattedTextField(yFormatter);
+			y = new JFormattedTextField(yFormatter);
 			normal.add(y);
 			y.setBorder(null);
 			if (data.getInDepthCursor().getY() != null)
@@ -572,7 +610,7 @@ public class ControlDataPanel extends JPanel {
 					}
 				}
 			});
-			JButton yClear = new JButton("[x]");
+			yClear = new JButton("[x]");
 			normal.add(yClear);
 			yClear.setFocusable(false);
 			yClear.setMargin(new Insets(0, 0, 0, 0));
@@ -584,7 +622,7 @@ public class ControlDataPanel extends JPanel {
 			yPanel.add(yClear);
 			yPanel.add(y);
 			
-			JComboBoxVar yVar = new JComboBoxVar(CommandVarType.DIGIT,"y");
+			yVar = new JComboBoxVar(CommandVarType.DIGIT,"y");
 			yVar.setVisible(false);
 			var.add(yVar);
 			yPanel.add(yVar);
@@ -615,7 +653,7 @@ public class ControlDataPanel extends JPanel {
 				JLabel finalXLabel = new JLabel(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
 				finalXLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				finalXPanel.add(finalXLabel);
-				JFormattedTextField finalX = new JFormattedTextField(finalXFormatter);
+				finalX = new JFormattedTextField(finalXFormatter);
 				normal.add(finalX);
 				finalX.setBorder(null);
 				if (data.getInDepthCursor().getFinalX() != null)
@@ -677,7 +715,7 @@ public class ControlDataPanel extends JPanel {
 						}
 					}
 				});
-				JButton finalXClear = new JButton("[x]");
+				finalXClear = new JButton("[x]");
 				normal.add(finalXClear);
 				finalXClear.setFocusable(false);
 				finalXClear.setMargin(new Insets(0, 0, 0, 0));
@@ -689,7 +727,7 @@ public class ControlDataPanel extends JPanel {
 				finalXPanel.add(finalXClear);
 				finalXPanel.add(finalX);
 				
-				JComboBoxVar finalXVar = new JComboBoxVar(CommandVarType.DIGIT,"final_x");
+				finalXVar = new JComboBoxVar(CommandVarType.DIGIT,"final_x");
 				finalXVar.setVisible(false);
 				var.add(finalXVar);
 				finalXPanel.add(finalXVar);
@@ -706,7 +744,7 @@ public class ControlDataPanel extends JPanel {
 				finalYFormatter.setMinimum(Integer.MIN_VALUE);
 				finalYFormatter.setMaximum(Integer.MAX_VALUE);
 				finalYFormatter.setAllowsInvalid(false);
-				JFormattedTextField finalY = new JFormattedTextField(finalYFormatter);
+				finalY = new JFormattedTextField(finalYFormatter);
 				normal.add(finalY);		
 				finalY.setBorder(null);
 				if (data.getInDepthCursor().getFinalY() != null)
@@ -768,7 +806,7 @@ public class ControlDataPanel extends JPanel {
 						}
 					}
 				});
-				JButton finalYClear = new JButton("[x]");
+				finalYClear = new JButton("[x]");
 				normal.add(finalYClear);
 				finalYClear.setFocusable(false);
 				finalYClear.setMargin(new Insets(0, 0, 0, 0));
@@ -780,7 +818,7 @@ public class ControlDataPanel extends JPanel {
 				finalYPanel.add(finalYClear);
 				finalYPanel.add(finalY);
 				
-				JComboBoxVar finalYVar = new JComboBoxVar(CommandVarType.DIGIT,"final_y");
+				finalYVar = new JComboBoxVar(CommandVarType.DIGIT,"final_y");
 				finalYVar.setVisible(false);
 				var.add(finalYVar);
 				finalYPanel.add(finalYVar);
@@ -850,7 +888,7 @@ public class ControlDataPanel extends JPanel {
 		left.add(index);
 		// left.add(indexPanel);
 		// JButton help = new JButton("Help");
-		JButton remove = new JButton("[x]");
+		remove = new JButton("[x]");
 		remove.setFocusable(false);
 		remove.addActionListener(l -> {
 			this.in.remove(this);
@@ -938,5 +976,89 @@ public class ControlDataPanel extends JPanel {
 	
 	public ControlData getControlData() {
 		return data;
+	}
+
+	public CommandPanel getParent() {
+		return parent;
+	}
+
+	public List<Component> getVar() {
+		return var;
+	}
+
+	public JButton getKey() {
+		return key;
+	}
+
+	public JComboBox<JComboItem<Integer>> getOpt() {
+		return opt;
+	}
+
+	public JComboBoxVar getInputVar() {
+		return inputVar;
+	}
+
+	public JTextField getDuration() {
+		return duration;
+	}
+
+	public JTextField getAftermath() {
+		return aftermath;
+	}
+
+	public JComboBoxVar getAftermathVar() {
+		return aftermathVar;
+	}
+
+	public JFormattedTextField getInitialX() {
+		return x;
+	}
+
+	public JButton getXClear() {
+		return xClear;
+	}
+
+	public JComboBoxVar getXVar() {
+		return xVar;
+	}
+
+	public JFormattedTextField getInitialY() {
+		return y;
+	}
+
+	public JButton getYClear() {
+		return yClear;
+	}
+
+	public JComboBoxVar getYVar() {
+		return yVar;
+	}
+
+	public JFormattedTextField getFinalX() {
+		return finalX;
+	}
+
+	public JButton getFinalXClear() {
+		return finalXClear;
+	}
+
+	public JComboBoxVar getFinalXVar() {
+		return finalXVar;
+	}
+
+	public JFormattedTextField getFinalY() {
+		return finalY;
+	}
+
+	public JButton getFinalYClear() {
+		return finalYClear;
+	}
+
+	public JComboBoxVar getFinalYVar() {
+		return finalYVar;
+	}
+
+	public JButton getRemove() {
+		return remove;
 	}
 }

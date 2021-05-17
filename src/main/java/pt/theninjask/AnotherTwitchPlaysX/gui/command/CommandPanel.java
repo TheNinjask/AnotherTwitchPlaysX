@@ -64,6 +64,26 @@ public class CommandPanel extends JPanel {
 			"A","S","D","F","G","H","J","K","L",
 			"Z","X","C","V","B","N","M"));
 
+	private JButton back;
+
+	private JButton syntax;
+
+	private JButton help;
+
+	private JButton save;
+
+	private JButton delete;
+
+	private JTextField lead;
+
+	private JComboBox<CommandType> type;
+
+	private JComboBox<JComboItem<Pair<String, CommandVarType>>> vars;
+
+	private JButton varsRemove;
+
+	private JButton add;
+
 	public CommandPanel() {
 		this.current = new CommandData();
 		this.saved = null;
@@ -109,7 +129,7 @@ public class CommandPanel extends JPanel {
 		JLabel leadLabel = new JLabel("Lead: ");
 		leadLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		leadPanel.add(leadLabel);
-		JTextField lead = new JTextField("");
+		lead = new JTextField("");
 		if(current.getLead()!=null)
 			lead.setText(current.getLead());
 		lead.setBorder(null);
@@ -125,7 +145,7 @@ public class CommandPanel extends JPanel {
 		JLabel typeLabel = new JLabel("Type: ");
 		typeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		typePanel.add(typeLabel);
-		JComboBox<CommandType> type = new JComboBox<CommandType>(CommandType.getAll());
+		type = new JComboBox<CommandType>(CommandType.getAll());
 		type.setSelectedItem(CommandType.UNISON);
 		type.addActionListener(l->{
 			current.setType(type.getItemAt(type.getSelectedIndex()));
@@ -141,8 +161,8 @@ public class CommandPanel extends JPanel {
 		varsLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		varsPanel.add(varsLabel);
 
-		//TODO
-		JComboBox<JComboItem<Pair<String, CommandVarType>>> vars = new JComboBox<JComboItem<Pair<String, CommandVarType>>>();
+		//TODO?
+		vars = new JComboBox<JComboItem<Pair<String, CommandVarType>>>();
 		vars.addItem(new JComboItem<Pair<String,CommandVarType>>(null, "ADD"));
 		vars.setSelectedItem(null);
 		vars.setFocusable(false);
@@ -153,19 +173,19 @@ public class CommandPanel extends JPanel {
 			}
 		}
 		
-		JButton varsAction = new JButton("Remove");
-		varsAction.setMargin(new Insets(0, 0, 0, 0));
-		varsAction.setVisible(false);
-		varsAction.setEnabled(false);
-		varsAction.setFocusable(false);
+		varsRemove = new JButton("Remove");
+		varsRemove.setMargin(new Insets(0, 0, 0, 0));
+		varsRemove.setVisible(false);
+		varsRemove.setEnabled(false);
+		varsRemove.setFocusable(false);
 		AtomicBoolean disableVars = new AtomicBoolean(false);
-		varsAction.addActionListener(l->{
+		varsRemove.addActionListener(l->{
 			switch(vars.getItemAt(vars.getSelectedIndex()).toString()) {
 				default:
 					disableVars.set(true);
 					varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getKey());
-					varsAction.setVisible(false);
-					varsAction.setEnabled(false);
+					varsRemove.setVisible(false);
+					varsRemove.setEnabled(false);
 					controls.forEach(c->{
 						c.removeVar(vars.getItemAt(vars.getSelectedIndex()).get());
 					});
@@ -198,8 +218,8 @@ public class CommandPanel extends JPanel {
 							Constants.TWITCH_COLOR
 							);
 					vars.setSelectedItem(null);
-					varsAction.setVisible(false);
-					varsAction.setEnabled(false);
+					varsRemove.setVisible(false);
+					varsRemove.setEnabled(false);
 					break;
 				}
 				Pair<String, CommandVarType> tmp = new Pair<String, CommandVarType>(var.get(), CommandVarType.DIGIT);
@@ -210,18 +230,18 @@ public class CommandPanel extends JPanel {
 				controls.forEach(c->{
 					c.addVar(tmp);
 				});
-				varsAction.setVisible(true);
-				varsAction.setEnabled(true);
+				varsRemove.setVisible(true);
+				varsRemove.setEnabled(true);
 				break;
 			default:
-				varsAction.setVisible(true);
-				varsAction.setEnabled(true);
+				varsRemove.setVisible(true);
+				varsRemove.setEnabled(true);
 				break;
 			}
 		});
 		//vars.setEnabled(false);
 		varsPanel.add(vars);
-		varsPanel.add(varsAction);
+		varsPanel.add(varsRemove);
 		mainPanel.add(varsPanel);
 
 		JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
@@ -262,7 +282,7 @@ public class CommandPanel extends JPanel {
 	private JPanel buttonMenu() {
 		JPanel bMenu = new JPanel(new GridLayout(5, 1));
 
-		JButton back = new JButton("Back");
+		back = new JButton("Back");
 		back.setFocusable(false);
 		back.addActionListener(l -> {
 			if (saved==null || !saved.equals(current)) {
@@ -289,7 +309,7 @@ public class CommandPanel extends JPanel {
 		});
 		bMenu.add(back);
 
-		JButton syntax = new JButton("Syntax");
+		syntax = new JButton("Syntax");
 		syntax.setFocusable(false);
 		syntax.addActionListener(l->{
 			try {
@@ -316,12 +336,12 @@ public class CommandPanel extends JPanel {
 		});
 		bMenu.add(syntax);
 
-		JButton help = new JButton("Help");
+		help = new JButton("Help");
 		help.setEnabled(false);
 		help.setFocusable(false);
 		bMenu.add(help);
 
-		JButton save = new JButton("Save");
+		save = new JButton("Save");
 		save.setFocusable(false);
 		save.addActionListener(l->{
 			if(saved!=null) {
@@ -342,7 +362,7 @@ public class CommandPanel extends JPanel {
 		});
 		bMenu.add(save);
 
-		JButton delete = new JButton("Delete");
+		delete = new JButton("Delete");
 		delete.setFocusable(false);
 		delete.addActionListener(l->{
 			if(saved!=null)
@@ -460,7 +480,7 @@ public class CommandPanel extends JPanel {
 	private JPanel displayAdd() {
 		addPanel = new JPanel(new GridBagLayout());
 		addPanel.setOpaque(false);
-		JButton add = new JButton("ADD");
+		add = new JButton("ADD");
 		add.setFocusable(false);
 		add.addActionListener(l -> {
 			JTextArea msg = new JTextArea();
@@ -503,5 +523,69 @@ public class CommandPanel extends JPanel {
 
 	public CommandData getCurrentCommandData() {
 		return current;
+	}
+
+	public List<ControlDataPanel> getControls() {
+		return controls;
+	}
+
+	public JPanel getAddPanel() {
+		return addPanel;
+	}
+
+	public JButton getLeft() {
+		return left;
+	}
+
+	public JButton getRight() {
+		return right;
+	}
+
+	public JButton getMode() {
+		return mode;
+	}
+
+	public Set<String> getVarsBag() {
+		return varsBag;
+	}
+
+	public JButton getBack() {
+		return back;
+	}
+
+	public JButton getSyntax() {
+		return syntax;
+	}
+
+	public JButton getHelp() {
+		return help;
+	}
+
+	public JButton getSave() {
+		return save;
+	}
+
+	public JButton getDelete() {
+		return delete;
+	}
+
+	public JTextField getLead() {
+		return lead;
+	}
+
+	public JComboBox<CommandType> getType() {
+		return type;
+	}
+
+	public JComboBox<JComboItem<Pair<String, CommandVarType>>> getVars() {
+		return vars;
+	}
+
+	public JButton getVarsRemove() {
+		return varsRemove;
+	}
+
+	public JButton getAdd() {
+		return add;
 	}
 }

@@ -30,11 +30,11 @@ public class TwitchChatFrame extends JFrame {
 	
 	private static TwitchChatFrame singleton = new TwitchChatFrame();
 	
-	public static final int MSG_DISPLAY_MIN = 5;
+	public static int MSG_DISPLAY_MIN = 5;
 	
-	public static final int MSG_DISPLAY_MAX = 50;
+	public static int MSG_DISPLAY_MAX = 50;
 	
-	public static final int MSG_DISPLAY_INFINITE = 51;
+	public static int MSG_DISPLAY_INFINITE = 51;
 	
 	public enum Type{
 		MINECRAFT("Minecraft Style", "<%s> %s\n"),
@@ -170,12 +170,19 @@ public class TwitchChatFrame extends JFrame {
 		return chat.getFont();
 	}
 	
-	public Type getChatType() {
-		return type;
-	}
-	
 	public void setChatType(Type type) {
 		this.type = type;
 	}
 	
+	public Type getChatType() {
+		return type;
+	}
+
+	public JScrollPane getScroll() {
+		return scroll;
+	}
+	
+	public JTextArea getChat() {
+		return chat;
+	}
 }

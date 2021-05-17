@@ -9,6 +9,7 @@ import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,12 +58,16 @@ public class MainMenuPanel extends JPanel {
 
 	private JButton commandsButton;
 
+	private JButton modButton;
+
 	private JButton gameButton;
 
 	private JButton changeSessionButton;
 
 	private JButton twitchChatButton;
 
+	private List<JComponent> twitchChatOptions;
+	
 	private JSlider twitchChatSize;
 
 	private JCheckBox sponsor;
@@ -157,7 +162,7 @@ public class MainMenuPanel extends JPanel {
 			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
 		});
 		tmp.add(commandsButton, BorderLayout.CENTER);
-		JButton modButton = new JButton("Mod");
+		modButton = new JButton("Mod");
 		modButton.setFocusable(false);
 		//modButton.setEnabled(false);
 		modButton.addActionListener(l -> {
@@ -444,21 +449,20 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private void moveOptionPanel(boolean right) {
-
-		List<JComponent> options = Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatFontPanel,
-				twitchChatFontSizePanel, twitchChatOnTop);
-
-		int index = options.indexOf(twitchChatOptionsPanel.getComponent(0));
+		twitchChatOptions = new ArrayList<JComponent>(Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatFontPanel,
+				twitchChatFontSizePanel, twitchChatOnTop));
+		
+		int index = twitchChatOptions.indexOf(twitchChatOptionsPanel.getComponent(0));
 
 		if (right) {
 			index += 1;
-			index = index >= options.size() ? 0 : index;
+			index = index >= twitchChatOptions.size() ? 0 : index;
 		} else {
 			index -= 1;
-			index = index < 0 ? options.size() - 1 : index;
+			index = index < 0 ? twitchChatOptions.size() - 1 : index;
 		}
 		twitchChatOptionsPanel.removeAll();
-		twitchChatOptionsPanel.add(options.get(index));
+		twitchChatOptionsPanel.add(twitchChatOptions.get(index));
 
 		twitchChatOptionsPanel.revalidate();
 		twitchChatOptionsPanel.repaint();
@@ -602,6 +606,34 @@ public class MainMenuPanel extends JPanel {
 		tmp.setFocusable(false);
 		tmp.setBackground(Constants.TWITCH_COLOR);
 		return tmp;
+	}
+
+	public JButton getConnectButton() {
+		return connectButton;
+	}
+
+	public JButton getCommandsButton() {
+		return commandsButton;
+	}
+
+	public JButton getModButton() {
+		return modButton;
+	}
+
+	public JButton getGameButton() {
+		return gameButton;
+	}
+
+	public JButton getChangeSessionButton() {
+		return changeSessionButton;
+	}
+
+	public JButton getTwitchChatButton() {
+		return twitchChatButton;
+	}
+
+	public List<JComponent> getTwitchChatOptions() {
+		return twitchChatOptions;
 	}
 
 }

@@ -41,8 +41,22 @@ public class AllCommandPanel extends JPanel {
 	
 	private JPanel mainCommandPanel;
 	
-	private JTableCommand table;
+	private JButton create;
 	
+	private JButton load;
+	
+	private JButton back;
+	
+	private JTableCommand table;
+
+	private JButton insert;
+
+	private JButton help;
+
+	private JButton popout;
+
+	private JButton save;
+
 	private AllCommandPanel() {
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new BorderLayout());
@@ -60,7 +74,7 @@ public class AllCommandPanel extends JPanel {
 		tmp.setFocusable(false);
 		tmp.setOpaque(false);
 		
-		JButton create = new JButton("New");
+		create = new JButton("New");
 		create.setFocusable(false);
 		create.setOpaque(false);
 		create.addActionListener(l->{
@@ -73,7 +87,7 @@ public class AllCommandPanel extends JPanel {
 		right.setFocusable(false);
 		right.setOpaque(false);
 		
-		JButton load = new JButton("Load");
+		load = new JButton("Load");
 		load.setFocusable(false);
 		load.setOpaque(false);
 		load.addActionListener(l->{
@@ -92,7 +106,7 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(load);
 		
-		JButton back = new JButton("Back");
+		back = new JButton("Back");
 		back.setFocusable(false);
 		back.setOpaque(false);
 		back.addActionListener(l->{
@@ -139,7 +153,7 @@ public class AllCommandPanel extends JPanel {
 		
 		right.setOpaque(false);
 		
-		JButton insert = new JButton("Insert");
+		insert = new JButton("Insert");
 		insert.setFocusable(false);
 		insert.addActionListener(l->{
 			//table.addRow(new CommandData());
@@ -160,12 +174,12 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(start);
 		*/
-		JButton help = new JButton("Help");
+		help = new JButton("Help");
 		help.setEnabled(false);
 		help.setFocusable(false);
 		right.add(help);
 		
-		JButton popout = new JButton("Pop Out");
+		popout = new JButton("Pop Out");
 		popout.setFocusable(false);
 		popout.addActionListener(l->{
 			new PopOutFrame(left, MainFrame.getInstance()).addWindowListener(new WindowAdapter() {
@@ -179,7 +193,7 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(popout);
 		
-		JButton save = new JButton("Save");
+		save = new JButton("Save");
 		save.setFocusable(false);
 		save.addActionListener(l->{
 			File file = Constants.showSaveFile(new File("commands.json"),new FileNameExtensionFilter("JSON", "json"), this);
@@ -203,7 +217,7 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(save);
 		
-		JButton load = new JButton("Load");
+		load = new JButton("Load");
 		load.setFocusable(false);
 		load.addActionListener(l->{
 			try {
@@ -220,7 +234,7 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(load);
 		
-		JButton back = new JButton("Back");
+		back = new JButton("Back");
 		back.setFocusable(false);
 		back.addActionListener(l->{
 			MainFrame.getInstance().replacePanel(MainMenuPanel.getInstance());
@@ -245,6 +259,50 @@ public class AllCommandPanel extends JPanel {
 	private void refreshTable() {
 		if(table!=null)
 			this.table.clearAndSet(DataManager.getInstance().getCommands());
+	}
+	
+	public JPanel getCurrentPanel() {
+		return currentPanel;
+	}
+	
+	public void setCurrentPanel(JPanel newer) {
+		this.currentPanel = newer;
+	}
+	
+	public JButton getCreate() {
+		return create;
+	}
+
+	public JButton getLoad() {
+		return load;
+	}
+
+	public JButton getBack() {
+		return back;
+	}
+
+	public JTableCommand getTable() {
+		return table;
+	}
+
+	public JPanel getMainCommandPanel() {
+		return mainCommandPanel;
+	}
+
+	public JButton getInsert() {
+		return insert;
+	}
+
+	public JButton getHelp() {
+		return help;
+	}
+
+	public JButton getPopout() {
+		return popout;
+	}
+
+	public JButton getSave() {
+		return save;
 	}
 	
 }
