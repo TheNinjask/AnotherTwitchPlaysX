@@ -126,9 +126,9 @@ public class InDepthCursorData implements Data {
 	
 	public InDepthCursorData clone() {
 		InDepthCursorData copy = new InDepthCursorData();
-		copy.setX(x==null?null:new Integer(x.intValue()));
-		copy.setY(y==null?null:new Integer(y.intValue()));
-		copy.setScroll(scroll==null?null:new Integer(scroll.intValue()));
+		copy.setX(x==null?null:Integer.valueOf(x.intValue()));
+		copy.setY(y==null?null:Integer.valueOf(y.intValue()));
+		copy.setScroll(scroll==null?null:Integer.valueOf(scroll.intValue()));
 		return copy;
 	}
 }

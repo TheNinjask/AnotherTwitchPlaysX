@@ -163,7 +163,9 @@ public final class Constants {
 				className = className.replace('/', '.');
 				Class<?> c = cl.loadClass(className);
 				Mod annotation = c.getDeclaredAnnotation(Mod.class);
-				Object tmp = c.newInstance();
+				
+				Object tmp = c.getConstructor().newInstance();
+				
 				if (mod==null && annotation != null && annotation.main() && tmp instanceof ModPanel) {
 					mod = (ModPanel) tmp;
 				}

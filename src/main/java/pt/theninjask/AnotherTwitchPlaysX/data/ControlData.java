@@ -322,9 +322,9 @@ public class ControlData implements Data {
 	
 	public ControlData clone() {
 		ControlData copy = new ControlData();
-		copy.setKey(key==null?null:new Integer(key.intValue()));
-		copy.setDuration(duration==null?null:new Integer(duration.intValue()));
-		copy.setAftermathDelay(aftermathDelay==null?null:new Integer(aftermathDelay.intValue()));
+		copy.setKey(key==null?null:Integer.valueOf(key.intValue()));
+		copy.setDuration(duration==null?null:Integer.valueOf(duration.intValue()));
+		copy.setAftermathDelay(aftermathDelay==null?null:Integer.valueOf(aftermathDelay.intValue()));
 		copy.setType(type==null?null:type);
 		copy.setInDepthCursor(inDepthCursor==null?null:inDepthCursor.clone());
 		if(map==null)
