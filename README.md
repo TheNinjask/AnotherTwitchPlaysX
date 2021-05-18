@@ -13,7 +13,7 @@
 The Key escape is a special key that can be used to stop the app from running after pressing the button start. (You will know, do not fret)
 ```
 
-[Download](/releases/latest)
+[Download](https://github.com/TheNinjask/AnotherTwitchPlaysX/releases/latest)
 
 <!-- omit in toc -->
 ## Table of Contents
