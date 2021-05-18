@@ -30,7 +30,7 @@ public class SponsorBot implements Runnable{
 	public static String getSponsorMsg() {
 		return String.format(SPONSOR_MSG, 
 				DataManager.getInstance().getSession().getNickname(),
-				"#INSERT LINK");
+				"https://github.com/TheNinjask/AnotherTwitchPlaysX");
 	}
 	
 	public void setCooldown(int minutes) {

@@ -12,11 +12,15 @@
 ```
 The Key escape is a special key that can be used to stop the app from running after pressing the button start. (You will know, do not fret)
 ```
+
+[Download](/releases/latest)
+
 <!-- omit in toc -->
 ## Table of Contents
 
 
 - [Introduction](#introduction)
+- [Features](#features)
 - [Modding](#modding)
 - [F.A.Q. with out the F.A.](#faq-with-out-the-fa)
 - [Bugs](#bugs)
@@ -29,6 +33,16 @@ The Key escape is a special key that can be used to stop the app from running af
 This app was made with the intention to any type of user to have it easy to play with their chat maybe just their chat alone.
 
 So I hope you can have fun using this application!
+
+## Features
+
+Well as the name of the app says its another TwitchPlays app.
+I am a bit bad at explaining thing in text but if you use the app I hope it is intuitive enough.
+* Set commands with control(s) assigned;
+* The commands have (minimum for now) support for variables! e.g. type in chat !test 1 2 can correspond to move mouse to (1,2)
+* Support for mods (if someone develops)
+* Display twitch chat (wow really? that so hard /s)
+* and more! ("and more!" may not be included.)
 
 ## Modding
 
