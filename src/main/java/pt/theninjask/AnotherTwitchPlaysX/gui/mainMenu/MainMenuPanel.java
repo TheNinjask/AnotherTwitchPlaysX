@@ -170,6 +170,8 @@ public class MainMenuPanel extends JPanel {
 				try {
 					File file = Constants.showOpenFile(new FileNameExtensionFilter("JAR", "jar"), this);
 					mod = Constants.loadMod(file);	
+					if(mod==null)
+						return;
 					mod.refresh();
 					if(mod.getClass().getDeclaredAnnotation(Mod.class).hasPanel())
 						MainFrame.getInstance().replacePanel(mod.getJPanelInstance());

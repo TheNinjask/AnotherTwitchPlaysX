@@ -190,7 +190,7 @@ public final class Constants {
 						case JOptionPane.CLOSED_OPTION:
 						case JOptionPane.CANCEL_OPTION:
 						default:
-							throw new ModNotLoadedException();
+							return null;
 					}
 					break;
 			};
@@ -310,7 +310,7 @@ public final class Constants {
 	}
 
 	public static final void showExceptionDialog(Exception e) {
-		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getName(), JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static final void showExpectedExceptionDialog(Exception e) {
@@ -320,7 +320,7 @@ public final class Constants {
 		Object panelBG = UIManager.get("Panel.background");
 		UIManager.put("OptionPane.background", TWITCH_COLOR);
 		UIManager.put("Panel.background", TWITCH_COLOR);
-		JOptionPane.showMessageDialog(null, exception, e.getClass().getName(), JOptionPane.WARNING_MESSAGE, null);
+		JOptionPane.showMessageDialog(null, exception, e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE, null);
 		UIManager.put("OptionPane.background", paneBG);
 		UIManager.put("Panel.background", panelBG);
 	}
