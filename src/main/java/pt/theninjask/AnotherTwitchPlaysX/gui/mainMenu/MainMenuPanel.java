@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -255,6 +256,7 @@ public class MainMenuPanel extends JPanel {
 							}
 						}
 					});
+					MainFrame.getInstance().setState(JFrame.ICONIFIED);
 					isAppStarted.set(true);
 				} catch (NativeHookException e) {
 					Constants.showExceptionDialog(e);

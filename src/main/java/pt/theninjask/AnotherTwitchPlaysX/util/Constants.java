@@ -102,11 +102,11 @@ public final class Constants {
 				if(elem.getName().equals("VK_ESCAPE"))
 					continue;
 				if (elem.getName().contains("VK_"))
-					STRING_TO_KEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
+					STRING_TO_KEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)).toLowerCase(), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
 			}
-			STRING_TO_KEYCODE.put("Button Left", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
-			STRING_TO_KEYCODE.put("Button Right", new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
-			STRING_TO_KEYCODE.put("Button Middle", new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Left".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Right".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Middle".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
 		} catch (Exception e) {
 			showExceptionDialog(e);
 		}
@@ -121,11 +121,11 @@ public final class Constants {
 				if(elem.getName().equals("VK_ESCAPE"))
 					continue;
 				if (elem.getName().contains("VK_"))
-					map.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
+					map.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)).toLowerCase(), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
 			}
-			map.put("Button Left", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
-			map.put("Button Right", new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
-			map.put("Button Middle", new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Left".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Right".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Middle".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
 		} catch (Exception e) {
 			showExceptionDialog(e);
 		}

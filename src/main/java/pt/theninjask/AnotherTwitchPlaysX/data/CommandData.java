@@ -192,7 +192,7 @@ public class CommandData implements Data {
 			if(value!=null && value.isEmpty())
 				value = null;
 			if(value!=null)
-				map.put(elem.getKey(), value);
+				map.put(elem.getKey(), value.toLowerCase());
 		}
 		switch (type) {
 			case QUEUE:
