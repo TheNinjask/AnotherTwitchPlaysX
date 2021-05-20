@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -28,6 +29,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.exception.ModNotLoadedException;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.Mod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ModPanel;
@@ -91,25 +93,18 @@ public final class Constants {
 
 	public static final String MOD_INFO = "You are loading a third party mod that was validated by the creator of this app!";
 
-	public static final Map<String, Integer> STRINGTOKEYCODE = getStringToKeyCode();
-
-	@Deprecated
-	//This is here due to pondering the access 
-	//to the STRINGTOKEYCODE not being well defined
-	//as of right now
-	//POST NOTE
-	//This may be unnecessary if removal/ban of certain key(s)
-	public static Integer getKeyCodeFromText(String code) {
-		return STRINGTOKEYCODE.get(code);
-	}
+	public static final Map<String, Pair<Integer, ControlType>> STRINGTOKEYCODE = getStringToKeyCode();
 	
-	public static Map<String, Integer> refreshStringToKeyCode(){
+	public static Map<String, Pair<Integer, ControlType>> refreshStringToKeyCode(){
 		STRINGTOKEYCODE.clear();
 		try {
 			for (Field elem : KeyEvent.class.getFields()) {
 				if (elem.getName().contains("VK_"))
-					STRINGTOKEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), elem.getInt(KeyEvent.class));
+					STRINGTOKEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
 			}
+			STRINGTOKEYCODE.put("Button Left", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			STRINGTOKEYCODE.put("Button Right", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			STRINGTOKEYCODE.put("Button Middle", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
 		} catch (Exception e) {
 			showExceptionDialog(e);
 		}
@@ -117,13 +112,16 @@ public final class Constants {
 	}
 	
 	
-	private static Map<String, Integer> getStringToKeyCode() {
-		Map<String, Integer> map = new HashMap<String, Integer>();
+	private static Map<String, Pair<Integer, ControlType>> getStringToKeyCode() {
+		Map<String, Pair<Integer, ControlType>> map = new HashMap<String, Pair<Integer, ControlType>>();
 		try {
 			for (Field elem : KeyEvent.class.getFields()) {
 				if (elem.getName().contains("VK_"))
-					map.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), elem.getInt(KeyEvent.class));
+					map.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
 			}
+			map.put("Button Left", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Right", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Middle", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
 		} catch (Exception e) {
 			showExceptionDialog(e);
 		}

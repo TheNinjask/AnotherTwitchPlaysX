@@ -6,9 +6,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -247,9 +247,9 @@ public class ControlDataPanel extends JPanel {
 			normal.add(opt);
 			opt.setFocusable(false);
 			opt.addItem(new JComboItem<Integer>(null, "None"));
-			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON1_DOWN_MASK, "Left"));
-			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON2_DOWN_MASK, "Right"));
-			opt.addItem(new JComboItem<Integer>(InputEvent.BUTTON3_DOWN_MASK, "Middle"));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON1_DOWN_MASK, "Left"));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON3_DOWN_MASK, "Right"));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON2_DOWN_MASK, "Middle"));
 			opt.addActionListener(l -> {
 				this.data.setKey(opt.getItemAt(opt.getSelectedIndex()).get());
 			});
