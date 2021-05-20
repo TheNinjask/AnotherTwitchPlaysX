@@ -68,12 +68,14 @@ public class ControlDataPanel extends JPanel {
 	private List<Component> var = new ArrayList<Component>();
 
 	private JButton key;
-
+	
 	private JComboBox<JComboItem<Integer>> opt;
 
 	private JComboBoxVar inputVar;
 
 	private JTextField duration;
+
+	private JComboBoxVar durationVar;
 
 	private JTextField aftermath;
 
@@ -358,7 +360,7 @@ public class ControlDataPanel extends JPanel {
 			duration.setPreferredSize(new Dimension(50, 20));
 			durationPanel.add(duration);
 			
-			JComboBoxVar durationVar = new JComboBoxVar(CommandVarType.DIGIT,"duration");
+			durationVar = new JComboBoxVar(CommandVarType.DIGIT,"duration");
 			durationVar.setVisible(false);
 			var.add(durationVar);
 			durationPanel.add(durationVar);
@@ -978,14 +980,6 @@ public class ControlDataPanel extends JPanel {
 		return data;
 	}
 
-	public CommandPanel getParent() {
-		return parent;
-	}
-
-	public List<Component> getVar() {
-		return var;
-	}
-
 	public JButton getKey() {
 		return key;
 	}
@@ -1000,6 +994,10 @@ public class ControlDataPanel extends JPanel {
 
 	public JTextField getDuration() {
 		return duration;
+	}
+
+	public JComboBoxVar getDurationVar() {
+		return durationVar;
 	}
 
 	public JTextField getAftermath() {
