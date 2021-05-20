@@ -184,6 +184,7 @@ public class CommandPanel extends JPanel {
 				default:
 					disableVars.set(true);
 					varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getKey());
+					current.getVars().remove(vars.getItemAt(vars.getSelectedIndex()).get());
 					varsRemove.setVisible(false);
 					varsRemove.setEnabled(false);
 					controls.forEach(c->{

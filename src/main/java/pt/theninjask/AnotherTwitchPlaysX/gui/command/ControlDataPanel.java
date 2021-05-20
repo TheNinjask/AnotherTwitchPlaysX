@@ -154,9 +154,9 @@ public class ControlDataPanel extends JPanel {
 		public void removeItem(Pair<String, CommandVarType> var) {
 			if(var==null || var.getValue()!=type || "NONE".equals(var.getKey()) || !vars.containsKey(var.getKey()))
 				return;
-			if(getItemAt(getSelectedIndex()).get().equals(var))
+			if(getItemAt(getSelectedIndex()).get()!=null && getItemAt(getSelectedIndex()).get().equals(var))
 				setSelectedDefault();
-			removeItem(vars.get(var.getKey()));
+			removeItem(vars.remove(var.getKey()));
 		}
 		
 		public void setSelectedDefault() {
