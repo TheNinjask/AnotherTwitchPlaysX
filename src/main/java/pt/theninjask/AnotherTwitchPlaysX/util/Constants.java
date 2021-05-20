@@ -1,80 +1,20 @@
 package pt.theninjask.AnotherTwitchPlaysX.util;
 
-import static java.awt.event.KeyEvent.VK_0;
-import static java.awt.event.KeyEvent.VK_1;
-import static java.awt.event.KeyEvent.VK_2;
-import static java.awt.event.KeyEvent.VK_3;
-import static java.awt.event.KeyEvent.VK_4;
-import static java.awt.event.KeyEvent.VK_5;
-import static java.awt.event.KeyEvent.VK_6;
-import static java.awt.event.KeyEvent.VK_7;
-import static java.awt.event.KeyEvent.VK_8;
-import static java.awt.event.KeyEvent.VK_9;
-import static java.awt.event.KeyEvent.VK_A;
-import static java.awt.event.KeyEvent.VK_AMPERSAND;
-import static java.awt.event.KeyEvent.VK_ASTERISK;
-import static java.awt.event.KeyEvent.VK_AT;
-import static java.awt.event.KeyEvent.VK_B;
-import static java.awt.event.KeyEvent.VK_BACK_QUOTE;
-import static java.awt.event.KeyEvent.VK_BACK_SLASH;
-import static java.awt.event.KeyEvent.VK_C;
-import static java.awt.event.KeyEvent.VK_CIRCUMFLEX;
-import static java.awt.event.KeyEvent.VK_CLOSE_BRACKET;
-import static java.awt.event.KeyEvent.VK_COLON;
-import static java.awt.event.KeyEvent.VK_COMMA;
-import static java.awt.event.KeyEvent.VK_D;
-import static java.awt.event.KeyEvent.VK_DOLLAR;
-import static java.awt.event.KeyEvent.VK_E;
-import static java.awt.event.KeyEvent.VK_ENTER;
-import static java.awt.event.KeyEvent.VK_EQUALS;
-import static java.awt.event.KeyEvent.VK_EXCLAMATION_MARK;
-import static java.awt.event.KeyEvent.VK_F;
-import static java.awt.event.KeyEvent.VK_G;
-import static java.awt.event.KeyEvent.VK_H;
-import static java.awt.event.KeyEvent.VK_I;
-import static java.awt.event.KeyEvent.VK_J;
-import static java.awt.event.KeyEvent.VK_K;
-import static java.awt.event.KeyEvent.VK_L;
-import static java.awt.event.KeyEvent.VK_LEFT_PARENTHESIS;
-import static java.awt.event.KeyEvent.VK_M;
-import static java.awt.event.KeyEvent.VK_MINUS;
-import static java.awt.event.KeyEvent.VK_N;
-import static java.awt.event.KeyEvent.VK_NUMBER_SIGN;
-import static java.awt.event.KeyEvent.VK_O;
-import static java.awt.event.KeyEvent.VK_OPEN_BRACKET;
-import static java.awt.event.KeyEvent.VK_P;
-import static java.awt.event.KeyEvent.VK_PERIOD;
-import static java.awt.event.KeyEvent.VK_PLUS;
-import static java.awt.event.KeyEvent.VK_Q;
-import static java.awt.event.KeyEvent.VK_QUOTE;
-import static java.awt.event.KeyEvent.VK_QUOTEDBL;
-import static java.awt.event.KeyEvent.VK_R;
-import static java.awt.event.KeyEvent.VK_RIGHT_PARENTHESIS;
-import static java.awt.event.KeyEvent.VK_S;
-import static java.awt.event.KeyEvent.VK_SEMICOLON;
-import static java.awt.event.KeyEvent.VK_SLASH;
-import static java.awt.event.KeyEvent.VK_SPACE;
-import static java.awt.event.KeyEvent.VK_T;
-import static java.awt.event.KeyEvent.VK_TAB;
-import static java.awt.event.KeyEvent.VK_U;
-import static java.awt.event.KeyEvent.VK_UNDERSCORE;
-import static java.awt.event.KeyEvent.VK_V;
-import static java.awt.event.KeyEvent.VK_W;
-import static java.awt.event.KeyEvent.VK_X;
-import static java.awt.event.KeyEvent.VK_Y;
-import static java.awt.event.KeyEvent.VK_Z;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -146,57 +86,84 @@ public final class Constants {
 	// JUST FOR ME :) BUT NOT RECOMENDED
 	@Deprecated
 	public static final Color BLUE_COLOR = new Color(0x123456);
-	
+
 	public static final String MOD_WARN = "You are loading a mod that was not made by the creator of this app nor verified by them!\nProceed at your own risk.";
-	
+
 	public static final String MOD_INFO = "You are loading a third party mod that was validated by the creator of this app!";
+
+	public static final Map<String, Integer> STRINGTOKEYCODE = getStringToKeyCode();
+
+	@Deprecated
+	//This is here due to pondering the access 
+	//to the STRINGTOKEYCODE not being well defined
+	//as of right now
+	//POST NOTE
+	//This may be unnecessary if removal/ban of certain key(s)
+	public static Integer getKeyCodeFromText(String code) {
+		return STRINGTOKEYCODE.get(code);
+	}
 	
+	public static Map<String, Integer> refreshStringToKeyCode(){
+		STRINGTOKEYCODE.clear();
+		try {
+			for (Field elem : KeyEvent.class.getFields()) {
+				if (elem.getName().contains("VK_"))
+					STRINGTOKEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), elem.getInt(KeyEvent.class));
+			}
+		} catch (Exception e) {
+			showExceptionDialog(e);
+		}
+		return STRINGTOKEYCODE;
+	}
+	
+	
+	private static Map<String, Integer> getStringToKeyCode() {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		try {
+			for (Field elem : KeyEvent.class.getFields()) {
+				if (elem.getName().contains("VK_"))
+					map.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), elem.getInt(KeyEvent.class));
+			}
+		} catch (Exception e) {
+			showExceptionDialog(e);
+		}
+		return map;
+	}
+
 	public static ModPanel loadMod(File modFile) throws Exception {
 		ModPanel mod = null;
 		try {
-			switch(JarVerifier.getInstance().verifyJar(modFile)) {
-				case MAIN:
+			switch (JarVerifier.getInstance().verifyJar(modFile)) {
+			case MAIN:
+				break;
+			case THIRD_PARTY:
+				JTextArea msg = new JTextArea(MOD_INFO);
+				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
+				msg.setOpaque(false);
+				showCustomColorMessageDialog(null, msg, "Mod Info", JOptionPane.INFORMATION_MESSAGE, null,
+						TWITCH_COLOR);
+				break;
+			case UNKNOWN:
+			default:
+				msg = new JTextArea(MOD_WARN);
+				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
+				msg.setOpaque(false);
+				int resp = showCustomColorOptionDialog(null, msg, "Mod Warning", JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE, null, null, null, TWITCH_COLOR);
+				switch (resp) {
+				case JOptionPane.OK_OPTION:
 					break;
-				case THIRD_PARTY:
-					JTextArea msg = new JTextArea(MOD_INFO);
-					msg.setForeground(TWITCH_COLOR_COMPLEMENT);
-					msg.setOpaque(false);
-					showCustomColorMessageDialog(
-							null, 
-							msg, 
-							"Mod Info", 
-							JOptionPane.INFORMATION_MESSAGE, 
-							null, 
-							TWITCH_COLOR);
-					break;
-				case UNKNOWN:
+				case JOptionPane.CLOSED_OPTION:
+				case JOptionPane.CANCEL_OPTION:
 				default:
-					msg = new JTextArea(MOD_WARN);
-					msg.setForeground(TWITCH_COLOR_COMPLEMENT);
-					msg.setOpaque(false);
-					int resp = showCustomColorOptionDialog(
-							null, 
-							msg, 
-							"Mod Warning", 
-							JOptionPane.OK_CANCEL_OPTION, 
-							JOptionPane.WARNING_MESSAGE, 
-							null, 
-							null, 
-							null, 
-							TWITCH_COLOR);
-					switch (resp) {
-						case JOptionPane.OK_OPTION:
-							break;
-						case JOptionPane.CLOSED_OPTION:
-						case JOptionPane.CANCEL_OPTION:
-						default:
-							return null;
-					}
-					break;
-			};
+					return null;
+				}
+				break;
+			}
+			;
 			JarFile jarFile = new JarFile(modFile.getAbsolutePath());
 			Enumeration<JarEntry> e = jarFile.entries();
-			
+
 			URLClassLoader cl = URLClassLoader.newInstance(new URL[] { modFile.toURI().toURL() },
 					ModPanel.class.getClassLoader());
 
@@ -335,217 +302,6 @@ public final class Constants {
 		} else {
 			JOptionPane.showMessageDialog(null, Constants.BROWSER_NOT_SUPPORTED, Constants.DEFAULT_ERROR_TITLE,
 					JOptionPane.INFORMATION_MESSAGE);
-		}
-	}
-
-	@Deprecated
-	public static final int getKeyCodeOrDefault(String key, int defaultValue) {
-		Integer value = getKeyCode(key);
-		if (value == null)
-			return defaultValue;
-		return value;
-	}
-
-	@Deprecated
-	/**
-	 * Avoid using this function at least I dont like it the way it is now Maybe in
-	 * the future have a "learn" capability like a area where the user presses keys
-	 * and show the code and string associated and it is saved as a
-	 * map<string,keycode> for the vars
-	 */
-	public static final Integer getKeyCode(String key) {
-		// adapted from sauce: https://stackoverflow.com/a/1248709
-		if (key == null || key.length() != 1)
-			return null;
-		switch (key.charAt(0)) {
-		case 'a':
-			return VK_A;
-		case 'b':
-			return VK_B;
-		case 'c':
-			return VK_C;
-		case 'd':
-			return VK_D;
-		case 'e':
-			return VK_E;
-		case 'f':
-			return VK_F;
-		case 'g':
-			return VK_G;
-		case 'h':
-			return VK_H;
-		case 'i':
-			return VK_I;
-		case 'j':
-			return VK_J;
-		case 'k':
-			return VK_K;
-		case 'l':
-			return VK_L;
-		case 'm':
-			return VK_M;
-		case 'n':
-			return VK_N;
-		case 'o':
-			return VK_O;
-		case 'p':
-			return VK_P;
-		case 'q':
-			return VK_Q;
-		case 'r':
-			return VK_R;
-		case 's':
-			return VK_S;
-		case 't':
-			return VK_T;
-		case 'u':
-			return VK_U;
-		case 'v':
-			return VK_V;
-		case 'w':
-			return VK_W;
-		case 'x':
-			return VK_X;
-		case 'y':
-			return VK_Y;
-		case 'z':
-			return VK_Z;
-		case 'A':
-			return VK_A; // VK_SHIFT, VK_A;
-		case 'B':
-			return VK_B; // VK_SHIFT, VK_B;
-		case 'C':
-			return VK_C; // VK_SHIFT, VK_C;
-		case 'D':
-			return VK_D; // VK_SHIFT, VK_D;
-		case 'E':
-			return VK_E; // VK_SHIFT, VK_E;
-		case 'F':
-			return VK_F; // VK_SHIFT, VK_F;
-		case 'G':
-			return VK_G; // VK_SHIFT, VK_G;
-		case 'H':
-			return VK_H; // VK_SHIFT, VK_H;
-		case 'I':
-			return VK_I; // VK_SHIFT, VK_I;
-		case 'J':
-			return VK_J; // VK_SHIFT, VK_J;
-		case 'K':
-			return VK_K; // VK_SHIFT, VK_K;
-		case 'L':
-			return VK_L; // VK_SHIFT, VK_L;
-		case 'M':
-			return VK_M; // VK_SHIFT, VK_M;
-		case 'N':
-			return VK_N; // VK_SHIFT, VK_N;
-		case 'O':
-			return VK_O; // VK_SHIFT, VK_O;
-		case 'P':
-			return VK_P; // VK_SHIFT, VK_P;
-		case 'Q':
-			return VK_Q; // VK_SHIFT, VK_Q;
-		case 'R':
-			return VK_R; // VK_SHIFT, VK_R;
-		case 'S':
-			return VK_S; // VK_SHIFT, VK_S;
-		case 'T':
-			return VK_T; // VK_SHIFT, VK_T;
-		case 'U':
-			return VK_U; // VK_SHIFT, VK_U;
-		case 'V':
-			return VK_V; // VK_SHIFT, VK_V;
-		case 'W':
-			return VK_W; // VK_SHIFT, VK_W;
-		case 'X':
-			return VK_X; // VK_SHIFT, VK_X;
-		case 'Y':
-			return VK_Y; // VK_SHIFT, VK_Y;
-		case 'Z':
-			return VK_Z; // VK_SHIFT, VK_Z;
-		case '`':
-			return VK_BACK_QUOTE;
-		case '0':
-			return VK_0;
-		case '1':
-			return VK_1;
-		case '2':
-			return VK_2;
-		case '3':
-			return VK_3;
-		case '4':
-			return VK_4;
-		case '5':
-			return VK_5;
-		case '6':
-			return VK_6;
-		case '7':
-			return VK_7;
-		case '8':
-			return VK_8;
-		case '9':
-			return VK_9;
-		case '-':
-			return VK_MINUS;
-		case '=':
-			return VK_EQUALS;
-		// case '~': return VK_SHIFT, VK_BACK_QUOTE;
-		case '!':
-			return VK_EXCLAMATION_MARK;
-		case '@':
-			return VK_AT;
-		case '#':
-			return VK_NUMBER_SIGN;
-		case '$':
-			return VK_DOLLAR;
-		// case '%': return VK_SHIFT, VK_5;
-		case '^':
-			return VK_CIRCUMFLEX;
-		case '&':
-			return VK_AMPERSAND;
-		case '*':
-			return VK_ASTERISK;
-		case '(':
-			return VK_LEFT_PARENTHESIS;
-		case ')':
-			return VK_RIGHT_PARENTHESIS;
-		case '_':
-			return VK_UNDERSCORE;
-		case '+':
-			return VK_PLUS;
-		case '\t':
-			return VK_TAB;
-		case '\n':
-			return VK_ENTER;
-		case '[':
-			return VK_OPEN_BRACKET;
-		case ']':
-			return VK_CLOSE_BRACKET;
-		case '\\':
-			return VK_BACK_SLASH;
-		// case '{': return VK_SHIFT, VK_OPEN_BRACKET;
-		// case '}': return VK_SHIFT, VK_CLOSE_BRACKET;
-		// case '|': return VK_SHIFT, VK_BACK_SLASH;
-		case ';':
-			return VK_SEMICOLON;
-		case ':':
-			return VK_COLON;
-		case '\'':
-			return VK_QUOTE;
-		case '"':
-			return VK_QUOTEDBL;
-		case ',':
-			return VK_COMMA;
-		// case '<': return VK_SHIFT, VK_COMMA;
-		case '.':
-			return VK_PERIOD;
-		// case '>': return VK_SHIFT, VK_PERIOD;
-		case '/':
-			return VK_SLASH;
-		// case '?': return VK_SHIFT, VK_SLASH;
-		case ' ':
-			return VK_SPACE;
-		default:
-			return null;
 		}
 	}
 }
