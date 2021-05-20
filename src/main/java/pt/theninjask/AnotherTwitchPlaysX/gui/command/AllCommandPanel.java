@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.util.JTableCommand;
+import pt.theninjask.AnotherTwitchPlaysX.gui.command.util.StringToKeyCodePanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
@@ -56,6 +57,8 @@ public class AllCommandPanel extends JPanel {
 	private JButton popout;
 
 	private JButton save;
+
+	private JButton keycodes;
 
 	private AllCommandPanel() {
 		this.setBackground(Constants.TWITCH_COLOR);
@@ -160,20 +163,12 @@ public class AllCommandPanel extends JPanel {
 			MainFrame.getInstance().replacePanel(new CommandPanel());
 		});
 		right.add(insert);
-		/*
-		JButton start = new JButton("Start");
-		start.setFocusable(false);
-		start.addActionListener(l->{
-			if(isOn) {
-				isOn = false;
-				start.setText("Start");
-			}else {
-				isOn = true;
-				start.setText("Stop");
-			}
+		keycodes = new JButton("Codes");
+		keycodes.setFocusable(false);
+		keycodes.addActionListener(l->{
+			MainFrame.getInstance().replacePanel(StringToKeyCodePanel.getInstance());
 		});
-		right.add(start);
-		*/
+		right.add(keycodes);
 		help = new JButton("Help");
 		help.setEnabled(false);
 		help.setFocusable(false);
@@ -303,6 +298,10 @@ public class AllCommandPanel extends JPanel {
 
 	public JButton getSave() {
 		return save;
+	}
+
+	public JButton getKeycodes() {
+		return keycodes;
 	}
 	
 }

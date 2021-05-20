@@ -93,22 +93,24 @@ public final class Constants {
 
 	public static final String MOD_INFO = "You are loading a third party mod that was validated by the creator of this app!";
 
-	public static final Map<String, Pair<Integer, ControlType>> STRINGTOKEYCODE = getStringToKeyCode();
-	
-	public static Map<String, Pair<Integer, ControlType>> refreshStringToKeyCode(){
-		STRINGTOKEYCODE.clear();
+	public static final Map<String, Pair<Integer, ControlType>> STRING_TO_KEYCODE = getStringToKeyCode();
+		
+	public static Map<String, Pair<Integer, ControlType>> resetStringToKeyCode(){
+		STRING_TO_KEYCODE.clear();
 		try {
 			for (Field elem : KeyEvent.class.getFields()) {
+				if(elem.getName().equals("VK_ESCAPE"))
+					continue;
 				if (elem.getName().contains("VK_"))
-					STRINGTOKEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
+					STRING_TO_KEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
 			}
-			STRINGTOKEYCODE.put("Button Left", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
-			STRINGTOKEYCODE.put("Button Right", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
-			STRINGTOKEYCODE.put("Button Middle", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Left", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Right", new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Middle", new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
 		} catch (Exception e) {
 			showExceptionDialog(e);
 		}
-		return STRINGTOKEYCODE;
+		return STRING_TO_KEYCODE;
 	}
 	
 	
@@ -116,12 +118,14 @@ public final class Constants {
 		Map<String, Pair<Integer, ControlType>> map = new HashMap<String, Pair<Integer, ControlType>>();
 		try {
 			for (Field elem : KeyEvent.class.getFields()) {
+				if(elem.getName().equals("VK_ESCAPE"))
+					continue;
 				if (elem.getName().contains("VK_"))
 					map.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
 			}
 			map.put("Button Left", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
-			map.put("Button Right", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
-			map.put("Button Middle", new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Right", new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Middle", new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
 		} catch (Exception e) {
 			showExceptionDialog(e);
 		}
