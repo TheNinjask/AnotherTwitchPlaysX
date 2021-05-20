@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
+
 public class ControlData implements Data {
 
 	private Integer key;
@@ -19,6 +21,8 @@ public class ControlData implements Data {
 	private InDepthCursorData inDepthCursor;
 	
 	private Map<String, String> map;
+	
+	private static Map<String, Pair<Integer, ControlType>> translation;
 	
 	public ControlData() {
 		this.key = null;
@@ -169,10 +173,19 @@ public class ControlData implements Data {
 			Integer scroll;
 			Integer x;
 			Integer y;
+			Integer key;
 			String tmp;
+			Pair<Integer, ControlType> trans;
 			break;
 			
 		case KEY:
+			tmp = getValueFromMap("key", vars);
+			trans = translation.get(tmp);
+			if(trans==null || trans.getValue() != ControlType.KEY) {
+				key = this.key;
+			}else {
+				key = trans.getKey();
+			}
 			if(key==null)
 				break;
 			robot.keyPress(key);
@@ -216,6 +229,15 @@ public class ControlData implements Data {
 			//this is implying dead code in y==null even tho it is the same
 			y = tmp==null ? inDepthCursor.getYorDefault() : Integer.parseInt(tmp);
 			robot.mouseMove(x,y);
+			
+			tmp = getValueFromMap("key", vars);
+			trans = translation.get(tmp);
+			if(trans==null || trans.getValue() != ControlType.MOUSE) {
+				key = this.key;
+			}else {
+				key = trans.getKey();
+			}
+			
 			if(key!=null)
 				robot.mousePress(key);
 			tmp = getValueFromMap("duration", vars);
@@ -232,6 +254,15 @@ public class ControlData implements Data {
 			tmp = getValueFromMap("y", vars);
 			y = tmp==null ? inDepthCursor.getYorDefault() : Integer.parseInt(tmp);
 			robot.mouseMove(x,y);
+			
+			tmp = getValueFromMap("key", vars);
+			trans = translation.get(tmp);
+			if(trans==null || trans.getValue() != ControlType.MOUSE) {
+				key = this.key;
+			}else {
+				key = trans.getKey();
+			}
+			
 			if(key!=null)
 				robot.mousePress(key);
 			/*tmp = getValueFromMap("duration", vars);
@@ -337,6 +368,10 @@ public class ControlData implements Data {
 			copy.setMap(mapCopy);
 		}
 		return copy;
+	}
+
+	public static void setTranslation(Map<String, Pair<Integer, ControlType>> translation) {
+		ControlData.translation = translation;
 	}
 	
 }

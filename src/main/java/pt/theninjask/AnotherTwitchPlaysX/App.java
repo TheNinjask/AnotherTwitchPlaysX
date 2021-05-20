@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 
 import org.jnativehook.GlobalScreen;
 
+import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
@@ -50,6 +51,9 @@ public class App {
 		GlobalScreen.registerNativeHook();
 		GlobalScreen.unregisterNativeHook();
 		System.setOut(tmp);
+		
+		ControlData.setTranslation(Constants.STRING_TO_KEYCODE);
+		
 		//
 	}
 }
