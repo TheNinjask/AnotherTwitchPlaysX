@@ -490,12 +490,12 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private JPanel twitchChatFontSize() {
-		twitchChatFontSizePanel = new JPanel(new FlowLayout());
+		twitchChatFontSizePanel = new JPanel(new BorderLayout());
 		twitchChatFontSizePanel.setFocusable(false);
 		twitchChatFontSizePanel.setOpaque(false);
 		JLabel tmp = new JLabel("Font Size: (12)");
 		tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		twitchChatFontSizePanel.add(tmp);
+		twitchChatFontSizePanel.add(tmp, BorderLayout.WEST);
 		twitchChatFontSize = new JSlider(5, 50, 12);
 
 		twitchChatFontSize.setMajorTickSpacing(45);
@@ -506,7 +506,7 @@ public class MainMenuPanel extends JPanel {
 			TwitchChatFrame.getInstance().setFontSize(twitchChatFontSize.getValue());
 		});
 
-		twitchChatFontSizePanel.add(twitchChatFontSize);
+		twitchChatFontSizePanel.add(twitchChatFontSize, BorderLayout.CENTER);
 		return twitchChatFontSizePanel;
 	}
 

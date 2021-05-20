@@ -201,11 +201,13 @@ public class ControlDataPanel extends JPanel {
 			break;
 		}
 		center.setOpaque(false);
-		JPanel inputPanel = new JPanel(new FlowLayout());
+		JPanel inputPanel = new JPanel(new BorderLayout());
+		JPanel content = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		content.setOpaque(false);
 		inputPanel.setOpaque(false);
 		JLabel inputLabel = new JLabel(data.getType() == ControlType.KEY ? "Key" : "Button");
 		inputLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		inputPanel.add(inputLabel);
+		inputPanel.add(inputLabel, BorderLayout.WEST);
 		switch (data.getType()) {
 		case KEY:
 			key = new JButton("None");
@@ -238,7 +240,7 @@ public class ControlDataPanel extends JPanel {
 				// pressPanel.add(ok);
 				new PopOutFrame(pressPanel, MainFrame.getInstance());
 			});
-			inputPanel.add(key);
+			content.add(key);
 			break;
 		// case MOUSE_CLICK:
 		case MOUSE:
@@ -253,7 +255,7 @@ public class ControlDataPanel extends JPanel {
 			opt.addActionListener(l -> {
 				this.data.setKey(opt.getItemAt(opt.getSelectedIndex()).get());
 			});
-			inputPanel.add(opt);
+			content.add(opt);
 			break;
 		// case MOUSE_MOV:
 		case MOUSE_WHEEL:
@@ -261,14 +263,17 @@ public class ControlDataPanel extends JPanel {
 			JLabel na = new JLabel("N/A");
 			normal.add(na);
 			na.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-			inputPanel.add(na);
+			content.add(na);
 			break;
 		}
+		inputPanel.add(content);
 		inputVar = new JComboBoxVar(CommandVarType.STRING, "key");
 		inputVar.setVisible(false);
 		//inputVar.setEnabled(false);
 		var.add(inputVar);
-		inputPanel.add(inputVar);
+		content.add(inputVar);
+		
+		inputPanel.add(content);
 		
 		center.add(inputPanel);
 
@@ -287,11 +292,13 @@ public class ControlDataPanel extends JPanel {
 			durationFormatter.setMinimum(0);
 			durationFormatter.setMaximum(Integer.MAX_VALUE);
 			durationFormatter.setAllowsInvalid(false);
-			JPanel durationPanel = new JPanel();
+			JPanel durationPanel = new JPanel(new BorderLayout());
 			durationPanel.setOpaque(false);
+			content = new JPanel(new FlowLayout(FlowLayout.LEADING));
+			content.setOpaque(false);
 			JLabel durationLabel = new JLabel("Duration (sec):");
 			durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-			durationPanel.add(durationLabel);
+			durationPanel.add(durationLabel, BorderLayout.WEST);
 			duration = new JFormattedTextField(durationFormatter);
 			normal.add(duration);
 			duration.setBorder(null);
@@ -358,21 +365,25 @@ public class ControlDataPanel extends JPanel {
 				}
 			});
 			duration.setPreferredSize(new Dimension(50, 20));
-			durationPanel.add(duration);
+			content.add(duration);
 			
 			durationVar = new JComboBoxVar(CommandVarType.DIGIT,"duration");
 			durationVar.setVisible(false);
 			var.add(durationVar);
-			durationPanel.add(durationVar);
+			content.add(durationVar);
+			
+			durationPanel.add(content);
 			
 			center.add(durationPanel);
 		}
 
-		JPanel aftermathPanel = new JPanel();
+		JPanel aftermathPanel = new JPanel(new BorderLayout());
 		aftermathPanel.setOpaque(false);
+		content = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		content.setOpaque(false);
 		JLabel aftermathLabel = new JLabel("Aftermath (sec):");
 		aftermathLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		aftermathPanel.add(aftermathLabel);
+		aftermathPanel.add(aftermathLabel, BorderLayout.WEST);
 		NumberFormatter aftermathFormatter = new NumberFormatter(format);
 		aftermathFormatter.setValueClass(Integer.class);
 		aftermathFormatter.setMinimum(0);
@@ -440,12 +451,14 @@ public class ControlDataPanel extends JPanel {
 				}
 			}
 		});
-		aftermathPanel.add(aftermath);
+		content.add(aftermath);
 		
 		aftermathVar = new JComboBoxVar(CommandVarType.DIGIT,"aftermathDelay");
 		aftermathVar.setVisible(false);
 		var.add(aftermathVar);
-		aftermathPanel.add(aftermathVar);
+		content.add(aftermathVar);
+		
+		aftermathPanel.add(content);
 		
 		center.add(aftermathPanel);
 		if ((data.getType() == ControlType.MOUSE || data.getType()==ControlType.MOUSE_DRAG)&& data.getInDepthCursor() != null) {
@@ -454,11 +467,13 @@ public class ControlDataPanel extends JPanel {
 			xFormatter.setMinimum(Integer.MIN_VALUE);
 			xFormatter.setMaximum(Integer.MAX_VALUE);
 			xFormatter.setAllowsInvalid(false);
-			JPanel xPanel = new JPanel();
+			JPanel xPanel = new JPanel(new BorderLayout());
 			xPanel.setOpaque(false);
+			content = new JPanel(new FlowLayout(FlowLayout.LEADING));
+			content.setOpaque(false);
 			JLabel xLabel = new JLabel(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
 			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-			xPanel.add(xLabel);
+			xPanel.add(xLabel, BorderLayout.WEST);
 			x = new JFormattedTextField(xFormatter);
 			normal.add(x);
 			x.setBorder(null);
@@ -530,21 +545,25 @@ public class ControlDataPanel extends JPanel {
 				x.setValue(null);
 				data.getInDepthCursor().setX(null);
 			});
-			xPanel.add(xClear);
-			xPanel.add(x);
+			content.add(xClear);
+			content.add(x);
 			
 			xVar = new JComboBoxVar(CommandVarType.DIGIT,"x");
 			xVar.setVisible(false);
 			var.add(xVar);
-			xPanel.add(xVar);
+			content.add(xVar);
+			
+			xPanel.add(content);
 			
 			center.add(xPanel);
 
-			JPanel yPanel = new JPanel();
+			JPanel yPanel = new JPanel(new BorderLayout());
 			yPanel.setOpaque(false);
+			content = new JPanel(new FlowLayout(FlowLayout.LEADING));
+			content.setOpaque(false);
 			JLabel yLabel = new JLabel(String.format("Y (%s):", MouseCoords.getInstance().getY().get()));
 			yLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-			yPanel.add(yLabel);
+			yPanel.add(yLabel, BorderLayout.WEST);
 			NumberFormatter yFormatter = new NumberFormatter(format);
 			yFormatter.setValueClass(Integer.class);
 			yFormatter.setMinimum(Integer.MIN_VALUE);
@@ -621,13 +640,15 @@ public class ControlDataPanel extends JPanel {
 				y.setValue(null);
 				data.getInDepthCursor().setY(null);
 			});
-			yPanel.add(yClear);
-			yPanel.add(y);
+			content.add(yClear);
+			content.add(y);
 			
 			yVar = new JComboBoxVar(CommandVarType.DIGIT,"y");
 			yVar.setVisible(false);
 			var.add(yVar);
-			yPanel.add(yVar);
+			content.add(yVar);
+			
+			yPanel.add(content);
 			
 			center.add(yPanel);
 			listener = (eX, eY) -> {
@@ -650,11 +671,13 @@ public class ControlDataPanel extends JPanel {
 				finalXFormatter.setMinimum(Integer.MIN_VALUE);
 				finalXFormatter.setMaximum(Integer.MAX_VALUE);
 				finalXFormatter.setAllowsInvalid(false);
-				JPanel finalXPanel = new JPanel();
+				JPanel finalXPanel = new JPanel(new BorderLayout());
 				finalXPanel.setOpaque(false);
+				content = new JPanel(new FlowLayout(FlowLayout.LEADING));
+				content.setOpaque(false);
 				JLabel finalXLabel = new JLabel(String.format("X (%s):", MouseCoords.getInstance().getX().get()));
 				finalXLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-				finalXPanel.add(finalXLabel);
+				finalXPanel.add(finalXLabel, BorderLayout.WEST);
 				finalX = new JFormattedTextField(finalXFormatter);
 				normal.add(finalX);
 				finalX.setBorder(null);
@@ -726,21 +749,25 @@ public class ControlDataPanel extends JPanel {
 					finalX.setValue(null);
 					data.getInDepthCursor().setFinalX(null);
 				});
-				finalXPanel.add(finalXClear);
-				finalXPanel.add(finalX);
+				content.add(finalXClear);
+				content.add(finalX);
 				
 				finalXVar = new JComboBoxVar(CommandVarType.DIGIT,"final_x");
 				finalXVar.setVisible(false);
 				var.add(finalXVar);
-				finalXPanel.add(finalXVar);
+				content.add(finalXVar);
+				
+				finalXPanel.add(content);
 				
 				//center.add(finalXPanel);
 
-				JPanel finalYPanel = new JPanel();
+				JPanel finalYPanel = new JPanel(new BorderLayout());
 				finalYPanel.setOpaque(false);
+				content = new JPanel(new FlowLayout(FlowLayout.LEADING));
+				content.setOpaque(false);
 				JLabel finalYLabel = new JLabel(String.format("Y (%s):", MouseCoords.getInstance().getY().get()));
 				finalYLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-				finalYPanel.add(finalYLabel);
+				finalYPanel.add(finalYLabel, BorderLayout.WEST);
 				NumberFormatter finalYFormatter = new NumberFormatter(format);
 				finalYFormatter.setValueClass(Integer.class);
 				finalYFormatter.setMinimum(Integer.MIN_VALUE);
@@ -817,13 +844,15 @@ public class ControlDataPanel extends JPanel {
 					finalY.setValue(null);
 					data.getInDepthCursor().setFinalY(null);
 				});
-				finalYPanel.add(finalYClear);
-				finalYPanel.add(finalY);
+				content.add(finalYClear);
+				content.add(finalY);
 				
 				finalYVar = new JComboBoxVar(CommandVarType.DIGIT,"final_y");
 				finalYVar.setVisible(false);
 				var.add(finalYVar);
-				finalYPanel.add(finalYVar);
+				content.add(finalYVar);
+				
+				finalYPanel.add(content);
 				
 				//center.add(yPanel);
 				listenerFinal = (eX, eY) -> {
