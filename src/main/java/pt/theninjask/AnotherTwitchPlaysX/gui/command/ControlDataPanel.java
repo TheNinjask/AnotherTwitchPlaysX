@@ -266,7 +266,7 @@ public class ControlDataPanel extends JPanel {
 		}
 		inputVar = new JComboBoxVar(CommandVarType.STRING, "key");
 		inputVar.setVisible(false);
-		inputVar.setEnabled(false);
+		//inputVar.setEnabled(false);
 		var.add(inputVar);
 		inputPanel.add(inputVar);
 		

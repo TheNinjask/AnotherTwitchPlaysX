@@ -44,7 +44,7 @@ public class CommandPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private CommandData saved;
-	
+
 	private CommandData current;
 
 	private List<ControlDataPanel> controls;
@@ -56,13 +56,11 @@ public class CommandPanel extends JPanel {
 	private JButton left;
 
 	private JButton right;
-	
+
 	private JButton mode;
-	
-	private Set<String> varsBag = new HashSet<String>(Arrays.asList(
-			"Q","W","E","R","T","Y","U","I","O","P",
-			"A","S","D","F","G","H","J","K","L",
-			"Z","X","C","V","B","N","M"));
+
+	private Set<String> varsBag = new HashSet<String>(Arrays.asList("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
+			"A", "S", "D", "F", "G", "H", "J", "K", "L", "Z", "X", "C", "V", "B", "N", "M"));
 
 	private JButton back;
 
@@ -130,11 +128,11 @@ public class CommandPanel extends JPanel {
 		leadLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		leadPanel.add(leadLabel);
 		lead = new JTextField("");
-		if(current.getLead()!=null)
+		if (current.getLead() != null)
 			lead.setText(current.getLead());
 		lead.setBorder(null);
 		lead.setPreferredSize(new Dimension(151, 20));
-		lead.addCaretListener(l->{
+		lead.addCaretListener(l -> {
 			current.setLead(lead.getText());
 		});
 		leadPanel.add(lead);
@@ -147,7 +145,7 @@ public class CommandPanel extends JPanel {
 		typePanel.add(typeLabel);
 		type = new JComboBox<CommandType>(CommandType.getAll());
 		type.setSelectedItem(CommandType.UNISON);
-		type.addActionListener(l->{
+		type.addActionListener(l -> {
 			current.setType(type.getItemAt(type.getSelectedIndex()));
 		});
 		type.setFocusable(false);
@@ -161,74 +159,86 @@ public class CommandPanel extends JPanel {
 		varsLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		varsPanel.add(varsLabel);
 
-		//TODO?
+		// TODO?
 		vars = new JComboBox<JComboItem<Pair<String, CommandVarType>>>();
-		vars.addItem(new JComboItem<Pair<String,CommandVarType>>(null, "ADD"));
+		vars.addItem(new JComboItem<Pair<String, CommandVarType>>(null, "ADD"));
 		vars.setSelectedItem(null);
 		vars.setFocusable(false);
 		for (Pair<String, CommandVarType> elem : current.getVars()) {
-			if(!elem.getKey().equals("ADD")) {
-				vars.addItem(new JComboItem<Pair<String,CommandVarType>>(elem, elem.getKey()));
+			if (!elem.getKey().equals("ADD")) {
+				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(elem, elem.getKey()));
 				varsBag.remove(elem.getKey());
 			}
 		}
-		
+
 		varsRemove = new JButton("Remove");
 		varsRemove.setMargin(new Insets(0, 0, 0, 0));
 		varsRemove.setVisible(false);
 		varsRemove.setEnabled(false);
 		varsRemove.setFocusable(false);
 		AtomicBoolean disableVars = new AtomicBoolean(false);
-		varsRemove.addActionListener(l->{
-			switch(vars.getItemAt(vars.getSelectedIndex()).toString()) {
-				default:
-					disableVars.set(true);
-					varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getKey());
-					current.getVars().remove(vars.getItemAt(vars.getSelectedIndex()).get());
-					varsRemove.setVisible(false);
-					varsRemove.setEnabled(false);
-					controls.forEach(c->{
-						c.removeVar(vars.getItemAt(vars.getSelectedIndex()).get());
-					});
-					vars.removeItemAt(vars.getSelectedIndex());
-					vars.setSelectedItem(null);
-					disableVars.set(false);
-					break;
-				case "ADD":
-					break;
+		varsRemove.addActionListener(l -> {
+			switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
+			default:
+				disableVars.set(true);
+				varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getKey());
+				current.getVars().remove(vars.getItemAt(vars.getSelectedIndex()).get());
+				varsRemove.setVisible(false);
+				varsRemove.setEnabled(false);
+				controls.forEach(c -> {
+					c.removeVar(vars.getItemAt(vars.getSelectedIndex()).get());
+				});
+				vars.removeItemAt(vars.getSelectedIndex());
+				vars.setSelectedItem(null);
+				disableVars.set(false);
+				break;
+			case "ADD":
+				break;
 			}
 		});
-		
-		vars.addActionListener(l->{
-			if(vars.getItemAt(vars.getSelectedIndex())==null)
+
+		vars.addActionListener(l -> {
+			if (vars.getItemAt(vars.getSelectedIndex()) == null)
 				return;
-			if(disableVars.get())
+			if (disableVars.get())
 				return;
 			switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
 			case "ADD":
 				Optional<String> var = varsBag.stream().findAny();
-				if(!var.isPresent()) {
+				if (!var.isPresent()) {
 					JLabel msg = new JLabel("Standard (and Already In) Variables Ran Out!");
 					msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-					Constants.showCustomColorMessageDialog(
-							null, 
-							msg, 
-							"Syntax of command", 
-							JOptionPane.WARNING_MESSAGE, 
-							null, 
-							Constants.TWITCH_COLOR
-							);
+					Constants.showCustomColorMessageDialog(null, msg, "Ran Out Of Vars", JOptionPane.WARNING_MESSAGE,
+							null, Constants.TWITCH_COLOR);
 					vars.setSelectedItem(null);
 					varsRemove.setVisible(false);
 					varsRemove.setEnabled(false);
 					break;
 				}
-				Pair<String, CommandVarType> tmp = new Pair<String, CommandVarType>(var.get(), CommandVarType.DIGIT);
-				vars.addItem(new JComboItem<Pair<String,CommandVarType>>(tmp, tmp.getKey()));
-				vars.setSelectedIndex(vars.getItemCount()-1);
+
+				JLabel msg = new JLabel("Type of variable");
+				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				String[] opt = { "Digit", "String" };
+				int resp = Constants.showCustomColorOptionDialog(null, msg, "Choose type", JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE, null, opt, null, Constants.TWITCH_COLOR);
+				CommandVarType type;
+				switch (resp) {
+				case JOptionPane.YES_OPTION:
+					type = CommandVarType.DIGIT;
+					break;
+				case JOptionPane.NO_OPTION:
+					type = CommandVarType.STRING;
+					break;
+				case JOptionPane.CLOSED_OPTION:
+				default:
+					return;
+				}
+				Pair<String, CommandVarType> tmp = new Pair<String, CommandVarType>(var.get(), type);
+				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(tmp, tmp.getKey()));
+				vars.setSelectedIndex(vars.getItemCount() - 1);
 				varsBag.remove(var.get());
 				current.getVars().add(tmp);
-				controls.forEach(c->{
+				controls.forEach(c -> {
 					c.addVar(tmp);
 				});
 				varsRemove.setVisible(true);
@@ -240,7 +250,7 @@ public class CommandPanel extends JPanel {
 				break;
 			}
 		});
-		//vars.setEnabled(false);
+		// vars.setEnabled(false);
 		varsPanel.add(vars);
 		varsPanel.add(varsRemove);
 		mainPanel.add(varsPanel);
@@ -253,29 +263,27 @@ public class CommandPanel extends JPanel {
 		mode = new JButton("Normal");
 		mode.setMargin(new Insets(0, 0, 0, 0));
 		mode.setFocusable(false);
-		mode.addActionListener(l->{
-			switch(mode.getText()) {
-				case "Normal":
-					for (ControlDataPanel elem : controls) {
-						elem.setMode(Type.VAR);
-					}
-					mode.setText("Vars");
-					break;
-				case "Vars":
-					for (ControlDataPanel elem : controls) {
-						elem.setMode(Type.NORMAL);
-					}
-					mode.setText("Normal");
-					break;
-				default:
-					break;
+		mode.addActionListener(l -> {
+			switch (mode.getText()) {
+			case "Normal":
+				for (ControlDataPanel elem : controls) {
+					elem.setMode(Type.VAR);
+				}
+				mode.setText("Vars");
+				break;
+			case "Vars":
+				for (ControlDataPanel elem : controls) {
+					elem.setMode(Type.NORMAL);
+				}
+				mode.setText("Normal");
+				break;
+			default:
+				break;
 			}
 		});
-		
+
 		modePanel.add(mode);
 		mainPanel.add(modePanel);
-		
-		
 
 		return mainPanel;
 	}
@@ -286,7 +294,7 @@ public class CommandPanel extends JPanel {
 		back = new JButton("Back");
 		back.setFocusable(false);
 		back.addActionListener(l -> {
-			if (saved==null || !saved.equals(current)) {
+			if (saved == null || !saved.equals(current)) {
 				JTextArea msg = new JTextArea();
 				msg.setText("This command has not saved changes!");
 				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
@@ -312,26 +320,20 @@ public class CommandPanel extends JPanel {
 
 		syntax = new JButton("Syntax");
 		syntax.setFocusable(false);
-		syntax.addActionListener(l->{
+		syntax.addActionListener(l -> {
 			try {
-				
-			JPanel tmp = new JPanel(new GridLayout(2, 1));
-			tmp.setOpaque(false);
-			JLabel syntaxLabel = new JLabel(String.format("Syntax: %s", current.getRegex()));
-			syntaxLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-			tmp.add(syntaxLabel);
-			JLabel egLabel = new JLabel(String.format("Example: %s", current.getRegexExample()));
-			egLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-			tmp.add(egLabel);
-			Constants.showCustomColorMessageDialog(
-					null, 
-					tmp, 
-					"Syntax of command", 
-					JOptionPane.PLAIN_MESSAGE, 
-					null, 
-					Constants.TWITCH_COLOR
-					);
-			}catch (Exception e) {
+
+				JPanel tmp = new JPanel(new GridLayout(2, 1));
+				tmp.setOpaque(false);
+				JLabel syntaxLabel = new JLabel(String.format("Syntax: %s", current.getRegex()));
+				syntaxLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				tmp.add(syntaxLabel);
+				JLabel egLabel = new JLabel(String.format("Example: %s", current.getRegexExample()));
+				egLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				tmp.add(egLabel);
+				Constants.showCustomColorMessageDialog(null, tmp, "Syntax of command", JOptionPane.PLAIN_MESSAGE, null,
+						Constants.TWITCH_COLOR);
+			} catch (Exception e) {
 				Constants.showExpectedExceptionDialog(e);
 			}
 		});
@@ -344,16 +346,16 @@ public class CommandPanel extends JPanel {
 
 		save = new JButton("Save");
 		save.setFocusable(false);
-		save.addActionListener(l->{
-			if(saved!=null) {
+		save.addActionListener(l -> {
+			if (saved != null) {
 				int index = DataManager.getInstance().getCommands().indexOf(saved);
 				DataManager.getInstance().getCommands().remove(saved);
 				for (ControlDataPanel elem : controls) {
 					current.getControls().add(elem.getControlData());
 				}
-				saved=current;
-				DataManager.getInstance().getCommands().add(index, current);				
-			}else {
+				saved = current;
+				DataManager.getInstance().getCommands().add(index, current);
+			} else {
 				for (ControlDataPanel elem : controls) {
 					current.getControls().add(elem.getControlData());
 				}
@@ -365,8 +367,8 @@ public class CommandPanel extends JPanel {
 
 		delete = new JButton("Delete");
 		delete.setFocusable(false);
-		delete.addActionListener(l->{
-			if(saved!=null)
+		delete.addActionListener(l -> {
+			if (saved != null)
 				DataManager.getInstance().getCommands().remove(saved);
 			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
 		});
@@ -458,21 +460,21 @@ public class CommandPanel extends JPanel {
 		controlsPanel.revalidate();
 		controlsPanel.repaint();
 	}
-	
+
 	public void resetMoveControlDisplayButtons() {
 		Component comp = controlsPanel.getComponent(0);
 		if (!(comp instanceof ControlDataPanel)) {
 			this.right.setEnabled(false);
-			if(controls.isEmpty()) {
+			if (controls.isEmpty()) {
 				this.left.setEnabled(false);
-			}else {
+			} else {
 				this.left.setEnabled(true);
 			}
-		}else {
+		} else {
 			this.right.setEnabled(true);
-			if(controls.indexOf(comp)==0) {
+			if (controls.indexOf(comp) == 0) {
 				this.left.setEnabled(false);
-			}else {
+			} else {
 				this.left.setEnabled(true);
 			}
 		}
@@ -510,7 +512,7 @@ public class CommandPanel extends JPanel {
 			}
 			controlsPanel.removeAll();
 			ControlDataPanel tmp = new ControlDataPanel(cData, controls, this);
-			if(mode.getText().equals("Vars"))
+			if (mode.getText().equals("Vars"))
 				tmp.setMode(Type.VAR);
 			controlsPanel.add(tmp);
 			controlsPanel.revalidate();
