@@ -61,4 +61,5 @@ local.properties
 #.project
 
 session.json
-.build
+.build/
+.m2/

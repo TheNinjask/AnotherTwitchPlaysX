@@ -183,7 +183,7 @@ I also wanted to be a other way to setup the commands without relying on the UI 
 		vars:[
 			{
 				key: String, #varname
-				type: "String" #DIGIT only (STRING is yet to be used and implemented)
+				type: "String" #DIGIT or STRING
 			},
 			.
 			.
@@ -207,6 +207,6 @@ For now, I do not intend to touch more this project besided to fix any issues at
 
 I'll like to give credits to:
 
-* [KittehOrg](https://github.com/KittehOrg) for [KittehIRCClientLib](https://github.com/KittehOrg/KittehIRCClientLib) to allow connection with Twitch;
+* [KittehOrg](https://github.com/KittehOrg) for [Kitteh IRC Client Library](https://github.com/KittehOrg/KittehIRCClientLib) to allow connection with Twitch;
 * [Alex Barker](https://github.com/kwhat) for [JNativeHook](https://github.com/kwhat/jnativehook) for the global keyboard and mouse listeners;
 * [Universal-Team](https://github.com/Universal-Team) from the [Pokémon Chest Team](https://github.com/Universal-Team/pkmn-chest) for the templates.
