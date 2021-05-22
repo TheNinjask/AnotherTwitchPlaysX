@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>pt.theninjask</groupId>
-	<artifactId>AnotherTwitchPlaysX</artifactId>
+	<artifactId>anothertwitchplaysx</artifactId>
 	<version>1.1.1</version>
 	<packaging>jar</packaging>
 
@@ -65,13 +65,27 @@
 					<release>11</release>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+				<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
 	<distributionManagement>
 		<repository>
 			<id>github</id>
-			<name>GitHub OWNER Apache Maven Packages</name>
+			<name>GitHub TheNinjask Apache Maven Packages</name>
 			<url>https://maven.pkg.github.com/TheNinjask/AnotherTwitchPlaysX</url>
 		</repository>
 	</distributionManagement>
