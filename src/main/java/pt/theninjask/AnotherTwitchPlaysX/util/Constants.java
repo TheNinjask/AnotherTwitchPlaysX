@@ -71,7 +71,7 @@ public final class Constants {
 
 	public static final String CURRENT_CHAT_SIZE = "Current Twitch Chat size: %s messages";
 
-	public static final String IS_TWITCH_CHAT_ON_TOP = "Set Twitch Chat Always On Top?";
+	public static final String IS_TWITCH_CHAT_ON_TOP = "Set Twitch Chat Always On Top & Locked?";
 
 	public static final int TITLE_SCREEN_ICON_WIDTH = 25;
 

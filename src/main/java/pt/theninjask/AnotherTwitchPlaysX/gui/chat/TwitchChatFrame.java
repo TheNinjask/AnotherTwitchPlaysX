@@ -169,7 +169,7 @@ public class TwitchChatFrame extends JFrame {
 		return scroll;
 	}
 	
-	private void enableDragAndResize() {
+	public void enableDragAndResize() {
 		if(enabledDR.get())
 			return;
 		chat.addMouseListener(new MouseAdapter()
@@ -193,7 +193,7 @@ public class TwitchChatFrame extends JFrame {
 		enabledDR.set(true);
 	}
 	
-	private void disableDragAndResize() {
+	public void disableDragAndResize() {
 		if(!enabledDR.get())
 			return;
 		for (MouseListener elem : chat.getMouseListeners()) {
@@ -254,16 +254,13 @@ public class TwitchChatFrame extends JFrame {
 		switch (mode) {
 		case TRANSPARENT:
 			alpha = 0;
-			disableDragAndResize();
 			break;
 		case SEMI_SOLID:
 			alpha = 127;
-			enableDragAndResize();
 			break;
 		case SOLID:
 		default:
 			alpha = 255;
-			enableDragAndResize();
 			break;
 		}
 		setBackground(new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), alpha));

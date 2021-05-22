@@ -441,14 +441,15 @@ public class MainMenuPanel extends JPanel {
 		twitchChatOnTop.setHorizontalAlignment(JCheckBox.CENTER);
 		twitchChatOnTop.setOpaque(false);
 		twitchChatOnTop.setFocusable(false);
-
+		twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
 		twitchChatOnTop.addActionListener(l -> {
 			if (twitchChatOnTop.isSelected()) {
-				twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
 				TwitchChatFrame.getInstance().setAlwaysOnTop(true);
+				TwitchChatFrame.getInstance().disableDragAndResize();
 			} else {
 				twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
 				TwitchChatFrame.getInstance().setAlwaysOnTop(false);
+				TwitchChatFrame.getInstance().enableDragAndResize();
 				MainFrame.getInstance().toFront();
 				MainFrame.getInstance().requestFocus();
 			}
