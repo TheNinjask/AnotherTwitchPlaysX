@@ -37,7 +37,7 @@ So I hope you can have fun using this application!
 ## Features
 
 Well as the name of the app says its another TwitchPlays app.
-I am a bit bad at explaining thing in text but if you use the app I hope it is intuitive enough.
+I am a bit bad at explaining in text but if you use the app I hope it is intuitive enough.
 * Set commands with control(s) assigned;
 * The commands have (minimum for now) support for variables! e.g. type in chat !test 1 2 can correspond to move mouse to (1,2)
 * Support for mods (if someone develops)
@@ -48,7 +48,7 @@ I am a bit bad at explaining thing in text but if you use the app I hope it is i
 
 Yes! In this application, you can load a single mod (but is there can be a mod that loads multiple mods but for now I am not doing that.)
 
-To make a mod for this app, you start a maven project and add the following [dependency](https://github.com/TheNinjask/AnotherTwitchPlaysX/packages/805306)
+To make a mod for this app, you start a maven project and add the following [dependency](https://github.com/TheNinjask/AnotherTwitchPlaysX/packages)
 ```
 <dependency>
   <groupId>pt.theninjask</groupId>
