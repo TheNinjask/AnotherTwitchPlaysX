@@ -36,7 +36,8 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame;
-import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.Type;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.ChatMode;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.ChatType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.Mod;
@@ -95,6 +96,8 @@ public class MainMenuPanel extends JPanel {
 
 	private ModPanel mod = null;
 
+	private JPanel twitchChatTransparencyModePanel;
+
 	private MainMenuPanel() {
 		this.isAppStarted = new AtomicBoolean(false);
 		this.setBackground(Constants.TWITCH_COLOR);
@@ -109,6 +112,7 @@ public class MainMenuPanel extends JPanel {
 		setTwitchChatOnTop();
 		twitchChatFont();
 		twitchChatFontSize();
+		twitchChatTransparencyModePanel();
 		this.add(twitchChatOptionsLabel());
 		this.add(twitchChatOptionsPanel());
 		this.add(twitchChatSlider());
@@ -392,6 +396,41 @@ public class MainMenuPanel extends JPanel {
 		twitchChatColorModePanel.add(twitch);
 		return twitchChatColorModePanel;
 	}
+	
+	private JPanel twitchChatTransparencyModePanel() {
+		twitchChatTransparencyModePanel = new JPanel(new FlowLayout());
+		twitchChatTransparencyModePanel.setOpaque(false);
+		ButtonGroup group = new ButtonGroup();
+		JRadioButton transp = new JRadioButton("Transparent");
+		JRadioButton semisolid = new JRadioButton("Semi-Solid");
+		JRadioButton solid = new JRadioButton("Solid");
+		transp.setOpaque(false);
+		transp.setFocusable(false);
+		transp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		transp.addActionListener(i -> {
+			TwitchChatFrame.getInstance().setChatMode(ChatMode.TRANSPARENT);
+		});
+		semisolid.setOpaque(false);
+		semisolid.setFocusable(false);
+		semisolid.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		semisolid.addActionListener(i -> {
+			TwitchChatFrame.getInstance().setChatMode(ChatMode.SEMI_SOLID);
+		});
+		solid.setOpaque(false);
+		solid.setFocusable(false);
+		solid.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		solid.setSelected(true);
+		solid.addActionListener(i -> {
+			TwitchChatFrame.getInstance().setChatMode(ChatMode.SOLID);
+		});
+		group.add(transp);
+		group.add(semisolid);
+		group.add(solid);
+		twitchChatTransparencyModePanel.add(transp);
+		twitchChatTransparencyModePanel.add(semisolid);
+		twitchChatTransparencyModePanel.add(solid);
+		return twitchChatTransparencyModePanel;
+	}
 
 	private JCheckBox setTwitchChatOnTop() {
 		twitchChatOnTop = new JCheckBox();
@@ -422,19 +461,19 @@ public class MainMenuPanel extends JPanel {
 		twitchChatMode = new JPanel(new FlowLayout());
 		twitchChatMode.setOpaque(false);
 		ButtonGroup group = new ButtonGroup();
-		JRadioButton mine = new JRadioButton(Type.MINECRAFT.getType());
+		JRadioButton mine = new JRadioButton(ChatType.MINECRAFT.getType());
 		mine.setOpaque(false);
 		mine.setFocusable(false);
 		mine.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		mine.addActionListener(i -> {
-			TwitchChatFrame.getInstance().setChatType(Type.MINECRAFT);
+			TwitchChatFrame.getInstance().setChatType(ChatType.MINECRAFT);
 		});
-		JRadioButton twitch = new JRadioButton(Type.TWITCH.getType());
+		JRadioButton twitch = new JRadioButton(ChatType.TWITCH.getType());
 		twitch.setOpaque(false);
 		twitch.setFocusable(false);
 		twitch.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		twitch.addActionListener(i -> {
-			TwitchChatFrame.getInstance().setChatType(Type.TWITCH);
+			TwitchChatFrame.getInstance().setChatType(ChatType.TWITCH);
 		});
 		mine.setSelected(true);
 		group.add(mine);
@@ -454,7 +493,7 @@ public class MainMenuPanel extends JPanel {
 
 	private void moveOptionPanel(boolean right) {
 		twitchChatOptions = new ArrayList<JComponent>(Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatFontPanel,
-				twitchChatFontSizePanel, twitchChatOnTop));
+				twitchChatFontSizePanel, twitchChatTransparencyModePanel, twitchChatOnTop));
 		
 		int index = twitchChatOptions.indexOf(twitchChatOptionsPanel.getComponent(0));
 

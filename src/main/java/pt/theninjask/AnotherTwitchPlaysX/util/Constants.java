@@ -22,7 +22,6 @@ import java.util.jar.JarFile;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.LookAndFeel;
@@ -277,13 +276,27 @@ public final class Constants {
 		UIManager.put("Panel.background", panelBG);
 		return value;
 	}
+	
+	public static final void showMessageDialog(String msg, String... title) {
+		JTextArea message = new JTextArea(msg);
+		message.setOpaque(false);
+		message.setForeground(TWITCH_COLOR_COMPLEMENT);
+		Object paneBG = UIManager.get("OptionPane.background");
+		Object panelBG = UIManager.get("Panel.background");
+		UIManager.put("OptionPane.background", TWITCH_COLOR);
+		UIManager.put("Panel.background", TWITCH_COLOR);
+		JOptionPane.showMessageDialog(null, message, title.length>0 ? title[0] : "", JOptionPane.PLAIN_MESSAGE, null);
+		UIManager.put("OptionPane.background", paneBG);
+		UIManager.put("Panel.background", panelBG);
+	}
 
 	public static final void showExceptionDialog(Exception e) {
 		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static final void showExpectedExceptionDialog(Exception e) {
-		JLabel exception = new JLabel(e.getMessage());
+		JTextArea exception = new JTextArea(e.getMessage());
+		exception.setOpaque(false);
 		exception.setForeground(TWITCH_COLOR_COMPLEMENT);
 		Object paneBG = UIManager.get("OptionPane.background");
 		Object panelBG = UIManager.get("Panel.background");

@@ -48,16 +48,51 @@ I am a bit bad at explaining thing in text but if you use the app I hope it is i
 
 Yes! In this application, you can load a single mod (but is there can be a mod that loads multiple mods but for now I am not doing that.)
 
-To make a mod for this app, you can download the `AnotherTwitchPlaysXLib.jar` and add the jar has an external jar to your project.
+To make a mod for this app, you start a maven project and add the following [dependency](https://github.com/TheNinjask/AnotherTwitchPlaysX/packages/805306)
+```
+<dependency>
+  <groupId>pt.theninjask</groupId>
+  <artifactId>anothertwitchplaysx</artifactId>
+  <version>1.1.1</version>
+</dependency>
+```
+and when you use mvn package, the .jar created has to be a fat .jar (but it won't require the dependency above.)
 
-It will be required for the mod at least 1 class (it will be the first that it finds) with the annotation `@Mod` with the value `main` as `true` which is by default and must have an empty constructor.
+Here a plugin to help you create one that also excludes unnecessary dependencies from the fat .jar file.
+```
+<plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-shade-plugin</artifactId>
+	<version>3.2.4</version>
+	<executions>
+		<execution>
+			<phase>package</phase>
+			<goals>
+				<goal>shade</goal>
+			</goals>
+			<configuration>
+				<artifactSet>
+					<excludes>
+						<exclude>pt.theninjask</exclude>
+						<exclude>org.kitteh.irc</exclude>
+						<exclude>com.fasterxml.jackson.core</exclude>
+						<exclude>com.1stleg</exclude>
+					</excludes>
+				</artifactSet>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+```
+
+It will be required for the mod at least 1 class (it will be the first that it finds) with the annotation `@Mod` with the value `main` as `true` which is by default and must have an public empty constructor.
 
 Also there will be 3 types of mods:
 * First Party - That will show no problems.
-* Third Party Approved - This will show a message when loading that has be approved by me/us.
+* Third Party approved - This will show a message when loading that has be approved by me/us.
 * Unknown - This will show a warning message that the code being loaded has not been overseer by me (the user will have the option to opt out of loading the mod.) 
 
-If you wish to be a Third Party Approved, for now wait but if you wanna get ready, it will require that jar has the source code attached.
+If you wish to be a Third Party approved, for now you'll have to wait.
 
 For any issues/wishes please refer to [bugs](#bugs) section (even tho it might not be a bug) and feel free to say the problem/wish.
 
@@ -84,10 +119,8 @@ public class HelloWorld implements ModPanel {
 		for (ActionListener elem : modButton.getActionListeners()) {
 			modButton.removeActionListener(elem);
 		}
-		JLabel hello = new JLabel("Greetings World!");
-		hello.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		modButton.addActionListener(l->{
-			Constants.showCustomColorMessageDialog(null, hello, "Hello World!", JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);
+			Constants.showMessageDialog("Greetings World!", "Title-Hello World!");
 		});
 	}
 	
@@ -183,7 +216,7 @@ I also wanted to be a other way to setup the commands without relying on the UI 
 		vars:[
 			{
 				key: String, #varname
-				type: "String" #DIGIT only (STRING is yet to be used and implemented)
+				type: "String" #DIGIT or STRING
 			},
 			.
 			.
@@ -207,6 +240,6 @@ For now, I do not intend to touch more this project besided to fix any issues at
 
 I'll like to give credits to:
 
-* [KittehOrg](https://github.com/KittehOrg) for [KittehIRCClientLib](https://github.com/KittehOrg/KittehIRCClientLib) to allow connection with Twitch;
+* [KittehOrg](https://github.com/KittehOrg) for [Kitteh IRC Client Library](https://github.com/KittehOrg/KittehIRCClientLib) to allow connection with Twitch;
 * [Alex Barker](https://github.com/kwhat) for [JNativeHook](https://github.com/kwhat/jnativehook) for the global keyboard and mouse listeners;
 * [Universal-Team](https://github.com/Universal-Team) from the [Pokémon Chest Team](https://github.com/Universal-Team/pkmn-chest) for the templates.
