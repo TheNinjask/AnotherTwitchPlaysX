@@ -199,7 +199,6 @@ public class AllCommandPanel extends JPanel {
 					tmp.setEditable(false);
 					tmp.setBorder(null);
 					tmp.setOpaque(false);
-					tmp.setToolTipText(Constants.CHANNEL_FIELD_TIP);
 					tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 					objectMapper.writeValue(file, DataManager.getInstance().getCommands());
 					Constants.showCustomColorMessageDialog(null, 
