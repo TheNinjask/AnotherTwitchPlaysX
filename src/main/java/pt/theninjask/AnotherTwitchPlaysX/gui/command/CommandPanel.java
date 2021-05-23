@@ -165,9 +165,9 @@ public class CommandPanel extends JPanel {
 		vars.setSelectedItem(null);
 		vars.setFocusable(false);
 		for (Pair<String, CommandVarType> elem : current.getVars()) {
-			if (!elem.getKey().equals("ADD")) {
-				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(elem, elem.getKey()));
-				varsBag.remove(elem.getKey());
+			if (!elem.getLeft().equals("ADD")) {
+				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(elem, elem.getLeft()));
+				varsBag.remove(elem.getLeft());
 			}
 		}
 
@@ -181,7 +181,7 @@ public class CommandPanel extends JPanel {
 			switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
 			default:
 				disableVars.set(true);
-				varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getKey());
+				varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getLeft());
 				current.getVars().remove(vars.getItemAt(vars.getSelectedIndex()).get());
 				varsRemove.setVisible(false);
 				varsRemove.setEnabled(false);
@@ -234,7 +234,7 @@ public class CommandPanel extends JPanel {
 					return;
 				}
 				Pair<String, CommandVarType> tmp = new Pair<String, CommandVarType>(var.get(), type);
-				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(tmp, tmp.getKey()));
+				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(tmp, tmp.getLeft()));
 				vars.setSelectedIndex(vars.getItemCount() - 1);
 				varsBag.remove(var.get());
 				current.getVars().add(tmp);

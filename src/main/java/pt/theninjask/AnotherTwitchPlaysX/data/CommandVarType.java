@@ -2,8 +2,8 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 
 public enum CommandVarType {
 
-	STRING("string", "."),
-	DIGIT("digit", "\\d");
+	STRING("string", ".*"),
+	DIGIT("digit", "(-?\\d+)?");
 	
 	private String type;
 	

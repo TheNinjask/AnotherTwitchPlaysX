@@ -2,50 +2,54 @@ package pt.theninjask.AnotherTwitchPlaysX.util;
 
 public class Pair<X,Y> {
 	
-	private X key;
+	private X left;
 	
-	private Y value;
+	private Y right;
 	
 	public Pair() {}
 	
-	public Pair(X key, Y value) {
-		this.key = key;
-		this.value = value;
+	public Pair(X left, Y right) {
+		this.left = left;
+		this.right = right;
 	}
 
-	public void setKey(X key) {
-		this.key = key;
+	public void setLeft(X left) {
+		this.left = left;
 	}
 	
-	public X getKey() {
-		return key;
+	public X getLeft() {
+		return left;
 	}
 
-	public void setValue(Y value) {
-		this.value = value;
+	public void setRight(Y right) {
+		this.right = right;
 	}
 	
-	public Y getValue() {
-		return value;
+	public Y getRight() {
+		return right;
 	}
 	
 	public boolean equals(Pair<X,Y> other) {
 		if(other==null)
 			return false;
-		if(key==null) {
-			if(other.key!=null)
+		if(left==null) {
+			if(other.left!=null)
 				return false;
 		}else {
-			if(!key.equals(other.key))
+			if(!left.equals(other.left))
 				return false;
 		}
-		if(value==null) {
-			if(other.value!=null)
+		if(right==null) {
+			if(other.right!=null)
 				return false;
 		}else {
-			if(!value.equals(other.value))
+			if(!right.equals(other.right))
 				return false;
 		}
 		return true;
+	}
+	
+	public Pair<X, Y> clone(){
+		return new Pair<X, Y>(left, right);
 	}
 }

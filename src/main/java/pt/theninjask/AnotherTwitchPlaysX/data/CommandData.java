@@ -86,7 +86,7 @@ public class CommandData implements Data {
 		StringBuilder regex = new StringBuilder(lead);
 		for (Pair<String, CommandVarType> elem : vars) {
 			regex.append(
-					String.format("\\s?(?<%s>%s*)", elem.getKey(), elem.getValue().getRegex())
+					String.format("\\s?(?<%s>%s)", elem.getLeft(), elem.getRight().getRegex())
 					);
 		}
 		return regex.toString();
@@ -101,7 +101,7 @@ public class CommandData implements Data {
 			byte[] array = new byte[4];
 		    new Random().nextBytes(array);
 			example.append(
-					String.format(" %s", CommandVarType.DIGIT == elem.getValue() ? tmp.nextInt(100) : new String(array, Charset.forName("UTF-8")))
+					String.format(" %s", CommandVarType.DIGIT == elem.getRight() ? tmp.nextInt(100) : new String(array, Charset.forName("UTF-8")))
 					);
 		}
 		return example.toString();
@@ -171,7 +171,7 @@ public class CommandData implements Data {
 		else {
 			ArrayList<Pair<String, CommandVarType>> tmp = new ArrayList<Pair<String, CommandVarType>>();
 			for (Pair<String, CommandVarType> elem : vars) {
-				tmp.add(new Pair<String, CommandVarType>(new String(elem.getKey()), elem.getValue()));
+				tmp.add(new Pair<String, CommandVarType>(new String(elem.getLeft()), elem.getRight()));
 			}
 			copy.setVars(tmp);
 		}
@@ -182,17 +182,21 @@ public class CommandData implements Data {
 	public void onMessage(ChannelMessageEvent event){
 		//if(!event.getActor().getNick().equalsIgnoreCase("mytwitchusername69420"))
 		//	return;
+		if(!event.getActor().getNick().equalsIgnoreCase("wynautcritical"))
+			return;
 		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
 		Matcher match = pattern.matcher(event.getMessage());
-		if(!match.matches())
+		if(!match.matches()) {
+			System.out.println("Wiff");
 			return;
+		}
 		Map<String, String> map = new HashMap<String, String>();
 		for (Pair<String, CommandVarType> elem : vars) {
-			String value = match.group(elem.getKey());
+			String value = match.group(elem.getLeft());
 			if(value!=null && value.isEmpty())
 				value = null;
 			if(value!=null)
-				map.put(elem.getKey(), value.toLowerCase());
+				map.put(elem.getLeft(), value.toLowerCase());
 		}
 		switch (type) {
 			case QUEUE:

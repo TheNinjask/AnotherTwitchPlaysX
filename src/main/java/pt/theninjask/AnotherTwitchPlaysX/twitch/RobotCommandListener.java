@@ -34,9 +34,9 @@ public class RobotCommandListener {
 			return;
 		Map<String, String> map = new HashMap<String, String>();
 		for (Pair<String, CommandVarType> elem : data.getVars()) {
-			String value = match.group(elem.getKey());
+			String value = match.group(elem.getLeft());
 			if(value!=null)
-				map.put(elem.getKey(), value);
+				map.put(elem.getLeft(), value);
 		}
 		switch (data.getType()) {
 			case QUEUE:

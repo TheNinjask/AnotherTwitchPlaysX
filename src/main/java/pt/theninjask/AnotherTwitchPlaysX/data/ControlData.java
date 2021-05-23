@@ -1,5 +1,6 @@
 package pt.theninjask.AnotherTwitchPlaysX.data;
 
+import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,6 +73,10 @@ public class ControlData implements Data {
 		case MOUSE_WHEEL:
 			if(inDepthCursor==null)
 				inDepthCursor = new InDepthCursorData();
+			if(this.type==ControlType.MOUSE_DRAG) {
+				inDepthCursor.setFinalX(new Pair<Integer, MouseCoordsType>(null, MouseCoordsType.ABS));
+				inDepthCursor.setFinalY(new Pair<Integer, MouseCoordsType>(null, MouseCoordsType.ABS));
+			}
 			break;
 		default:
 			if(inDepthCursor!=null)
@@ -106,6 +111,10 @@ public class ControlData implements Data {
 
 	public void execute(Robot robot){
 		switch(type) {
+		default:
+			Integer x;
+			Integer y;
+			break;			
 		case KEY:
 			if(key==null)
 				break;
@@ -120,8 +129,17 @@ public class ControlData implements Data {
 			break;
 		case MOUSE_CLICK:*/
 		case MOUSE:
-			if(inDepthCursor!=null)
-				robot.mouseMove(inDepthCursor.getXorDefault(), inDepthCursor.getYorDefault());
+			if(inDepthCursor!=null) {
+				x = inDepthCursor.getXorDefault();
+				if(inDepthCursor.getX()!=null && inDepthCursor.getX().getRight()==MouseCoordsType.REL) {
+					x = MouseInfo.getPointerInfo().getLocation().x + x;
+				}
+				y = inDepthCursor.getYorDefault();
+				if(inDepthCursor.getY()!=null && inDepthCursor.getY().getRight()==MouseCoordsType.REL) {
+					y = MouseInfo.getPointerInfo().getLocation().y + y;
+				}
+				robot.mouseMove(x, y);
+			}
 			if(key!=null)
 				robot.mousePress(key);
 			if(duration!=null);
@@ -130,12 +148,30 @@ public class ControlData implements Data {
 				robot.mouseRelease(key);
 			break;
 		case MOUSE_DRAG:
-			if(inDepthCursor!=null)
-				robot.mouseMove(inDepthCursor.getXorDefault(), inDepthCursor.getYorDefault());
+			if(inDepthCursor!=null) {
+				x = inDepthCursor.getXorDefault();
+				if(inDepthCursor.getX()!=null && inDepthCursor.getX().getRight()==MouseCoordsType.REL) {
+					x = MouseInfo.getPointerInfo().getLocation().x + x;
+				}
+				y = inDepthCursor.getYorDefault();
+				if(inDepthCursor.getY()!=null && inDepthCursor.getY().getRight()==MouseCoordsType.REL) {
+					y = MouseInfo.getPointerInfo().getLocation().y + y;
+				}
+				robot.mouseMove(x, y);
+			}
 			if(key==null)
 				robot.mousePress(key);
-			if(inDepthCursor!=null)
-				robot.mouseMove(inDepthCursor.getFinalXorDefault(), inDepthCursor.getFinalYorDefault());
+			if(inDepthCursor!=null) {
+				x = inDepthCursor.getFinalXorDefault();
+				if(inDepthCursor.getFinalX()!=null && inDepthCursor.getFinalX().getRight()==MouseCoordsType.REL) {
+					x = MouseInfo.getPointerInfo().getLocation().x + x;
+				}
+				y = inDepthCursor.getFinalYorDefault();
+				if(inDepthCursor.getFinalY()!=null && inDepthCursor.getFinalY().getRight()==MouseCoordsType.REL) {
+					y = MouseInfo.getPointerInfo().getLocation().y + y;
+				}
+				robot.mouseMove(x, y);
+			}
 			if(key!=null)
 				robot.mouseRelease(key);
 			break;
@@ -143,9 +179,6 @@ public class ControlData implements Data {
 			if(inDepthCursor!=null && inDepthCursor.getScroll()!=null)
 				robot.mouseWheel(inDepthCursor.getScroll());
 			break;
-		default:
-			break;
-			
 		}
 	}
 	
@@ -181,10 +214,10 @@ public class ControlData implements Data {
 		case KEY:
 			tmp = getValueFromMap("key", vars);
 			trans = translation.get(tmp);
-			if(trans==null || trans.getValue() != ControlType.KEY) {
+			if(trans==null || trans.getRight() != ControlType.KEY) {
 				key = this.key;
 			}else {
-				key = trans.getKey();
+				key = trans.getLeft();
 			}
 			if(key==null)
 				break;
@@ -224,18 +257,24 @@ public class ControlData implements Data {
 			//deprecated comment x2 xD
 			//this is implying dead code in x==null even tho it is the same
 			x= tmp==null? inDepthCursor.getXorDefault() : Integer.parseInt(tmp);
+			if(inDepthCursor.getX()!=null && inDepthCursor.getX().getRight()==MouseCoordsType.REL) {
+				x = MouseInfo.getPointerInfo().getLocation().x + x;
+			}
 			tmp = getValueFromMap("y", vars);
 			//deprecated comment x2
 			//this is implying dead code in y==null even tho it is the same
 			y = tmp==null ? inDepthCursor.getYorDefault() : Integer.parseInt(tmp);
+			if(inDepthCursor.getY()!=null && inDepthCursor.getY().getRight()==MouseCoordsType.REL) {
+				y = MouseInfo.getPointerInfo().getLocation().y + y;
+			}
 			robot.mouseMove(x,y);
 			
 			tmp = getValueFromMap("key", vars);
 			trans = translation.get(tmp);
-			if(trans==null || trans.getValue() != ControlType.MOUSE) {
+			if(trans==null || trans.getRight() != ControlType.MOUSE) {
 				key = this.key;
 			}else {
-				key = trans.getKey();
+				key = trans.getLeft();
 			}
 			
 			if(key!=null)
@@ -251,16 +290,24 @@ public class ControlData implements Data {
 		case MOUSE_DRAG:
 			tmp = getValueFromMap("x", vars);
 			x= tmp==null? inDepthCursor.getXorDefault() : Integer.parseInt(tmp);
+			if(inDepthCursor.getX()!=null && inDepthCursor.getX().getRight()==MouseCoordsType.REL) {
+				x = MouseInfo.getPointerInfo().getLocation().x + x;
+			}
+			
 			tmp = getValueFromMap("y", vars);
 			y = tmp==null ? inDepthCursor.getYorDefault() : Integer.parseInt(tmp);
+			if(inDepthCursor.getY()!=null && inDepthCursor.getY().getRight()==MouseCoordsType.REL) {
+				y = MouseInfo.getPointerInfo().getLocation().y + y;
+			}
+			
 			robot.mouseMove(x,y);
 			
 			tmp = getValueFromMap("key", vars);
 			trans = translation.get(tmp);
-			if(trans==null || trans.getValue() != ControlType.MOUSE) {
+			if(trans==null || trans.getRight() != ControlType.MOUSE) {
 				key = this.key;
 			}else {
-				key = trans.getKey();
+				key = trans.getLeft();
 			}
 			
 			if(key!=null)
@@ -270,8 +317,16 @@ public class ControlData implements Data {
 			robot.delay(duration);*/
 			tmp = getValueFromMap("final_x", vars);
 			x= tmp==null? inDepthCursor.getFinalXorDefault() : Integer.parseInt(tmp);
+			if(inDepthCursor.getFinalX()!=null && inDepthCursor.getFinalX().getRight()==MouseCoordsType.REL) {
+				x = MouseInfo.getPointerInfo().getLocation().x + x;
+			}
+			
 			tmp = getValueFromMap("final_y", vars);
 			y = tmp==null ? inDepthCursor.getFinalYorDefault() : Integer.parseInt(tmp);
+			if(inDepthCursor.getFinalY()!=null && inDepthCursor.getFinalY().getRight()==MouseCoordsType.REL) {
+				y = MouseInfo.getPointerInfo().getLocation().y + y;
+			}
+			
 			robot.mouseMove(x,y);
 			if(key!=null)
 				robot.mouseRelease(key);
