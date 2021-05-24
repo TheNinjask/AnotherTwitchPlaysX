@@ -10,5 +10,8 @@ public @interface Mod {
 	
 	public boolean hasPanel() default true;
 	
+	@Deprecated
 	public int version() default 0;
+	
+	public boolean keepLoaded() default true;
 }

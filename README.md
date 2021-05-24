@@ -46,7 +46,7 @@ I am a bit bad at explaining in text but if you use the app I hope it is intuiti
 
 ## Modding
 
-Yes! In this application, you can load a single mod (but is there can be a mod that loads multiple mods but for now I am not doing that.)
+Yes! In this application, you can load a single mod (but there can be a mod that loads multiple mods but for now I am not doing that.)
 
 To make a mod for this app, you start a maven project and add the following [dependency](https://github.com/TheNinjask/AnotherTwitchPlaysX/packages)
 ```
@@ -85,7 +85,7 @@ Here a plugin to help you create one that also excludes unnecessary dependencies
 </plugin>
 ```
 
-It will be required for the mod at least 1 class (it will be the first that it finds) with the annotation `@Mod` with the value `main` as `true` which is by default and must have an public empty constructor.
+It will be required for the mod at least 1 class (it will be the first that it finds) with the annotation `@Mod` with the value `main` as `true` which is by default and must have an public constructor with no params.
 
 Also there will be 3 types of mods:
 * First Party - That will show no problems.
@@ -159,7 +159,7 @@ The first intention of this project (even tho it can't be seen through the commi
 <!-- omit in toc -->
 ### I don't like/know how to use the UI. Is there a other way?
 
-I also wanted to be a other way to setup the commands without relying on the UI so you can write a JSON file with the following below and load your written file.
+I also wanted to be a other way to setup the commands without relying on the UI so you can write a JSON file with the following below and load your written file. (This might be outdaded)
 ```
 [
 	#this will be a comment, but remember JSON does not support it

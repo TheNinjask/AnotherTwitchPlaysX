@@ -29,12 +29,13 @@ import javax.swing.text.NumberFormatter;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandVarType;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
+import pt.theninjask.AnotherTwitchPlaysX.data.MouseCoordsType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
-import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoordsListener;
+import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords.MouseCoordsListener;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
 public class ControlDataPanel extends JPanel {
@@ -107,6 +108,14 @@ public class ControlDataPanel extends JPanel {
 
 	private JButton remove;
 
+	private JButton xType;
+
+	private JButton yType;
+
+	private JButton finalXType;
+
+	private JButton finalYType;
+
 	private class JComboBoxVar extends JComboBox<JComboItem<Pair<String, CommandVarType>>>{
 		
 		/**
@@ -139,26 +148,26 @@ public class ControlDataPanel extends JPanel {
 					data.getMap().remove(this.varOf);
 					break;
 				default:
-					data.getMap().put(this.varOf, getItemAt(getSelectedIndex()).get().getKey());
+					data.getMap().put(this.varOf, getItemAt(getSelectedIndex()).get().getLeft());
 					break;
 				}
 			});
 		}
 		
 		public void addItem(Pair<String, CommandVarType> var) {
-			if(var==null || var.getValue()!=type || "NONE".equals(var.getKey()) || vars.containsKey(var.getKey()))
+			if(var==null || var.getRight()!=type || "NONE".equals(var.getLeft()) || vars.containsKey(var.getLeft()))
 				return;
-			JComboItem<Pair<String, CommandVarType>> tmp = new JComboItem<Pair<String, CommandVarType>>(var, var.getKey());
-			vars.put(var.getKey(), tmp);
+			JComboItem<Pair<String, CommandVarType>> tmp = new JComboItem<Pair<String, CommandVarType>>(var, var.getLeft());
+			vars.put(var.getLeft(), tmp);
 			addItem(tmp);
 		}
 
 		public void removeItem(Pair<String, CommandVarType> var) {
-			if(var==null || var.getValue()!=type || "NONE".equals(var.getKey()) || !vars.containsKey(var.getKey()))
+			if(var==null || var.getRight()!=type || "NONE".equals(var.getLeft()) || !vars.containsKey(var.getLeft()))
 				return;
 			if(getItemAt(getSelectedIndex()).get()!=null && getItemAt(getSelectedIndex()).get().equals(var))
 				setSelectedDefault();
-			removeItem(vars.remove(var.getKey()));
+			removeItem(vars.remove(var.getLeft()));
 		}
 		
 		public void setSelectedDefault() {
@@ -290,7 +299,7 @@ public class ControlDataPanel extends JPanel {
 			NumberFormatter durationFormatter = new NumberFormatter(format);
 			durationFormatter.setValueClass(Integer.class);
 			durationFormatter.setMinimum(0);
-			durationFormatter.setMaximum(Integer.MAX_VALUE);
+			durationFormatter.setMaximum(60);
 			durationFormatter.setAllowsInvalid(false);
 			JPanel durationPanel = new JPanel(new BorderLayout());
 			durationPanel.setOpaque(false);
@@ -344,7 +353,7 @@ public class ControlDataPanel extends JPanel {
 						durationVal = data.getDuration();
 						if (durationVal == null)
 							break;
-						if (durationVal == Integer.MAX_VALUE)
+						if (durationVal == 60)
 							break;
 						updated = durationVal + 1;
 						data.setDuration(updated);
@@ -387,7 +396,7 @@ public class ControlDataPanel extends JPanel {
 		NumberFormatter aftermathFormatter = new NumberFormatter(format);
 		aftermathFormatter.setValueClass(Integer.class);
 		aftermathFormatter.setMinimum(0);
-		aftermathFormatter.setMaximum(Integer.MAX_VALUE);
+		aftermathFormatter.setMaximum(60);
 		aftermathFormatter.setAllowsInvalid(false);
 		aftermath = new JFormattedTextField(aftermathFormatter);
 		normal.add(aftermath);
@@ -431,7 +440,7 @@ public class ControlDataPanel extends JPanel {
 					aftermathVal = data.getAftermathDelay();
 					if (aftermathVal == null)
 						break;
-					if (aftermathVal == Integer.MAX_VALUE)
+					if (aftermathVal == 60)
 						break;
 					updated = aftermathVal + 1;
 					data.setAftermathDelay(updated);
@@ -477,8 +486,8 @@ public class ControlDataPanel extends JPanel {
 			x = new JFormattedTextField(xFormatter);
 			normal.add(x);
 			x.setBorder(null);
-			if (data.getInDepthCursor().getX() != null)
-				x.setText(data.getInDepthCursor().getX().toString());
+			if (data.getInDepthCursor().getX().getLeft() != null)
+				x.setText(data.getInDepthCursor().getX().getLeft().toString());
 			x.getDocument().addDocumentListener(new DocumentListener() {
 
 				@Override
@@ -498,12 +507,12 @@ public class ControlDataPanel extends JPanel {
 
 				private void update() {
 					try {
-						data.getInDepthCursor().setX(Integer.parseInt(x.getText()));
+						data.getInDepthCursor().getX().setLeft(Integer.parseInt(x.getText()));
 					} catch (NumberFormatException e) {
 					}
 				}
 			});
-			x.setPreferredSize(new Dimension(50, 20));
+			x.setPreferredSize(new Dimension(45, 20));
 			x.addKeyListener(new KeyAdapter() {
 				public void keyPressed(KeyEvent e) {
 					switch (e.getKeyCode()) {
@@ -513,24 +522,24 @@ public class ControlDataPanel extends JPanel {
 						break;
 					case KeyEvent.VK_UP:
 					case KeyEvent.VK_KP_UP:
-						xVal = data.getInDepthCursor().getX();
+						xVal = data.getInDepthCursor().getX().getLeft();
 						if (xVal == null)
 							break;
 						if (xVal == Integer.MAX_VALUE)
 							break;
 						updated = xVal + 1;
-						data.getInDepthCursor().setX(updated);
+						data.getInDepthCursor().getX().setLeft(updated);
 						x.setValue(updated);
 						break;
 					case KeyEvent.VK_DOWN:
 					case KeyEvent.VK_KP_DOWN:
-						xVal = data.getInDepthCursor().getX();
+						xVal = data.getInDepthCursor().getX().getLeft();
 						if (xVal == null)
 							break;
 						if (xVal == Integer.MIN_VALUE)
 							break;
 						updated = xVal - 1;
-						data.getInDepthCursor().setX(updated);
+						data.getInDepthCursor().getX().setLeft(updated);
 						x.setValue(updated);
 						break;
 					}
@@ -543,7 +552,7 @@ public class ControlDataPanel extends JPanel {
 			xClear.setPreferredSize(Constants.X_BUTTON);
 			xClear.addActionListener(l->{
 				x.setValue(null);
-				data.getInDepthCursor().setX(null);
+				data.getInDepthCursor().getX().setLeft(null);
 			});
 			content.add(xClear);
 			content.add(x);
@@ -552,7 +561,26 @@ public class ControlDataPanel extends JPanel {
 			xVar.setVisible(false);
 			var.add(xVar);
 			content.add(xVar);
-			
+
+			xType = new JButton("Abs");
+			if(data.getInDepthCursor().getX().getRight()==MouseCoordsType.REL)
+				xType.setText("Rel");
+			xType.setFocusable(false);
+			xType.setMargin(new Insets(0, 0, 0, 0));
+			xType.addActionListener(l->{
+				switch (xType.getText()) {
+				case "Abs":
+					data.getInDepthCursor().getX().setRight(MouseCoordsType.REL);
+					xType.setText("Rel");
+					break;
+				case "Rel":
+				default:
+					data.getInDepthCursor().getX().setRight(MouseCoordsType.ABS);
+					xType.setText("Abs");
+					break;
+				}
+			});
+			xPanel.add(xType, BorderLayout.EAST);
 			xPanel.add(content);
 			
 			center.add(xPanel);
@@ -572,8 +600,8 @@ public class ControlDataPanel extends JPanel {
 			y = new JFormattedTextField(yFormatter);
 			normal.add(y);
 			y.setBorder(null);
-			if (data.getInDepthCursor().getY() != null)
-				y.setText(data.getInDepthCursor().getY().toString());
+			if (data.getInDepthCursor().getY().getLeft() != null)
+				y.setText(data.getInDepthCursor().getY().getLeft().toString());
 			y.getDocument().addDocumentListener(new DocumentListener() {
 
 				@Override
@@ -593,12 +621,12 @@ public class ControlDataPanel extends JPanel {
 
 				private void update() {
 					try {
-						data.getInDepthCursor().setY(Integer.parseInt(y.getText()));
+						data.getInDepthCursor().getY().setLeft(Integer.parseInt(y.getText()));
 					} catch (NumberFormatException e) {
 					}
 				}
 			});
-			y.setPreferredSize(new Dimension(50, 20));
+			y.setPreferredSize(new Dimension(45, 20));
 			y.addKeyListener(new KeyAdapter() {
 				public void keyPressed(KeyEvent e) {
 					switch (e.getKeyCode()) {
@@ -608,24 +636,24 @@ public class ControlDataPanel extends JPanel {
 						break;
 					case KeyEvent.VK_UP:
 					case KeyEvent.VK_KP_UP:
-						yVal = data.getInDepthCursor().getY();
+						yVal = data.getInDepthCursor().getY().getLeft();
 						if (yVal == null)
 							break;
 						if (yVal == Integer.MAX_VALUE)
 							break;
 						updated = yVal + 1;
-						data.getInDepthCursor().setY(updated);
+						data.getInDepthCursor().getY().setLeft(updated);
 						y.setValue(updated);
 						break;
 					case KeyEvent.VK_DOWN:
 					case KeyEvent.VK_KP_DOWN:
-						yVal = data.getInDepthCursor().getY();
+						yVal = data.getInDepthCursor().getY().getLeft();
 						if (yVal == null)
 							break;
 						if (yVal == Integer.MIN_VALUE)
 							break;
 						updated = yVal - 1;
-						data.getInDepthCursor().setY(updated);
+						data.getInDepthCursor().getY().setLeft(updated);
 						y.setValue(updated);
 						break;
 					}
@@ -638,7 +666,7 @@ public class ControlDataPanel extends JPanel {
 			yClear.setPreferredSize(Constants.X_BUTTON);
 			yClear.addActionListener(l->{
 				y.setValue(null);
-				data.getInDepthCursor().setY(null);
+				data.getInDepthCursor().getY().setLeft(null);
 			});
 			content.add(yClear);
 			content.add(y);
@@ -648,6 +676,26 @@ public class ControlDataPanel extends JPanel {
 			var.add(yVar);
 			content.add(yVar);
 			
+			yType = new JButton("Abs");
+			if(data.getInDepthCursor().getY().getRight()==MouseCoordsType.REL)
+				yType.setText("Rel");
+			yType.setFocusable(false);
+			yType.setMargin(new Insets(0, 0, 0, 0));
+			yType.addActionListener(l->{
+				switch (yType.getText()) {
+				case "Abs":
+					data.getInDepthCursor().getY().setRight(MouseCoordsType.REL);
+					yType.setText("Rel");
+					break;
+				case "Rel":
+				default:
+					data.getInDepthCursor().getY().setRight(MouseCoordsType.ABS);
+					yType.setText("Abs");
+					break;
+				}
+			});
+			
+			yPanel.add(yType, BorderLayout.EAST);
 			yPanel.add(content);
 			
 			center.add(yPanel);
@@ -681,8 +729,8 @@ public class ControlDataPanel extends JPanel {
 				finalX = new JFormattedTextField(finalXFormatter);
 				normal.add(finalX);
 				finalX.setBorder(null);
-				if (data.getInDepthCursor().getFinalX() != null)
-					finalX.setText(data.getInDepthCursor().getX().toString());
+				if (data.getInDepthCursor().getFinalX().getLeft() != null)
+					finalX.setText(data.getInDepthCursor().getFinalX().getLeft().toString());
 				finalX.getDocument().addDocumentListener(new DocumentListener() {
 
 					@Override
@@ -702,12 +750,12 @@ public class ControlDataPanel extends JPanel {
 
 					private void update() {
 						try {
-							data.getInDepthCursor().setFinalX(Integer.parseInt(finalX.getText()));
+							data.getInDepthCursor().getFinalX().setLeft(Integer.parseInt(finalX.getText()));
 						} catch (NumberFormatException e) {
 						}
 					}
 				});
-				finalX.setPreferredSize(new Dimension(50, 20));
+				finalX.setPreferredSize(new Dimension(45, 20));
 				finalX.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent e) {
 						switch (e.getKeyCode()) {
@@ -717,24 +765,24 @@ public class ControlDataPanel extends JPanel {
 							break;
 						case KeyEvent.VK_UP:
 						case KeyEvent.VK_KP_UP:
-							xVal = data.getInDepthCursor().getFinalX();
+							xVal = data.getInDepthCursor().getFinalX().getLeft();
 							if (xVal == null)
 								break;
 							if (xVal == Integer.MAX_VALUE)
 								break;
 							updated = xVal + 1;
-							data.getInDepthCursor().setFinalX(updated);
+							data.getInDepthCursor().getFinalX().setLeft(updated);
 							finalX.setValue(updated);
 							break;
 						case KeyEvent.VK_DOWN:
 						case KeyEvent.VK_KP_DOWN:
-							xVal = data.getInDepthCursor().getFinalX();
+							xVal = data.getInDepthCursor().getFinalX().getLeft();
 							if (xVal == null)
 								break;
 							if (xVal == Integer.MIN_VALUE)
 								break;
 							updated = xVal - 1;
-							data.getInDepthCursor().setFinalX(updated);
+							data.getInDepthCursor().getFinalX().setLeft(updated);
 							finalX.setValue(updated);
 							break;
 						}
@@ -747,7 +795,7 @@ public class ControlDataPanel extends JPanel {
 				finalXClear.setPreferredSize(Constants.X_BUTTON);
 				finalXClear.addActionListener(l->{
 					finalX.setValue(null);
-					data.getInDepthCursor().setFinalX(null);
+					data.getInDepthCursor().getFinalX().setLeft(null);
 				});
 				content.add(finalXClear);
 				content.add(finalX);
@@ -757,6 +805,26 @@ public class ControlDataPanel extends JPanel {
 				var.add(finalXVar);
 				content.add(finalXVar);
 				
+				finalXType = new JButton("Abs");
+				if(data.getInDepthCursor().getFinalX().getRight()==MouseCoordsType.REL)
+					finalXType.setText("Rel");
+				finalXType.setFocusable(false);
+				finalXType.setMargin(new Insets(0, 0, 0, 0));
+				finalXType.addActionListener(l->{
+					switch (yType.getText()) {
+					case "Abs":
+						data.getInDepthCursor().getFinalX().setRight(MouseCoordsType.REL);
+						finalXType.setText("Rel");
+						break;
+					case "Rel":
+					default:
+						data.getInDepthCursor().getFinalX().setRight(MouseCoordsType.ABS);
+						finalXType.setText("Abs");
+						break;
+					}
+				});
+				
+				finalXPanel.add(finalXType, BorderLayout.EAST);
 				finalXPanel.add(content);
 				
 				//center.add(finalXPanel);
@@ -776,8 +844,8 @@ public class ControlDataPanel extends JPanel {
 				finalY = new JFormattedTextField(finalYFormatter);
 				normal.add(finalY);		
 				finalY.setBorder(null);
-				if (data.getInDepthCursor().getFinalY() != null)
-					finalY.setText(data.getInDepthCursor().getFinalY().toString());
+				if (data.getInDepthCursor().getFinalY().getLeft() != null)
+					finalY.setText(data.getInDepthCursor().getFinalY().getLeft().toString());
 				finalY.getDocument().addDocumentListener(new DocumentListener() {
 
 					@Override
@@ -797,12 +865,12 @@ public class ControlDataPanel extends JPanel {
 
 					private void update() {
 						try {
-							data.getInDepthCursor().setFinalY(Integer.parseInt(finalY.getText()));
+							data.getInDepthCursor().getFinalY().setLeft(Integer.parseInt(finalY.getText()));
 						} catch (NumberFormatException e) {
 						}
 					}
 				});
-				finalY.setPreferredSize(new Dimension(50, 20));
+				finalY.setPreferredSize(new Dimension(45, 20));
 				finalY.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent e) {
 						switch (e.getKeyCode()) {
@@ -812,24 +880,24 @@ public class ControlDataPanel extends JPanel {
 							break;
 						case KeyEvent.VK_UP:
 						case KeyEvent.VK_KP_UP:
-							yVal = data.getInDepthCursor().getFinalY();
+							yVal = data.getInDepthCursor().getFinalY().getLeft();
 							if (yVal == null)
 								break;
 							if (yVal == Integer.MAX_VALUE)
 								break;
 							updated = yVal + 1;
-							data.getInDepthCursor().setFinalY(updated);
+							data.getInDepthCursor().getFinalY().setLeft(updated);
 							finalY.setValue(updated);
 							break;
 						case KeyEvent.VK_DOWN:
 						case KeyEvent.VK_KP_DOWN:
-							yVal = data.getInDepthCursor().getFinalY();
+							yVal = data.getInDepthCursor().getFinalY().getLeft();
 							if (yVal == null)
 								break;
 							if (yVal == Integer.MIN_VALUE)
 								break;
 							updated = yVal - 1;
-							data.getInDepthCursor().setY(updated);
+							data.getInDepthCursor().getFinalY().setLeft(updated);
 							finalY.setValue(updated);
 							break;
 						}
@@ -842,7 +910,7 @@ public class ControlDataPanel extends JPanel {
 				finalYClear.setPreferredSize(Constants.X_BUTTON);
 				finalYClear.addActionListener(l->{
 					finalY.setValue(null);
-					data.getInDepthCursor().setFinalY(null);
+					data.getInDepthCursor().getFinalY().setLeft(null);
 				});
 				content.add(finalYClear);
 				content.add(finalY);
@@ -851,6 +919,27 @@ public class ControlDataPanel extends JPanel {
 				finalYVar.setVisible(false);
 				var.add(finalYVar);
 				content.add(finalYVar);
+				
+				finalYType = new JButton("Abs");
+				if(data.getInDepthCursor().getFinalY().getRight()==MouseCoordsType.REL)
+					finalYType.setText("Rel");
+				finalYType.setFocusable(false);
+				finalYType.setMargin(new Insets(0, 0, 0, 0));
+				finalYType.addActionListener(l->{
+					switch (yType.getText()) {
+					case "Abs":
+						data.getInDepthCursor().getFinalY().setRight(MouseCoordsType.REL);
+						finalYType.setText("Rel");
+						break;
+					case "Rel":
+					default:
+						data.getInDepthCursor().getFinalY().setRight(MouseCoordsType.ABS);
+						finalYType.setText("Abs");
+						break;
+					}
+				});
+				
+				finalYPanel.add(finalYType, BorderLayout.EAST);
 				
 				finalYPanel.add(content);
 				
@@ -1000,7 +1089,7 @@ public class ControlDataPanel extends JPanel {
 			}
 		}
 		data.getMap().forEach((k,v)->{
-			if(var.getKey().equals(v))
+			if(var.getLeft().equals(v))
 				data.getMap().remove(k);
 		});
 	}
@@ -1087,5 +1176,37 @@ public class ControlDataPanel extends JPanel {
 
 	public JButton getRemove() {
 		return remove;
+	}
+
+	public JButton getxClear() {
+		return xClear;
+	}
+
+	public JComboBoxVar getxVar() {
+		return xVar;
+	}
+
+	public JButton getyClear() {
+		return yClear;
+	}
+
+	public JComboBoxVar getyVar() {
+		return yVar;
+	}
+
+	public JButton getxType() {
+		return xType;
+	}
+
+	public JButton getyType() {
+		return yType;
+	}
+
+	public JButton getFinalXType() {
+		return finalXType;
+	}
+
+	public JButton getFinalYType() {
+		return finalYType;
 	}
 }
