@@ -255,6 +255,7 @@ public class MainMenuPanel extends JPanel {
 									gameButton.setText("Start");
 									commandsButton.setEnabled(true);
 									connectButton.setEnabled(true);
+									MainFrame.getInstance().setState(JFrame.NORMAL);
 									isAppStarted.set(false);
 								} catch (NativeHookException nativeHookException) {
 									Constants.showExceptionDialog(nativeHookException);

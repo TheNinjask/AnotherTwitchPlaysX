@@ -184,8 +184,6 @@ public class CommandData implements Data {
 	public void onMessage(ChannelMessageEvent event) {
 		// if(!event.getActor().getNick().equalsIgnoreCase("mytwitchusername69420"))
 		// return;
-		if (!event.getActor().getNick().equalsIgnoreCase("wynautcritical"))
-			return;
 		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
 		Matcher match = pattern.matcher(event.getMessage());
 		Map<String, String> map = new HashMap<String, String>();

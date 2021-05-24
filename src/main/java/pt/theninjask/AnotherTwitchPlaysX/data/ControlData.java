@@ -173,7 +173,6 @@ public class ControlData implements Data {
 			}
 			if(key!=null)
 				robot.mousePress(key);
-			robot.delay(100);
 			if(inDepthCursor!=null) {
 				x = inDepthCursor.getFinalXorDefault();
 				if(inDepthCursor.getFinalX()!=null && inDepthCursor.getFinalX().getRight()==MouseCoordsType.REL) {
@@ -328,7 +327,6 @@ public class ControlData implements Data {
 			/*tmp = getValueFromMap("duration", vars);
 			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
 			robot.delay(duration);*/
-			robot.delay(100);
 			tmp = getValueFromMap("final_x", vars);
 			x= tmp==null? inDepthCursor.getFinalXorDefault() : Integer.parseInt(tmp);
 			if(inDepthCursor.getFinalX()!=null && inDepthCursor.getFinalX().getRight()==MouseCoordsType.REL) {
