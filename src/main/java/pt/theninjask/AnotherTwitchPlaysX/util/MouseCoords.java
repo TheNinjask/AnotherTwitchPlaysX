@@ -22,6 +22,13 @@ public class MouseCoords implements NativeMouseInputListener {
 
 	private static MouseCoords singleton = new MouseCoords();
 
+	@FunctionalInterface
+	public interface MouseCoordsListener {
+
+		public void function(AtomicInteger x, AtomicInteger y);
+		
+	}
+	
 	public MouseCoords() {
 		this.x = new AtomicInteger(MouseInfo.getPointerInfo().getLocation().x);
 		this.y = new AtomicInteger(MouseInfo.getPointerInfo().getLocation().y);

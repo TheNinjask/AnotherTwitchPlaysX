@@ -36,19 +36,25 @@ public class ControlData implements Data {
 
 	public ControlData(Integer key, Integer duration, Integer aftermathDelay, ControlType type, InDepthCursorData inDepthCursor, Map<String, String> map) {
 		this.key = key;
-		this.duration = duration;
-		this.aftermathDelay = aftermathDelay;
+		this.duration = duration * 1000;
+		this.aftermathDelay = aftermathDelay * 1000;
 		this.type = type;
 		this.inDepthCursor = inDepthCursor;
 		this.map = map;
 	}
 	
 	public Integer getDuration() {
-		return duration;
+		return duration/1000;
 	}
 
-	public void setDuration(Integer duration) {
-		this.duration = duration;
+	public int setDuration(Integer duration) {
+		if(duration>60)
+			this.duration = 60 * 1000;
+		else if(duration<0) 
+			this.duration = 0;
+		else
+			this.duration = duration * 1000;
+		return this.duration/1000;
 	}
 
 	public Integer getKey() {
@@ -94,11 +100,17 @@ public class ControlData implements Data {
 	}
 	
 	public Integer getAftermathDelay() {
-		return aftermathDelay;
+		return aftermathDelay/1000;
 	}
 
-	public void setAftermathDelay(Integer aftermathDelay) {
-		this.aftermathDelay = aftermathDelay;
+	public int setAftermathDelay(Integer aftermathDelay) {
+		if(aftermathDelay>60)
+			this.aftermathDelay = 60 * 1000;
+		else if(aftermathDelay<0) 
+			this.aftermathDelay = 0;
+		else
+			this.aftermathDelay = aftermathDelay * 1000;
+		return this.aftermathDelay/1000;
 	}
 
 	public Map<String, String> getMap() {
@@ -119,7 +131,7 @@ public class ControlData implements Data {
 			if(key==null)
 				break;
 			robot.keyPress(key);
-			if(duration!=null);
+			if(duration!=null)
 				robot.delay(duration);
 			robot.keyRelease(key);
 			break;
@@ -142,7 +154,7 @@ public class ControlData implements Data {
 			}
 			if(key!=null)
 				robot.mousePress(key);
-			if(duration!=null);
+			if(duration!=null)
 				robot.delay(duration);
 			if(key!=null)
 				robot.mouseRelease(key);
@@ -159,8 +171,9 @@ public class ControlData implements Data {
 				}
 				robot.mouseMove(x, y);
 			}
-			if(key==null)
+			if(key!=null)
 				robot.mousePress(key);
+			robot.delay(100);
 			if(inDepthCursor!=null) {
 				x = inDepthCursor.getFinalXorDefault();
 				if(inDepthCursor.getFinalX()!=null && inDepthCursor.getFinalX().getRight()==MouseCoordsType.REL) {
@@ -315,6 +328,7 @@ public class ControlData implements Data {
 			/*tmp = getValueFromMap("duration", vars);
 			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
 			robot.delay(duration);*/
+			robot.delay(100);
 			tmp = getValueFromMap("final_x", vars);
 			x= tmp==null? inDepthCursor.getFinalXorDefault() : Integer.parseInt(tmp);
 			if(inDepthCursor.getFinalX()!=null && inDepthCursor.getFinalX().getRight()==MouseCoordsType.REL) {

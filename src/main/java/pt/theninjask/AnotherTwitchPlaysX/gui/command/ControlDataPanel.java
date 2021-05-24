@@ -35,7 +35,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
-import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoordsListener;
+import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords.MouseCoordsListener;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
 public class ControlDataPanel extends JPanel {
@@ -299,7 +299,7 @@ public class ControlDataPanel extends JPanel {
 			NumberFormatter durationFormatter = new NumberFormatter(format);
 			durationFormatter.setValueClass(Integer.class);
 			durationFormatter.setMinimum(0);
-			durationFormatter.setMaximum(Integer.MAX_VALUE);
+			durationFormatter.setMaximum(60);
 			durationFormatter.setAllowsInvalid(false);
 			JPanel durationPanel = new JPanel(new BorderLayout());
 			durationPanel.setOpaque(false);
@@ -353,7 +353,7 @@ public class ControlDataPanel extends JPanel {
 						durationVal = data.getDuration();
 						if (durationVal == null)
 							break;
-						if (durationVal == Integer.MAX_VALUE)
+						if (durationVal == 60)
 							break;
 						updated = durationVal + 1;
 						data.setDuration(updated);
@@ -396,7 +396,7 @@ public class ControlDataPanel extends JPanel {
 		NumberFormatter aftermathFormatter = new NumberFormatter(format);
 		aftermathFormatter.setValueClass(Integer.class);
 		aftermathFormatter.setMinimum(0);
-		aftermathFormatter.setMaximum(Integer.MAX_VALUE);
+		aftermathFormatter.setMaximum(60);
 		aftermathFormatter.setAllowsInvalid(false);
 		aftermath = new JFormattedTextField(aftermathFormatter);
 		normal.add(aftermath);
@@ -440,7 +440,7 @@ public class ControlDataPanel extends JPanel {
 					aftermathVal = data.getAftermathDelay();
 					if (aftermathVal == null)
 						break;
-					if (aftermathVal == Integer.MAX_VALUE)
+					if (aftermathVal == 60)
 						break;
 					updated = aftermathVal + 1;
 					data.setAftermathDelay(updated);
@@ -1176,5 +1176,37 @@ public class ControlDataPanel extends JPanel {
 
 	public JButton getRemove() {
 		return remove;
+	}
+
+	public JButton getxClear() {
+		return xClear;
+	}
+
+	public JComboBoxVar getxVar() {
+		return xVar;
+	}
+
+	public JButton getyClear() {
+		return yClear;
+	}
+
+	public JComboBoxVar getyVar() {
+		return yVar;
+	}
+
+	public JButton getxType() {
+		return xType;
+	}
+
+	public JButton getyType() {
+		return yType;
+	}
+
+	public JButton getFinalXType() {
+		return finalXType;
+	}
+
+	public JButton getFinalYType() {
+		return finalYType;
 	}
 }

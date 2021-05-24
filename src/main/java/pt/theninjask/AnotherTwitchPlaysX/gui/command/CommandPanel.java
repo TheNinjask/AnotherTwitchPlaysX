@@ -149,7 +149,6 @@ public class CommandPanel extends JPanel {
 			current.setType(type.getItemAt(type.getSelectedIndex()));
 		});
 		type.setFocusable(false);
-		type.setEnabled(false);
 		typePanel.add(type);
 		mainPanel.add(typePanel);
 
