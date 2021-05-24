@@ -37,12 +37,12 @@ public class SmoothMoveRobot extends Robot {
 
 	private void smoothMove(int fromX, int fromY, int toX, int toY) {
 		int sleepPerStep = speed / steps;
-		int deltaX = (toX - fromX) / steps;
-	    int deltaY = (toY - fromY) / steps;
+		double deltaX = (toX - fromX) / (double)steps;
+	    double deltaY = (toY - fromY) / (double)steps;
 	    for(int step=0; step<steps ;step++) {
-	    	int newX = deltaX * (step + 1) + fromX;
-	        int newY = deltaY * (step + 1) + fromY;
-	        super.mouseMove(newX, newY);        
+	    	double newX = deltaX * (step + 1) + fromX;
+	        double newY = deltaY * (step + 1) + fromY;
+	        super.mouseMove((int)Math.round(newX), (int)Math.round(newY));        
 	        this.delay(sleepPerStep);
 	    }
 	}
