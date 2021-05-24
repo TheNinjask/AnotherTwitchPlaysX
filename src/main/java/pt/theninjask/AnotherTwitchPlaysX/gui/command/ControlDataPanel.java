@@ -512,7 +512,7 @@ public class ControlDataPanel extends JPanel {
 					}
 				}
 			});
-			x.setPreferredSize(new Dimension(45, 20));
+			x.setPreferredSize(new Dimension(40, 20));
 			x.addKeyListener(new KeyAdapter() {
 				public void keyPressed(KeyEvent e) {
 					switch (e.getKeyCode()) {
@@ -626,7 +626,7 @@ public class ControlDataPanel extends JPanel {
 					}
 				}
 			});
-			y.setPreferredSize(new Dimension(45, 20));
+			y.setPreferredSize(new Dimension(40, 20));
 			y.addKeyListener(new KeyAdapter() {
 				public void keyPressed(KeyEvent e) {
 					switch (e.getKeyCode()) {
@@ -755,7 +755,7 @@ public class ControlDataPanel extends JPanel {
 						}
 					}
 				});
-				finalX.setPreferredSize(new Dimension(45, 20));
+				finalX.setPreferredSize(new Dimension(40, 20));
 				finalX.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent e) {
 						switch (e.getKeyCode()) {
@@ -870,7 +870,7 @@ public class ControlDataPanel extends JPanel {
 						}
 					}
 				});
-				finalY.setPreferredSize(new Dimension(45, 20));
+				finalY.setPreferredSize(new Dimension(40, 20));
 				finalY.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent e) {
 						switch (e.getKeyCode()) {
