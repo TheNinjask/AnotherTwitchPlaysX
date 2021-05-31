@@ -53,7 +53,7 @@ To make a mod for this app, you start a maven project and add the following [dep
 <dependency>
   <groupId>pt.theninjask</groupId>
   <artifactId>anothertwitchplaysx</artifactId>
-  <version>1.3.0</version>
+  <version>1.3.1</version>
 </dependency>
 ```
 and when you use mvn package, the .jar created has to be a fat .jar (but it won't require the dependency above.)
@@ -73,10 +73,11 @@ Here a plugin to help you create one that also excludes unnecessary dependencies
 			<configuration>
 				<artifactSet>
 					<excludes>
-						<exclude>pt.theninjask</exclude>
-						<exclude>org.kitteh.irc</exclude>
-						<exclude>com.fasterxml.jackson.core</exclude>
-						<exclude>com.1stleg</exclude>
+						<exclude>pt.theninjask:anothertwitchplaysx</exclude>
+						<exclude>org.kitteh.irc:client-lib</exclude>
+						<exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
+						<exclude>com.1stleg:jnativehook</exclude>
+						<exclude>commons-cli:commons-cli</exclude>
 					</excludes>
 				</artifactSet>
 			</configuration>
