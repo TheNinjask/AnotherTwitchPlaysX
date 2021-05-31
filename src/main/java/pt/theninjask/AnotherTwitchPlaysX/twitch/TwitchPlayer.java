@@ -1,5 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.twitch;
 
+import java.util.logging.Level;
+
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
 import org.kitteh.irc.client.library.feature.twitch.TwitchSupport;
@@ -10,6 +12,7 @@ import pt.theninjask.AnotherTwitchPlaysX.exception.AlreadyConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoSessionDataException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NotConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NotSetupException;
+import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class TwitchPlayer {
 
@@ -26,14 +29,17 @@ public class TwitchPlayer {
 	private static TwitchPlayer instance = new TwitchPlayer();
 	
 	private TwitchPlayer() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s()", TwitchPlayer.class.getSimpleName()));
 		this.connected = false;
 	}
 	
 	public static TwitchPlayer getInstance() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", TwitchPlayer.class.getSimpleName()));
 		return instance;
 	}
 
 	public void setSession(SessionData session) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.setSession()", TwitchPlayer.class.getSimpleName()));
 		this.session = session;
 	}
 	
@@ -42,6 +48,7 @@ public class TwitchPlayer {
 	}
 	
 	public void setup() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.setup()", TwitchPlayer.class.getSimpleName()));
 		if(session==null)
 			throw new NoSessionDataException();
 		if(connected)
@@ -55,6 +62,7 @@ public class TwitchPlayer {
 	}
 	
 	public void setupAndConnect() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.setupAndConnect()", TwitchPlayer.class.getSimpleName()));
 		if(session==null)
 			throw new NoSessionDataException();
 		if(connected)
@@ -82,17 +90,20 @@ public class TwitchPlayer {
 	}
 	
 	public void connect() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.connect()", TwitchPlayer.class.getSimpleName()));
 		client.connect();
 		connected = true;
 	}
 	
 	public void disconnect() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.disconnect()", TwitchPlayer.class.getSimpleName()));
 		connected = false;
 		client.shutdown();
 		client = null;
 	}
 	
 	public void sendMessage(String message) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.sendMessage()", TwitchPlayer.class.getSimpleName()));
 		if(session==null)
 			throw new NoSessionDataException();
 		if(!connected)

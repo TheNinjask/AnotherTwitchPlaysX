@@ -2,6 +2,7 @@ package pt.theninjask.AnotherTwitchPlaysX.util;
 
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.util.logging.Level;
 
 public class RobotSingleton {
 
@@ -19,7 +20,8 @@ public class RobotSingleton {
 		try {
 			robot = new SmoothMoveRobot();
 		} catch (AWTException e) {
-			throw new RuntimeException(e.getMessage());
+			Constants.printVerboseMessage(Level.SEVERE, e);
+			//throw new RuntimeException(e.getMessage());
 		}
 	}
 

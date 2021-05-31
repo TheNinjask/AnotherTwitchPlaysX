@@ -56,7 +56,6 @@ public class MouseCoords implements NativeMouseInputListener {
 				GlobalScreen.addNativeMouseMotionListener(this);
 				isRunning.set(true);
 			} catch (NativeHookException e) {
-				e.printStackTrace();
 				Constants.showExceptionDialog(e);
 			}
 		}
@@ -69,7 +68,6 @@ public class MouseCoords implements NativeMouseInputListener {
 				GlobalScreen.unregisterNativeHook();
 				isRunning.set(false);
 			} catch (NativeHookException e) {
-				e.printStackTrace();
 				Constants.showExceptionDialog(e);
 			}
 		}
@@ -81,7 +79,6 @@ public class MouseCoords implements NativeMouseInputListener {
 			GlobalScreen.unregisterNativeHook();
 			isRunning.set(false);
 		} catch (NativeHookException e) {
-			e.printStackTrace();
 			Constants.showExceptionDialog(e);
 		}
 	}

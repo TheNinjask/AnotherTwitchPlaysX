@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -83,6 +84,7 @@ public class CommandPanel extends JPanel {
 	private JButton add;
 
 	public CommandPanel() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
 		this.current = new CommandData();
 		this.saved = null;
 		controls = new ArrayList<ControlDataPanel>();
@@ -97,6 +99,7 @@ public class CommandPanel extends JPanel {
 	}
 
 	public CommandPanel(CommandData data) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
 		this.current = data.clone();
 		this.saved = data;
 		controls = new ArrayList<ControlDataPanel>();

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -99,6 +100,7 @@ public class MainMenuPanel extends JPanel {
 	private JPanel twitchChatTransparencyModePanel;
 
 	private MainMenuPanel() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainMenuPanel.class.getSimpleName()));
 		this.isAppStarted = new AtomicBoolean(false);
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new GridLayout(10, 1));
@@ -121,6 +123,7 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	public static MainMenuPanel getInstance() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", MainMenuPanel.class.getSimpleName()));
 		if (singleton.shouldGameButtonBeEnabled()) {
 			singleton.gameButton.setEnabled(true);
 		} else {

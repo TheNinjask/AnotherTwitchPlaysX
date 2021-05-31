@@ -18,6 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -95,8 +102,69 @@ public final class Constants {
 	public static final String MOD_INFO = "You are loading a third party mod that was validated by the creator of this app!";
 
 	public static int stopKey = NativeKeyEvent.VC_ESCAPE;
-	
+
 	public static final Map<String, Pair<Integer, ControlType>> STRING_TO_KEYCODE = getStringToKeyCode();
+
+	public static boolean debug = false;
+
+	public static boolean disableSession = false;
+
+	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
+		//private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
+		private static final String format = "[%1$s] %2$s %n";
+		@Override
+		public synchronized String format(LogRecord lr) {
+			return String.format(format, lr.getLevel().getLocalizedName(),
+					lr.getMessage());
+		}
+	};
+	
+	private static final Logger LOGGER = setUpLogger();
+	
+	private static final Logger setUpLogger() {
+
+		class DualConsoleHandler extends StreamHandler {
+
+		    private final ConsoleHandler stderrHandler = new ConsoleHandler();
+
+		    public DualConsoleHandler(Formatter format) {
+		        super(System.out, format);
+		        stderrHandler.setFormatter(format);
+		    }
+
+		    @Override
+		    public void publish(LogRecord record) {
+		        if (record.getLevel().intValue() <= Level.INFO.intValue()) {
+		            super.publish(record);
+		            super.flush();
+		        } else {
+		            stderrHandler.publish(record);
+		            stderrHandler.flush();
+		        }
+		    }
+		}
+		
+		Logger logger = Logger.getGlobal();
+		logger.setUseParentHandlers(false);
+		StreamHandler handler = new DualConsoleHandler(LOGGER_FORMATTER);
+		logger.addHandler(handler);
+		logger.setLevel(Level.OFF);
+		return logger;
+	}
+
+	public static void setLoggerLevel(Level level) {
+		LOGGER.setLevel(level);
+	}
+	
+	public static void printVerboseMessage(Level level, Throwable message) {
+		LOGGER.log(level, message.getClass().getSimpleName());
+		if (debug)
+			message.printStackTrace();
+	}
+
+	public static void printVerboseMessage(Level level, String message) {
+		LOGGER.log(level, message);
+	}
 
 	public static Map<String, Pair<Integer, ControlType>> resetStringToKeyCode() {
 		STRING_TO_KEYCODE.clear();
@@ -208,6 +276,9 @@ public final class Constants {
 
 			}
 		} catch (Exception | Error e) {
+
+			Constants.printVerboseMessage(Level.WARNING, e);
+
 			throw new ModNotLoadedException();
 		}
 		if (mod == null)
@@ -227,6 +298,9 @@ public final class Constants {
 			chooser.setFileFilter(filter);
 			UIManager.setLookAndFeel(previousLF);
 		} catch (Exception e) {
+
+			Constants.printVerboseMessage(Level.WARNING, e);
+
 			chooser = new JFileChooser();
 			chooser.setSelectedFile(defaultFile);
 			chooser.addChoosableFileFilter(filter);
@@ -254,6 +328,9 @@ public final class Constants {
 			chooser.setFileFilter(filter);
 			UIManager.setLookAndFeel(previousLF);
 		} catch (Exception e) {
+
+			Constants.printVerboseMessage(Level.WARNING, e);
+
 			chooser = new JFileChooser();
 			chooser.addChoosableFileFilter(filter);
 			chooser.setFileFilter(filter);
@@ -310,10 +387,16 @@ public final class Constants {
 	}
 
 	public static final void showExceptionDialog(Exception e) {
+
+		Constants.printVerboseMessage(Level.SEVERE, e);
+
 		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static final void showExpectedExceptionDialog(Exception e) {
+
+		Constants.printVerboseMessage(Level.WARNING, e);
+
 		JTextArea exception = new JTextArea(e.getMessage());
 		exception.setOpaque(false);
 		exception.setForeground(TWITCH_COLOR_COMPLEMENT);
