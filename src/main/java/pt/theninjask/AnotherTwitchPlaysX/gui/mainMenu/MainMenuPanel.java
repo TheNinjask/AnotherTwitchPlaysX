@@ -246,7 +246,7 @@ public class MainMenuPanel extends JPanel {
 
 						@Override
 						public void nativeKeyPressed(NativeKeyEvent e) {
-							if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+							if (e.getKeyCode() == Constants.stopKey) {
 								try {
 									GlobalScreen.unregisterNativeHook();
 									for (CommandData elem : DataManager.getInstance().getCommands()) {
