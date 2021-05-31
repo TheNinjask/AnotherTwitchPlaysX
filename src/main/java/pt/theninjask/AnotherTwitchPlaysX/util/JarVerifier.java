@@ -12,6 +12,7 @@ import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
 
 import pt.theninjask.AnotherTwitchPlaysX.exception.NotVerifyJarException;
 
@@ -39,7 +40,9 @@ public class JarVerifier {
 			CertificateFactory factory = CertificateFactory.getInstance("X.509");
 			main.add(factory.generateCertificate(JarVerifier.class.getResourceAsStream("/pt/theninjask/AnotherTwitchPlaysX/resource/certificate/app.cer")));
 			thirdParty.add(factory.generateCertificate(JarVerifier.class.getResourceAsStream("/pt/theninjask/AnotherTwitchPlaysX/resource/certificate/third_party.cer")));
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			Constants.printVerboseMessage(Level.SEVERE, e);
+		}
 	}
 
 	public static JarVerifier getInstance() {
@@ -115,6 +118,7 @@ public class JarVerifier {
 
 			return ModType.UNKNOWN;
 		} catch (Exception e) {
+			Constants.printVerboseMessage(Level.WARNING, e);
 			throw new NotVerifyJarException();
 		}
 	}

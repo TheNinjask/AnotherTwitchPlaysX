@@ -3,6 +3,7 @@ package pt.theninjask.AnotherTwitchPlaysX.util;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
 
 public class ThreadPool {
 
@@ -51,6 +52,7 @@ public class ThreadPool {
 		try {
 			poolUnison.executor.execute(task);			
 		}catch (NullPointerException|RejectedExecutionException e) {
+			Constants.printVerboseMessage(Level.WARNING, e);
 			return false;
 		}
 		return true;

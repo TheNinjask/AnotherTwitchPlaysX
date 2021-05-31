@@ -18,6 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -27,6 +34,8 @@ import javax.swing.JTextArea;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.jnativehook.keyboard.NativeKeyEvent;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.exception.ModNotLoadedException;
@@ -92,39 +101,117 @@ public final class Constants {
 
 	public static final String MOD_INFO = "You are loading a third party mod that was validated by the creator of this app!";
 
+	public static int stopKey = NativeKeyEvent.VC_ESCAPE;
+
 	public static final Map<String, Pair<Integer, ControlType>> STRING_TO_KEYCODE = getStringToKeyCode();
+
+	public static boolean debug = false;
+
+	public static boolean disableSession = false;
+
+	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
+		//private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
+		private static final String format = "[%1$s] %2$s %n";
+		@Override
+		public synchronized String format(LogRecord lr) {
+			return String.format(format, lr.getLevel().getLocalizedName(),
+					lr.getMessage());
+		}
+	};
+	
+	private static final Logger LOGGER = setUpLogger();
+	
+	private static final Logger setUpLogger() {
+
+		class DualConsoleHandler extends StreamHandler {
+
+		    private final ConsoleHandler stderrHandler = new ConsoleHandler();
+
+		    public DualConsoleHandler(Formatter format) {
+		        super(System.out, format);
+		        stderrHandler.setFormatter(format);
+		    }
+
+		    @Override
+		    public void publish(LogRecord record) {
+		        if (record.getLevel().intValue() <= Level.INFO.intValue()) {
+		            super.publish(record);
+		            super.flush();
+		        } else {
+		            stderrHandler.publish(record);
+		            stderrHandler.flush();
+		        }
+		    }
+		}
 		
-	public static Map<String, Pair<Integer, ControlType>> resetStringToKeyCode(){
+		Logger logger = Logger.getGlobal();
+		logger.setUseParentHandlers(false);
+		StreamHandler handler = new DualConsoleHandler(LOGGER_FORMATTER);
+		logger.addHandler(handler);
+		logger.setLevel(Level.OFF);
+		return logger;
+	}
+
+	public static void setLoggerLevel(Level level) {
+		LOGGER.setLevel(level);
+	}
+	
+	public static void printVerboseMessage(Level level, Throwable message) {
+		LOGGER.log(level, message.getClass().getSimpleName());
+		if (debug)
+			message.printStackTrace();
+	}
+
+	public static void printVerboseMessage(Level level, String message) {
+		LOGGER.log(level, message);
+	}
+
+	public static Map<String, Pair<Integer, ControlType>> resetStringToKeyCode() {
 		STRING_TO_KEYCODE.clear();
 		try {
 			for (Field elem : KeyEvent.class.getFields()) {
-				if(elem.getName().equals("VK_ESCAPE"))
-					continue;
-				if (elem.getName().contains("VK_"))
-					STRING_TO_KEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)).toLowerCase(), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
+				if (elem.getName().contains("VK_")) {
+					if (KeyEvent.getKeyText(elem.getInt(KeyEvent.class))
+							.equalsIgnoreCase(NativeKeyEvent.getKeyText(stopKey)))
+						continue;
+					// if (elem.getName().equals("VK_ESCAPE"))
+					// continue;
+					STRING_TO_KEYCODE.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)).toLowerCase(),
+							new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
+				}
 			}
-			STRING_TO_KEYCODE.put("Button Left".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
-			STRING_TO_KEYCODE.put("Button Right".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
-			STRING_TO_KEYCODE.put("Button Middle".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Left".toLowerCase(),
+					new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Right".toLowerCase(),
+					new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
+			STRING_TO_KEYCODE.put("Button Middle".toLowerCase(),
+					new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
 		} catch (Exception e) {
 			showExceptionDialog(e);
 		}
 		return STRING_TO_KEYCODE;
 	}
-	
-	
+
 	private static Map<String, Pair<Integer, ControlType>> getStringToKeyCode() {
 		Map<String, Pair<Integer, ControlType>> map = new HashMap<String, Pair<Integer, ControlType>>();
 		try {
 			for (Field elem : KeyEvent.class.getFields()) {
-				if(elem.getName().equals("VK_ESCAPE"))
-					continue;
-				if (elem.getName().contains("VK_"))
-					map.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)).toLowerCase(), new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
+				if (elem.getName().contains("VK_")) {
+					if (KeyEvent.getKeyText(elem.getInt(KeyEvent.class))
+							.equalsIgnoreCase(NativeKeyEvent.getKeyText(stopKey)))
+						continue;
+					// if (elem.getName().equals("VK_ESCAPE"))
+					// continue;
+					map.put(KeyEvent.getKeyText(elem.getInt(KeyEvent.class)).toLowerCase(),
+							new Pair<Integer, ControlType>(elem.getInt(KeyEvent.class), ControlType.KEY));
+				}
 			}
-			map.put("Button Left".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
-			map.put("Button Right".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
-			map.put("Button Middle".toLowerCase(), new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Left".toLowerCase(),
+					new Pair<Integer, ControlType>(MouseEvent.BUTTON1_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Right".toLowerCase(),
+					new Pair<Integer, ControlType>(MouseEvent.BUTTON3_DOWN_MASK, ControlType.MOUSE));
+			map.put("Button Middle".toLowerCase(),
+					new Pair<Integer, ControlType>(MouseEvent.BUTTON2_DOWN_MASK, ControlType.MOUSE));
 		} catch (Exception e) {
 			showExceptionDialog(e);
 		}
@@ -189,6 +276,9 @@ public final class Constants {
 
 			}
 		} catch (Exception | Error e) {
+
+			Constants.printVerboseMessage(Level.WARNING, e);
+
 			throw new ModNotLoadedException();
 		}
 		if (mod == null)
@@ -208,6 +298,9 @@ public final class Constants {
 			chooser.setFileFilter(filter);
 			UIManager.setLookAndFeel(previousLF);
 		} catch (Exception e) {
+
+			Constants.printVerboseMessage(Level.WARNING, e);
+
 			chooser = new JFileChooser();
 			chooser.setSelectedFile(defaultFile);
 			chooser.addChoosableFileFilter(filter);
@@ -235,6 +328,9 @@ public final class Constants {
 			chooser.setFileFilter(filter);
 			UIManager.setLookAndFeel(previousLF);
 		} catch (Exception e) {
+
+			Constants.printVerboseMessage(Level.WARNING, e);
+
 			chooser = new JFileChooser();
 			chooser.addChoosableFileFilter(filter);
 			chooser.setFileFilter(filter);
@@ -276,7 +372,7 @@ public final class Constants {
 		UIManager.put("Panel.background", panelBG);
 		return value;
 	}
-	
+
 	public static final void showMessageDialog(String msg, String... title) {
 		JTextArea message = new JTextArea(msg);
 		message.setOpaque(false);
@@ -285,16 +381,22 @@ public final class Constants {
 		Object panelBG = UIManager.get("Panel.background");
 		UIManager.put("OptionPane.background", TWITCH_COLOR);
 		UIManager.put("Panel.background", TWITCH_COLOR);
-		JOptionPane.showMessageDialog(null, message, title.length>0 ? title[0] : "", JOptionPane.PLAIN_MESSAGE, null);
+		JOptionPane.showMessageDialog(null, message, title.length > 0 ? title[0] : "", JOptionPane.PLAIN_MESSAGE, null);
 		UIManager.put("OptionPane.background", paneBG);
 		UIManager.put("Panel.background", panelBG);
 	}
 
 	public static final void showExceptionDialog(Exception e) {
+
+		Constants.printVerboseMessage(Level.SEVERE, e);
+
 		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static final void showExpectedExceptionDialog(Exception e) {
+
+		Constants.printVerboseMessage(Level.WARNING, e);
+
 		JTextArea exception = new JTextArea(e.getMessage());
 		exception.setOpaque(false);
 		exception.setForeground(TWITCH_COLOR_COMPLEMENT);

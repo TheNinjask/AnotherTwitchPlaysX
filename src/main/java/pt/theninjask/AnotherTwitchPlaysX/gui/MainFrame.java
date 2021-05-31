@@ -6,6 +6,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -33,6 +34,7 @@ public class MainFrame extends JFrame {
 	private JPanel currentPanel = LoginPanel.getInstance();
 	
 	private MainFrame() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainFrame.class.getSimpleName()));
 		this.onStart();
 		this.setTitle(Constants.TITLE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,6 +59,7 @@ public class MainFrame extends JFrame {
 	}
 	
 	private void saveSession() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.saveSession()", MainFrame.class.getSimpleName()));
 		if(currentPanel!=LoginPanel.getInstance()) {
 			try {
 				ObjectMapper objectMapper = new ObjectMapper();
@@ -78,10 +81,12 @@ public class MainFrame extends JFrame {
 	}
 	
 	public static MainFrame getInstance() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", MainFrame.class.getSimpleName()));
 		return singleton;
 	}
 
 	private void onStart() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.onStart()", MainFrame.class.getSimpleName()));
 		File sessionFile = new File("session.json");
 		if(sessionFile.exists())
 			try {
@@ -95,6 +100,7 @@ public class MainFrame extends JFrame {
 	}
 	
 	public void replacePanel(JPanel newPanel) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.replacePanel()", MainFrame.class.getSimpleName()));
 		this.remove(currentPanel);
 		this.currentPanel = newPanel;
 		this.add(newPanel);

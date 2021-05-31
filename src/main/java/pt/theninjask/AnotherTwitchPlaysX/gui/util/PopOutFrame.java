@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -21,6 +22,7 @@ public class PopOutFrame extends JFrame {
 	private JFrame parent;
 	
 	public PopOutFrame(JComponent comp) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", PopOutFrame.class.getSimpleName(),this.hashCode()));
 		this.parent = null;
 		this.add(comp);
 		
@@ -36,6 +38,7 @@ public class PopOutFrame extends JFrame {
 	}
 	
 	public PopOutFrame(JComponent comp, JFrame parentInc) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", PopOutFrame.class.getSimpleName(),this.hashCode()));
 		this.parent = parentInc;
 		this.parent.setEnabled(false);
 		this.add(comp);
@@ -60,6 +63,7 @@ public class PopOutFrame extends JFrame {
 	}
 	
 	public JFrame getParent() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getParent(%s)", PopOutFrame.class.getSimpleName(),this.hashCode()));
 		return parent;
 	}
 	

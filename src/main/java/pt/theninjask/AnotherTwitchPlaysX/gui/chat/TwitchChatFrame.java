@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -95,6 +96,7 @@ public class TwitchChatFrame extends JFrame {
 	private AtomicBoolean enabledDR;
 	
 	private TwitchChatFrame() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s()", TwitchChatFrame.class.getSimpleName()));
 		this.type = ChatType.MINECRAFT;
 		this.mode = ChatMode.SOLID;
 		// this.setTitle(String.format("%s's Twitch Chat",
@@ -123,6 +125,7 @@ public class TwitchChatFrame extends JFrame {
 	}
 	
 	public static TwitchChatFrame getInstance() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", TwitchChatFrame.class.getSimpleName()));
 		singleton.setTitle(
 				String.format("%s's Twitch Chat", DataManager.getInstance().getSession().getChannel().substring(1)));
 		return singleton;

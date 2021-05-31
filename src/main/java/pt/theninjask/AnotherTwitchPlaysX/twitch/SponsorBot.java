@@ -1,11 +1,13 @@
 package pt.theninjask.AnotherTwitchPlaysX.twitch;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 
 import org.kitteh.irc.client.library.event.connection.ClientConnectionEndedEvent;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NotSetupException;
+import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class SponsorBot implements Runnable{
 	
@@ -20,10 +22,12 @@ public class SponsorBot implements Runnable{
 	private final AtomicBoolean running = new AtomicBoolean(false);
 	
 	private SponsorBot() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s()", SponsorBot.class.getSimpleName()));
 		this.cooldown = 30 * 60 * 1000;
 	}
 	
 	public static SponsorBot getInstance() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", SponsorBot.class.getSimpleName()));
 		return singleton;
 	}
 	
@@ -34,20 +38,25 @@ public class SponsorBot implements Runnable{
 	}
 	
 	public void setCooldown(int minutes) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.setCooldown()", SponsorBot.class.getSimpleName()));
 		this.cooldown = minutes * 60 * 1000;
 	}
 	
 	public void start() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.start()", SponsorBot.class.getSimpleName()));
 		sponsor = new Thread(this);
 		TwitchPlayer.getInstance().registerEventListener(this);
 		sponsor.start();
 	}
 	
 	public void stop() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.stop()", SponsorBot.class.getSimpleName()));
 		running.set(false);
 		try {
 			TwitchPlayer.getInstance().unregisterEventListener(this);			
-		}catch (NotSetupException e) {}
+		}catch (NotSetupException e) {
+			Constants.printVerboseMessage(Level.WARNING, e);
+		}
 		if(sponsor!=null && sponsor.isAlive())
 			sponsor.interrupt();
 	}
@@ -61,7 +70,7 @@ public class SponsorBot implements Runnable{
         				);
 				Thread.sleep(cooldown);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				Constants.printVerboseMessage(Level.WARNING, e);
 				return;
 			}
          } 

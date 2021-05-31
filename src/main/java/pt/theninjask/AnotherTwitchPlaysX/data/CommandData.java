@@ -187,6 +187,8 @@ public class CommandData implements Data {
 		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
 		Matcher match = pattern.matcher(event.getMessage());
 		Map<String, String> map = new HashMap<String, String>();
+		if(!match.matches())
+			return;
 		for (Pair<String, CommandVarType> elem : vars) {
 			String value = match.group(elem.getLeft());
 			if (value != null && value.isEmpty())

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -192,6 +193,7 @@ public class ControlDataPanel extends JPanel {
 	}
 	
 	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", ControlDataPanel.class.getSimpleName(), this.hashCode()));
 		this.data = newData;
 		this.parent = parent;
 		this.in = in;

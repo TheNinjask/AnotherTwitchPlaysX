@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -61,6 +62,7 @@ public class AllCommandPanel extends JPanel {
 	private JButton keycodes;
 
 	private AllCommandPanel() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s()", AllCommandPanel.class.getSimpleName()));
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new BorderLayout());
 		this.add(currentPanel, BorderLayout.CENTER);
@@ -68,6 +70,7 @@ public class AllCommandPanel extends JPanel {
 	}
 	
 	public static AllCommandPanel getInstance() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", AllCommandPanel.class.getSimpleName()));
 		singleton.refreshTable();
 		return singleton;
 	}

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -40,10 +41,12 @@ public class LoginPanel extends JPanel {
 	private JCheckBox rememberSession;
 	
 	public static LoginPanel getInstance() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", LoginPanel.class.getSimpleName()));
 		return singleton;
 	}
 	
 	private LoginPanel() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s()", LoginPanel.class.getSimpleName()));
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new GridLayout(4, 1));
 		this.add(setupNickSlot());
