@@ -115,6 +115,8 @@ public class MainMenuPanel extends JPanel {
 		twitchChatFont();
 		twitchChatFontSize();
 		twitchChatTransparencyModePanel();
+		twitchChatOptions = new ArrayList<JComponent>(Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatFontPanel,
+				twitchChatFontSizePanel, twitchChatTransparencyModePanel, twitchChatOnTop));
 		this.add(twitchChatOptionsLabel());
 		this.add(twitchChatOptionsPanel());
 		this.add(twitchChatSlider());
@@ -499,9 +501,6 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private void moveOptionPanel(boolean right) {
-		twitchChatOptions = new ArrayList<JComponent>(Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatFontPanel,
-				twitchChatFontSizePanel, twitchChatTransparencyModePanel, twitchChatOnTop));
-		
 		int index = twitchChatOptions.indexOf(twitchChatOptionsPanel.getComponent(0));
 
 		if (right) {
@@ -512,7 +511,8 @@ public class MainMenuPanel extends JPanel {
 			index = index < 0 ? twitchChatOptions.size() - 1 : index;
 		}
 		twitchChatOptionsPanel.removeAll();
-		twitchChatOptionsPanel.add(twitchChatOptions.get(index));
+		if(index != -1)
+			twitchChatOptionsPanel.add(twitchChatOptions.get(index));
 
 		twitchChatOptionsPanel.revalidate();
 		twitchChatOptionsPanel.repaint();
@@ -684,6 +684,10 @@ public class MainMenuPanel extends JPanel {
 
 	public List<JComponent> getTwitchChatOptions() {
 		return twitchChatOptions;
+	}
+
+	public AtomicBoolean getIsAppStarted() {
+		return isAppStarted;
 	}
 
 }
