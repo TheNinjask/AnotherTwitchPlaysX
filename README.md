@@ -53,7 +53,7 @@ To make a mod for this app, you start a maven project and add the following [dep
 <dependency>
   <groupId>pt.theninjask</groupId>
   <artifactId>anothertwitchplaysx</artifactId>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
 </dependency>
 ```
 and when you use mvn package, the .jar created has to be a fat .jar (but it won't require the dependency above.)
@@ -160,7 +160,7 @@ The first intention of this project (even tho it can't be seen through the commi
 <!-- omit in toc -->
 ### I don't like/know how to use the UI. Is there a other way?
 
-I also wanted to be a other way to setup the commands without relying on the UI so you can write a JSON file with the following below and load your written file. (This might be outdaded)
+I also wanted to be a other way to setup the commands without relying on the UI so you can write a JSON file with the following below and load your written file. (This ~~might be~~ is outdaded and I am to lazy to update (since no one is using this) but if you really wanna know mess around with the Set Commands, save the commands you inserted and check the JSON output i.e. get your hands dirty!)
 ```
 [
 	#this will be a comment, but remember JSON does not support it

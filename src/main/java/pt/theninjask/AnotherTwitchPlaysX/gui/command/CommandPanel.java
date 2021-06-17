@@ -7,6 +7,9 @@ import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,11 +21,15 @@ import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.NumberFormatter;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandType;
@@ -83,8 +90,11 @@ public class CommandPanel extends JPanel {
 
 	private JButton add;
 
+	private JTextField cooldown;
+
 	public CommandPanel() {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
+		Constants.printVerboseMessage(Level.INFO,
+				String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
 		this.current = new CommandData();
 		this.saved = null;
 		controls = new ArrayList<ControlDataPanel>();
@@ -99,7 +109,8 @@ public class CommandPanel extends JPanel {
 	}
 
 	public CommandPanel(CommandData data) {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
+		Constants.printVerboseMessage(Level.INFO,
+				String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
 		this.current = data.clone();
 		this.saved = data;
 		controls = new ArrayList<ControlDataPanel>();
@@ -118,12 +129,12 @@ public class CommandPanel extends JPanel {
 		mainPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 		mainPanel.setOpaque(false);
 
-		JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		titlePanel.setOpaque(false);
-		JLabel title = new JLabel("Command");
-		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-		titlePanel.add(title);
-		mainPanel.add(titlePanel);
+		/*
+		 * JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		 * titlePanel.setOpaque(false); JLabel title = new JLabel("Command");
+		 * title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		 * titlePanel.add(title); mainPanel.add(titlePanel);
+		 */
 
 		JPanel leadPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		leadPanel.setOpaque(false);
@@ -140,6 +151,78 @@ public class CommandPanel extends JPanel {
 		});
 		leadPanel.add(lead);
 		mainPanel.add(leadPanel);
+
+		NumberFormat format = NumberFormat.getInstance();
+		format.setGroupingUsed(false);
+		NumberFormatter cooldownFormatter = new NumberFormatter(format);
+		cooldownFormatter.setValueClass(Integer.class);
+		cooldownFormatter.setMinimum(0);
+		cooldownFormatter.setMaximum(60);
+
+		JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		cooldownPanel.setOpaque(false);
+		JLabel cooldownLabel = new JLabel("Cmd Cooldown (sec): ");
+		cooldownLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		cooldownPanel.add(cooldownLabel);
+		cooldown = new JFormattedTextField(cooldownFormatter);
+		if (current.getCooldown() != null)
+			cooldown.setText(Long.toString(current.getCooldown().getTimer()));
+		cooldown.setBorder(null);
+		cooldown.setPreferredSize(new Dimension(62, 20));
+		cooldown.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				update();
+			}
+
+			private void update() {
+				try {
+					current.getCooldown().setTimer(Long.parseLong(cooldown.getText()));
+				} catch (NumberFormatException e) {
+				}
+			}
+		});
+
+		cooldown.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				long cooldownVal = current.getCooldown().getTimer();
+				switch (e.getKeyCode()) {
+				default:
+					long updated;
+					break;
+				case KeyEvent.VK_UP:
+				case KeyEvent.VK_KP_UP:
+					if (cooldownVal == 60)
+						break;
+					updated = cooldownVal + 1;
+					current.getCooldown().setTimer(updated);
+					cooldown.setText(Long.toString(updated));
+					break;
+				case KeyEvent.VK_DOWN:
+				case KeyEvent.VK_KP_DOWN:
+					updated = cooldownVal - 1;
+					if (updated < 0)
+						break;
+					current.getCooldown().setTimer(updated);
+					cooldown.setText(Long.toString(updated));
+					break;
+				}
+			}
+		});
+		
+		cooldownPanel.add(cooldown);
+		mainPanel.add(cooldownPanel);
 
 		JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		typePanel.setOpaque(false);

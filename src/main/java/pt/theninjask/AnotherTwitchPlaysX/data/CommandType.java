@@ -2,21 +2,24 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 
 public enum CommandType {
 
-	QUEUE("queue"),
-	UNISON("unison");
+	UNISON("Unison"),
+	@Deprecated
+	QUEUE("Queue"),
+	SINGLE("Single");
 	
 	private String type;
 	
 	private CommandType(String type) {
 		this.type = type;
 	}
-
-	public String getType() {
+	
+	@Override
+	public String toString() {
 		return type;
 	}
 	
 	public static CommandType[] getAll() {
-		return new CommandType[] {QUEUE,UNISON};
+		return new CommandType[] {UNISON,SINGLE};
 	}
 
 }

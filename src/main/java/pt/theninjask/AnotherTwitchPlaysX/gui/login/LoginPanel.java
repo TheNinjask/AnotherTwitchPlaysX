@@ -245,4 +245,13 @@ public class LoginPanel extends JPanel {
 		//rememberSession.setSelected(true);
 	}
 	
+	public void setSession(String nickname, String channel, String oauth) {
+		if(nickname!=null)
+			this.nickname.setText(nickname);
+		if(channel!=null)
+			this.channel.setText(channel.substring(1));
+		if(oauth!=null)
+			this.oauth.setText(oauth);
+	}
+	
 }

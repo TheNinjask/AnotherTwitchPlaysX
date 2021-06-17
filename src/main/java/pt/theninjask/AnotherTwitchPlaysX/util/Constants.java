@@ -376,6 +376,7 @@ public final class Constants {
 	public static final void showMessageDialog(String msg, String... title) {
 		JTextArea message = new JTextArea(msg);
 		message.setOpaque(false);
+		message.setEditable(false);
 		message.setForeground(TWITCH_COLOR_COMPLEMENT);
 		Object paneBG = UIManager.get("OptionPane.background");
 		Object panelBG = UIManager.get("Panel.background");
@@ -399,6 +400,7 @@ public final class Constants {
 
 		JTextArea exception = new JTextArea(e.getMessage());
 		exception.setOpaque(false);
+		exception.setEditable(false);
 		exception.setForeground(TWITCH_COLOR_COMPLEMENT);
 		Object paneBG = UIManager.get("OptionPane.background");
 		Object panelBG = UIManager.get("Panel.background");

@@ -139,6 +139,9 @@ public class MainMenuPanel extends JPanel {
 		connectButton.setFocusable(false);
 		connectButton.addActionListener(l -> {
 			if (TwitchPlayer.getInstance().isConnected()) {
+				sponsor.setEnabled(false);
+				sponsor.setSelected(false);
+				SponsorBot.getInstance().stop();
 				TwitchPlayer.getInstance().disconnect();
 				connectButton.setText("Connect");
 				twitchChatButton.setEnabled(false);
@@ -148,9 +151,6 @@ public class MainMenuPanel extends JPanel {
 				changeSessionButton.setEnabled(true);
 				TwitchChatFrame.getInstance().setVisible(false);
 				TwitchChatFrame.getInstance().clearChat();
-				sponsor.setEnabled(false);
-				sponsor.setSelected(false);
-				SponsorBot.getInstance().stop();
 			} else {
 				TwitchPlayer.getInstance().setupAndConnect();
 				connectButton.setText("Disconnect");

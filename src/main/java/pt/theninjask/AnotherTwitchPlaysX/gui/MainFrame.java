@@ -36,6 +36,7 @@ public class MainFrame extends JFrame {
 	private MainFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainFrame.class.getSimpleName()));
 		this.onStart();
+		this.getContentPane().setBackground(Constants.TWITCH_COLOR);
 		this.setTitle(Constants.TITLE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setMinimumSize(new Dimension(300, 300));

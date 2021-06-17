@@ -14,19 +14,19 @@ public class SmoothMoveRobot extends Robot {
 		super();
 	}
 
-	public static void setSpeed(int speed) {
+	public static void setDefaultSpeed(int speed) {
 		SmoothMoveRobot.speed = speed;
 	}
 
-	public static void setSteps(int steps) {
+	public static void setDefaultSteps(int steps) {
 		SmoothMoveRobot.steps = steps;
 	}
 	
-	public static int getSpeed() {
+	public static int getDefaultSpeed() {
 		return speed;
 	}
 	
-	public static int getSteps() {
+	public static int getDefaultSteps() {
 		return steps;
 	}
 

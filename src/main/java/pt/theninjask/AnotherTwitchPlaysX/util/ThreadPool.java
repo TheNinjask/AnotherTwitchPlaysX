@@ -10,7 +10,9 @@ public class ThreadPool {
 	private ThreadPoolExecutor executor;
 
 	private static ThreadPool poolUnison = new ThreadPool();
+	@Deprecated
 	private static ThreadPool poolQueue = new ThreadPool();
+	private static ThreadPool poolSingle = new ThreadPool();
 	
 	private static ThreadPool singleton = new ThreadPool();
 
@@ -25,8 +27,13 @@ public class ThreadPool {
 		return poolUnison;
 	}
 
+	@Deprecated
 	public static ThreadPool getQueueInstance() {
 		return poolQueue;
+	}
+	
+	public static ThreadPool getSingleInstance() {
+		return poolSingle;
 	}
 	
 	public static ThreadPool getInstance() {
@@ -74,6 +81,29 @@ public class ThreadPool {
 		return true;
 	}
 	
+	/**
+	 * 
+	 * @param task task to run
+	 * @return if true means that it was set to be executed else
+	 * if false means the pool is capped out most likely
+	 * it is asking for more execution than it executes or task is null.
+	 */
+	public static boolean executeSingle(Runnable task) {
+		try {			
+			poolSingle.executor.execute(task);
+		}catch (NullPointerException|RejectedExecutionException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param task task to run
+	 * @return if true means that it was set to be executed else
+	 * if false means the pool is capped out most likely
+	 * it is asking for more execution than it executes or task is null.
+	 */
 	public static boolean execute(Runnable task) {
 		try {			
 			singleton.executor.execute(task);
@@ -86,6 +116,7 @@ public class ThreadPool {
 	public static void stopAll() {
 		poolUnison.executor.shutdown();
 		poolQueue.executor.shutdown();
+		poolSingle.executor.shutdown();
 		singleton.executor.shutdown();
 	}
 
@@ -94,6 +125,8 @@ public class ThreadPool {
 		poolUnison = new ThreadPool();
 		poolQueue.executor.shutdown();
 		poolQueue = new ThreadPool();
+		poolSingle.executor.shutdown();
+		poolSingle = new ThreadPool();
 		singleton.executor.shutdown();
 		singleton = new ThreadPool();
 	}
