@@ -8,11 +8,14 @@ import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.jnativehook.GlobalScreen;
 
@@ -29,11 +32,16 @@ import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
 public class App {
 
 	public static void main(String[] args) {
-		
+
 		int amountOfSessionOptions = 0;
 
 		Options options = new Options();
-		options.addOption("v", "verbose", false, "Set Verbose - default ALL, options are: WARN, ALL");
+
+		OptionGroup verbose = new OptionGroup();
+		verbose.addOption(new Option("v", "verbose", false, "Sets Verbose to ALL"));
+		verbose.addOption(new Option("w", "verboseWarning", false, "Sets Verbose to WARN"));
+		options.addOptionGroup(verbose);
+
 		options.addOption("d", "debug", false, "Enables printStackTrace()");
 		options.addOption("s", "disableSession", false,
 				"Disables access to SessionData from DataManager (might \"brick\" app)\nMight be useful to check when a external mod gains access");
@@ -52,23 +60,11 @@ public class App {
 				return;
 			}
 			if (cmd.hasOption('v')) {
-				String val = cmd.getOptionValue('v');
-				if (val != null)
-					switch (val) {
-					case "WARN":
-						Constants.setLoggerLevel(Level.WARNING);
-						Constants.printVerboseMessage(Level.WARNING, "Verbose Set to WARN");
-						break;
-					case "ALL":
-					default:
-						Constants.setLoggerLevel(Level.ALL);
-						Constants.printVerboseMessage(Level.INFO, "Verbose Set to ALL");
-						break;
-					}
-				else {
-					Constants.setLoggerLevel(Level.ALL);
-					Constants.printVerboseMessage(Level.INFO, "Verbose Set to ALL");
-				}
+				Constants.setLoggerLevel(Level.ALL);
+				Constants.printVerboseMessage(Level.INFO, "Verbose Set to ALL");
+			} else if (cmd.hasOption('w')) {
+				Constants.setLoggerLevel(Level.WARNING);
+				Constants.printVerboseMessage(Level.WARNING, "Verbose Set to WARN");
 			}
 			if (cmd.hasOption('d')) {
 				Constants.debug = true;
@@ -94,7 +90,7 @@ public class App {
 				oauth = cmd.getOptionValue('t');
 			}
 			globalSetUp();
-			
+
 			if (amountOfSessionOptions >= 3) {
 				LoginPanel.getInstance().setVisible(false);
 				MainFrame.getInstance();
@@ -104,7 +100,7 @@ public class App {
 				MainFrame.getInstance();
 				LoginPanel.getInstance().setSession(nickname, String.format("#%s", channel), oauth);
 			}
-		} catch (MissingArgumentException e) {
+		} catch (MissingArgumentException | AlreadySelectedException e) {
 			System.out.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("java -jar ATPXapp.jar", options, true);
@@ -151,7 +147,7 @@ public class App {
 			System.setOut(tmp);
 
 			ControlData.setTranslation(Constants.STRING_TO_KEYCODE);
-			
+
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
 		} catch (Exception | Error e) {
 			System.setOut(tmp);
