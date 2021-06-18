@@ -288,11 +288,10 @@ public class ControlData implements Data {
 			}else {
 				key = trans.getLeft();
 			}
-			
 			if(key!=null)
 				robot.mousePress(key);
 			tmp = getValueFromMap("duration", vars);
-			duration = tmp==null ? null : Integer.parseInt(tmp);
+			duration = tmp==null ? this.duration : Integer.parseInt(tmp);
 			if(duration!=null)
 				robot.delay(duration);
 			if(key!=null)
@@ -421,8 +420,8 @@ public class ControlData implements Data {
 	public ControlData clone() {
 		ControlData copy = new ControlData();
 		copy.setKey(key==null?null:Integer.valueOf(key.intValue()));
-		copy.setDuration(duration==null?null:Integer.valueOf(duration.intValue()));
-		copy.setAftermathDelay(aftermathDelay==null?null:Integer.valueOf(aftermathDelay.intValue()));
+		copy.setDuration(duration==null?null:Integer.valueOf(getDuration()));
+		copy.setAftermathDelay(aftermathDelay==null?null:Integer.valueOf(getAftermathDelay()));
 		copy.setType(type==null?null:type);
 		copy.setInDepthCursor(inDepthCursor==null?null:inDepthCursor.clone());
 		if(map==null)

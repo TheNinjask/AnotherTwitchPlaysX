@@ -222,6 +222,8 @@ public class ControlDataPanel extends JPanel {
 		switch (data.getType()) {
 		case KEY:
 			key = new JButton("None");
+			if(data.getKey()!=null)
+				key.setText(KeyEvent.getKeyText(data.getKey()));
 			normal.add(key);
 			key.setFocusable(false);
 			key.addActionListener(l -> {
@@ -266,6 +268,14 @@ public class ControlDataPanel extends JPanel {
 			opt.addActionListener(l -> {
 				this.data.setKey(opt.getItemAt(opt.getSelectedIndex()).get());
 			});
+			if(data.getKey()!=null){
+				for (int i=0; i<opt.getItemCount();i++) {
+					if(data.getKey().equals(opt.getItemAt(i).get())) {
+						opt.setSelectedIndex(i);
+						break;
+					}
+				}
+			}
 			content.add(opt);
 			break;
 		// case MOUSE_MOV:

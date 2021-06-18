@@ -57,5 +57,8 @@ public class TaskCooldown {
 			}
 			return true;
 	}
-
+	
+	/*public TaskCooldown clone() {
+		return new TaskCooldown(getTimer());
+	}*/
 }

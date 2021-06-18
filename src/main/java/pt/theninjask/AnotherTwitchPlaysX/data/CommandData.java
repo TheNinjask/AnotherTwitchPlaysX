@@ -194,6 +194,7 @@ public class CommandData implements Data {
 			}
 			copy.setVars(tmp);
 		}
+		copy.setCooldown(new TaskCooldown(cooldown.getTimer()));
 		return copy;
 	}
 

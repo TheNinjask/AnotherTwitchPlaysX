@@ -436,6 +436,7 @@ public class CommandPanel extends JPanel {
 			if (saved != null) {
 				int index = DataManager.getInstance().getCommands().indexOf(saved);
 				DataManager.getInstance().getCommands().remove(saved);
+				current.getControls().clear();
 				for (ControlDataPanel elem : controls) {
 					current.getControls().add(elem.getControlData());
 				}
