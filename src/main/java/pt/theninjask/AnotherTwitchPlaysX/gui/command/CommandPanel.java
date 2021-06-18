@@ -167,7 +167,7 @@ public class CommandPanel extends JPanel {
 		cooldownPanel.add(cooldownLabel);
 		cooldown = new JFormattedTextField(cooldownFormatter);
 		if (current.getCooldown() != null)
-			cooldown.setText(Long.toString(current.getCooldown().getTimer()));
+			cooldown.setText(Long.toString(current.getCooldown().getTimer()/1000));
 		cooldown.setBorder(null);
 		cooldown.setPreferredSize(new Dimension(62, 20));
 		cooldown.getDocument().addDocumentListener(new DocumentListener() {
@@ -189,7 +189,7 @@ public class CommandPanel extends JPanel {
 
 			private void update() {
 				try {
-					current.getCooldown().setTimer(Long.parseLong(cooldown.getText()));
+					current.getCooldown().setTimer(Long.parseLong(cooldown.getText())*1000);
 				} catch (NumberFormatException e) {
 				}
 			}
@@ -204,19 +204,19 @@ public class CommandPanel extends JPanel {
 					break;
 				case KeyEvent.VK_UP:
 				case KeyEvent.VK_KP_UP:
-					if (cooldownVal == 60)
+					if (cooldownVal == 60*1000)
 						break;
-					updated = cooldownVal + 1;
+					updated = cooldownVal + 1*1000;
 					current.getCooldown().setTimer(updated);
-					cooldown.setText(Long.toString(updated));
+					cooldown.setText(Long.toString(updated/1000));
 					break;
 				case KeyEvent.VK_DOWN:
 				case KeyEvent.VK_KP_DOWN:
-					updated = cooldownVal - 1;
+					updated = cooldownVal - 1*1000;
 					if (updated < 0)
 						break;
 					current.getCooldown().setTimer(updated);
-					cooldown.setText(Long.toString(updated));
+					cooldown.setText(Long.toString(updated/1000));
 					break;
 				}
 			}

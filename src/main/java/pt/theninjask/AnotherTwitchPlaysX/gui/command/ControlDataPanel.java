@@ -324,7 +324,7 @@ public class ControlDataPanel extends JPanel {
 			normal.add(duration);
 			duration.setBorder(null);
 			if (data.getDuration() != null)
-				duration.setText(data.getDuration().toString());
+				duration.setText(Integer.toString(data.getDuration()/1000));
 			duration.getDocument().addDocumentListener(new DocumentListener() {
 
 				@Override
@@ -344,7 +344,7 @@ public class ControlDataPanel extends JPanel {
 
 				private void update() {
 					try {
-						data.setDuration(Integer.parseInt(duration.getText()));
+						data.setDuration(Integer.parseInt(duration.getText())*1000);
 					} catch (NumberFormatException e) {
 					}
 				}
@@ -365,22 +365,22 @@ public class ControlDataPanel extends JPanel {
 						durationVal = data.getDuration();
 						if (durationVal == null)
 							break;
-						if (durationVal == 60)
+						if (durationVal == 60*1000)
 							break;
-						updated = durationVal + 1;
+						updated = durationVal + 1*1000;
 						data.setDuration(updated);
-						duration.setText(Integer.toString(updated));
+						duration.setText(Integer.toString(updated/1000));
 						break;
 					case KeyEvent.VK_DOWN:
 					case KeyEvent.VK_KP_DOWN:
 						durationVal = data.getDuration();
 						if (durationVal == null)
 							break;
-						updated = durationVal - 1;
+						updated = durationVal - 1*1000;
 						if (updated < 0)
 							break;
 						data.setDuration(updated);
-						duration.setText(Integer.toString(updated));
+						duration.setText(Integer.toString(updated/1000));
 						break;
 					}
 				}
@@ -414,7 +414,7 @@ public class ControlDataPanel extends JPanel {
 		normal.add(aftermath);
 		aftermath.setBorder(null);
 		if (data.getAftermathDelay() != null)
-			aftermath.setText(data.getAftermathDelay().toString());
+			aftermath.setText(Integer.toString(data.getAftermathDelay()/1000));
 		aftermath.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
@@ -434,7 +434,7 @@ public class ControlDataPanel extends JPanel {
 
 			private void update() {
 				try {
-					data.setAftermathDelay(Integer.parseInt(aftermath.getText()));
+					data.setAftermathDelay(Integer.parseInt(aftermath.getText())*1000);
 				} catch (NumberFormatException e) {
 				}
 			}
@@ -452,22 +452,22 @@ public class ControlDataPanel extends JPanel {
 					aftermathVal = data.getAftermathDelay();
 					if (aftermathVal == null)
 						break;
-					if (aftermathVal == 60)
+					if (aftermathVal == 60*1000)
 						break;
-					updated = aftermathVal + 1;
+					updated = aftermathVal + 1*1000;
 					data.setAftermathDelay(updated);
-					aftermath.setText(Integer.toString(updated));
+					aftermath.setText(Integer.toString(updated/1000));
 					break;
 				case KeyEvent.VK_DOWN:
 				case KeyEvent.VK_KP_DOWN:
 					aftermathVal = data.getAftermathDelay();
 					if (aftermathVal == null)
 						break;
-					updated = aftermathVal - 1;
+					updated = aftermathVal - 1*1000;
 					if (updated < 0)
 						break;
 					data.setAftermathDelay(updated);
-					aftermath.setText(Integer.toString(updated));
+					aftermath.setText(Integer.toString(updated/1000));
 					break;
 				}
 			}

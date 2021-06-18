@@ -21,18 +21,18 @@ public class TaskCooldown {
 		this.ms = 0;
 	}
 
-	public TaskCooldown(long secs) {
-		this.ms = secs*1000;
+	public TaskCooldown(long ms) {
+		this.ms = ms;
 	}
 
 	@JsonProperty("timer")
-	public void setTimer(long secs) {
-		this.ms = secs*1000;
+	public void setTimer(long ms) {
+		this.ms = ms;
 	}
 
 	@JsonProperty("timer")
 	public long getTimer() {
-		return ms/1000;
+		return ms;
 	}
 
 	public void run(Runnable task) {

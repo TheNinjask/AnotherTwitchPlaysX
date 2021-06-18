@@ -44,17 +44,16 @@ public class ControlData implements Data {
 	}
 	
 	public Integer getDuration() {
-		return duration/1000;
+		return duration;
 	}
 
-	public int setDuration(Integer duration) {
-		if(duration>60)
-			this.duration = 60 * 1000;
+	public void setDuration(Integer duration) {
+		if(duration>60000)
+			this.duration = 60000;
 		else if(duration<0) 
 			this.duration = 0;
 		else
-			this.duration = duration * 1000;
-		return this.duration/1000;
+			this.duration = duration;
 	}
 
 	public Integer getKey() {
@@ -100,17 +99,16 @@ public class ControlData implements Data {
 	}
 	
 	public Integer getAftermathDelay() {
-		return aftermathDelay/1000;
+		return aftermathDelay;
 	}
 
-	public int setAftermathDelay(Integer aftermathDelay) {
-		if(aftermathDelay>60)
-			this.aftermathDelay = 60 * 1000;
+	public void setAftermathDelay(Integer aftermathDelay) {
+		if(aftermathDelay>60000)
+			this.aftermathDelay = 60000;
 		else if(aftermathDelay<0) 
 			this.aftermathDelay = 0;
 		else
-			this.aftermathDelay = aftermathDelay * 1000;
-		return this.aftermathDelay/1000;
+			this.aftermathDelay = aftermathDelay;
 	}
 
 	public Map<String, String> getMap() {
