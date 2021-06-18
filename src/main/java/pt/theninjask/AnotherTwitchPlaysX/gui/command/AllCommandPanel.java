@@ -116,7 +116,7 @@ public class AllCommandPanel extends JPanel {
 		back.setFocusable(false);
 		back.setOpaque(false);
 		back.addActionListener(l->{
-			MainFrame.getInstance().replacePanel(MainMenuPanel.getInstance());
+			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		});
 		right.add(back);
 		
@@ -163,13 +163,13 @@ public class AllCommandPanel extends JPanel {
 		insert.setFocusable(false);
 		insert.addActionListener(l->{
 			//table.addRow(new CommandData());
-			MainFrame.getInstance().replacePanel(new CommandPanel());
+			MainFrame.replacePanel(new CommandPanel());
 		});
 		right.add(insert);
 		keycodes = new JButton("Codes");
 		keycodes.setFocusable(false);
 		keycodes.addActionListener(l->{
-			MainFrame.getInstance().replacePanel(StringToKeyCodePanel.getInstance());
+			MainFrame.replacePanel(StringToKeyCodePanel.getInstance());
 		});
 		right.add(keycodes);
 		help = new JButton("Help");
@@ -234,7 +234,7 @@ public class AllCommandPanel extends JPanel {
 		back = new JButton("Back");
 		back.setFocusable(false);
 		back.addActionListener(l->{
-			MainFrame.getInstance().replacePanel(MainMenuPanel.getInstance());
+			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		});
 		right.add(back);
 		

@@ -9,22 +9,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoLeadDefinedException;
-import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 import pt.theninjask.AnotherTwitchPlaysX.util.RobotSingleton;
 import pt.theninjask.AnotherTwitchPlaysX.util.SmoothMoveRobot;
-import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
 import pt.theninjask.AnotherTwitchPlaysX.util.TaskCooldown;
+import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
 
 public class CommandData implements Data {
 
@@ -199,7 +198,7 @@ public class CommandData implements Data {
 	}
 
 	@Handler
-	public void onMessage(ChannelMessageEvent event) {
+	public void onMessage(ActorMessageEvent<User> event) {
 		// if(!event.getActor().getNick().equalsIgnoreCase("mytwitchusername69420"))
 		// return;
 		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
@@ -214,18 +213,29 @@ public class CommandData implements Data {
 			if (value != null)
 				map.put(elem.getLeft(), value.toLowerCase());
 		}
+		execute(map);
+	}
+
+	public void execute() {
 		switch (type) {
-		case QUEUE:
-			if (map.isEmpty())
-				executeQueue();
-			else
-				executeQueue(map);
+		case SINGLE:
+			executeSingle();
 			break;
+		case UNISON:
+		default:
+			executeUnison();
+			break;
+		}
+	}
+
+	public void execute(Map<String, String> map) {
+		switch (type) {
 		case SINGLE:
 			if (map.isEmpty())
 				executeSingle();
 			else
 				executeSingle(map);
+			break;
 		case UNISON:
 		default:
 			if (map.isEmpty())
@@ -290,48 +300,35 @@ public class CommandData implements Data {
 
 	}
 
-	@Deprecated
-	public void executeQueue() {
-		Constants.printVerboseMessage(Level.WARNING, "Use of Deprecated Method: CommandData.executeQueue()");
-		ThreadPool.execute(() -> {
-			Robot robot = RobotSingleton.getInstance().getRobot();
-			synchronized (robot) {
-				for (ControlData elem : controls) {
-					ThreadPool.executeQueue(() -> {
-						elem.execute(robot);
-					});
-					if (elem.getAftermathDelay() != null)
-						robot.delay(elem.getAftermathDelay());
-				}
-			}
-		});
-		/*
-		 * Robot robot = RobotSingleton.getQueueInstance().getRobot(); synchronized
-		 * (robot) { for (ControlData elem : controls) { elem.execute(robot); } }
-		 */
-	}
+	/*
+	 * @Deprecated public void executeQueue() {
+	 * Constants.printVerboseMessage(Level.WARNING,
+	 * "Use of Deprecated Method: CommandData.executeQueue()");
+	 * ThreadPool.execute(() -> { Robot robot =
+	 * RobotSingleton.getInstance().getRobot(); synchronized (robot) { for
+	 * (ControlData elem : controls) { ThreadPool.executeQueue(() -> {
+	 * elem.execute(robot); }); if (elem.getAftermathDelay() != null)
+	 * robot.delay(elem.getAftermathDelay()); } } }); /* Robot robot =
+	 * RobotSingleton.getQueueInstance().getRobot(); synchronized (robot) { for
+	 * (ControlData elem : controls) { elem.execute(robot); } }
+	 * 
+	 * }
+	 */
 
-	@Deprecated
-	public void executeQueue(Map<String, String> map) {
-		Constants.printVerboseMessage(Level.WARNING,
-				"Use of Deprecated Method: CommandData.executeQueue(Map<String, String> map)");
-		ThreadPool.execute(() -> {
-			Robot robot = RobotSingleton.getInstance().getRobot();
-			synchronized (robot) {
-				for (ControlData elem : controls) {
-					ThreadPool.executeQueue(() -> {
-						elem.execute(robot, map);
-					});
-					if (elem.getAftermathDelay() != null)
-						robot.delay(elem.getAftermathDelay());
-				}
-			}
-		});
-		/*
-		 * Robot robot = RobotSingleton.getQueueInstance().getRobot(); synchronized
-		 * (robot) { for (ControlData elem : controls) { elem.execute(robot, map); } }
-		 */
-	}
+	/*
+	 * @Deprecated public void executeQueue(Map<String, String> map) {
+	 * Constants.printVerboseMessage(Level.WARNING,
+	 * "Use of Deprecated Method: CommandData.executeQueue(Map<String, String> map)"
+	 * ); ThreadPool.execute(() -> { Robot robot =
+	 * RobotSingleton.getInstance().getRobot(); synchronized (robot) { for
+	 * (ControlData elem : controls) { ThreadPool.executeQueue(() -> {
+	 * elem.execute(robot, map); }); if (elem.getAftermathDelay() != null)
+	 * robot.delay(elem.getAftermathDelay()); } } }); /* Robot robot =
+	 * RobotSingleton.getQueueInstance().getRobot(); synchronized (robot) { for
+	 * (ControlData elem : controls) { elem.execute(robot, map); } }
+	 * 
+	 * }
+	 */
 
 	public void executeSingle() {
 		cooldown.run(() -> {

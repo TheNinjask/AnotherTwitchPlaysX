@@ -6,12 +6,14 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
@@ -41,12 +43,15 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.ChatMode;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.ChatType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.Mod;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ModPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.embedded.EmbeddedModMenuPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.SponsorBot;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
 
 public class MainMenuPanel extends JPanel {
 
@@ -95,10 +100,12 @@ public class MainMenuPanel extends JPanel {
 
 	private AtomicBoolean isAppStarted;
 
-	private ModPanel mod = null;
+	private ATPXMod mod = null;
 
 	private JPanel twitchChatTransparencyModePanel;
 
+	private List<Runnable> eventsWithStart;
+	
 	private MainMenuPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainMenuPanel.class.getSimpleName()));
 		this.isAppStarted = new AtomicBoolean(false);
@@ -122,6 +129,7 @@ public class MainMenuPanel extends JPanel {
 		this.add(twitchChatSlider());
 		this.add(twitchChatSliderLabel(), this.getComponentCount() - 1);
 		this.add(sponsorMeInChat());
+		eventsWithStart = new CopyOnWriteArrayList<Runnable>();
 	}
 
 	public static MainMenuPanel getInstance() {
@@ -169,13 +177,17 @@ public class MainMenuPanel extends JPanel {
 		commandsButton = new JButton("Set Commands");
 		commandsButton.setFocusable(false);
 		commandsButton.addActionListener(l -> {
-			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
+			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		tmp.add(commandsButton, BorderLayout.CENTER);
 		modButton = new JButton("Mod");
 		modButton.setFocusable(false);
 		//modButton.setEnabled(false);
 		modButton.addActionListener(l -> {
+			if(KeyPressedAdapter.isKeyPressed(KeyEvent.VK_SHIFT)) {
+				MainFrame.replacePanel(EmbeddedModMenuPanel.getInstance());
+				return;
+			}
 			if (mod == null) {
 				try {
 					File file = Constants.showOpenFile(new FileNameExtensionFilter("JAR", "jar"), this);
@@ -183,9 +195,9 @@ public class MainMenuPanel extends JPanel {
 					if(mod==null)
 						return;
 					mod.refresh();
-					if(mod.getClass().getDeclaredAnnotation(Mod.class).hasPanel())
-						MainFrame.getInstance().replacePanel(mod.getJPanelInstance());
-					if(!mod.getClass().getDeclaredAnnotation(Mod.class).keepLoaded())
+					if(mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
+						MainFrame.replacePanel(mod.getJPanelInstance());
+					if(!mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
 						mod = null;
 				} catch (Exception e) {
 					Constants.showExpectedExceptionDialog(e);
@@ -193,8 +205,11 @@ public class MainMenuPanel extends JPanel {
 				}
 			} else {
 				mod.refresh();
-				if(mod.getClass().getDeclaredAnnotation(Mod.class).hasPanel())
-					MainFrame.getInstance().replacePanel(mod.getJPanelInstance());
+				if(mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
+					if(mod.getClass().getAnnotation(ATPXModProps.class).popout())
+						new PopOutFrame(mod.getJPanelInstance());
+					else
+						MainFrame.replacePanel(mod.getJPanelInstance());
 			}
 		});
 		tmp.add(modButton, BorderLayout.EAST);
@@ -225,6 +240,9 @@ public class MainMenuPanel extends JPanel {
 					commandsButton.setEnabled(true);
 					connectButton.setEnabled(true);
 					isAppStarted.set(false);
+					eventsWithStart.forEach(a->{
+						a.run();
+					});
 				} catch (NativeHookException nativeHookException) {
 					Constants.showExceptionDialog(nativeHookException);
 				}
@@ -270,6 +288,9 @@ public class MainMenuPanel extends JPanel {
 					});
 					MainFrame.getInstance().setState(JFrame.ICONIFIED);
 					isAppStarted.set(true);
+					eventsWithStart.forEach(a->{
+						a.run();
+					});
 				} catch (NativeHookException e) {
 					Constants.showExceptionDialog(e);
 				}
@@ -283,7 +304,7 @@ public class MainMenuPanel extends JPanel {
 		changeSessionButton = new JButton("Change Session");
 		changeSessionButton.setFocusable(false);
 		changeSessionButton.addActionListener(l -> {
-			MainFrame.getInstance().replacePanel(LoginPanel.getInstance());
+			MainFrame.replacePanel(LoginPanel.getInstance());
 		});
 		return changeSessionButton;
 	}
@@ -690,4 +711,24 @@ public class MainMenuPanel extends JPanel {
 		return isAppStarted;
 	}
 
+	public ATPXMod getMod() {
+		return mod;
+	}
+
+	public void setMod(ATPXMod mod) {
+		this.mod = mod;
+	}
+	
+	/**
+	 * This will ensure this is the last this ran after pressing the button
+	 */
+	public void attachEventListenerToGameButton(Runnable action) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.attachEventListenerToGameButton(Runnable)", MainMenuPanel.class.getSimpleName()));
+		eventsWithStart.add(action);
+	}
+
+	public boolean dettachEventListenerToGameButton(Runnable action) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.dettachEventListenerToGameButton(Runnable)", MainMenuPanel.class.getSimpleName()));
+		return eventsWithStart.remove(action);
+	}
 }

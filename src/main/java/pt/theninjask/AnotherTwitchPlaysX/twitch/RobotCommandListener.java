@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
@@ -27,7 +28,7 @@ public class RobotCommandListener {
 	}
 	
 	@Handler
-	public void onMessage(ChannelMessageEvent event){
+	public void onMessage(ActorMessageEvent<User> event){
 		pattern = Pattern.compile(this.data.getRegex(), Pattern.CASE_INSENSITIVE);
 		Matcher match = pattern.matcher(event.getMessage());
 		if(!match.matches())
@@ -72,6 +73,7 @@ public class RobotCommandListener {
 		
 	}
 	
+	@Deprecated
 	public void executeQueue() {
 		Robot robot = RobotSingleton.getQueueInstance().getRobot();
 		synchronized (robot) {
@@ -81,6 +83,7 @@ public class RobotCommandListener {
 		}
 	}
 	
+	@Deprecated
 	public void executeQueue(Map<String, String> map) {
 		Robot robot = RobotSingleton.getQueueInstance().getRobot();
 		synchronized (robot) {

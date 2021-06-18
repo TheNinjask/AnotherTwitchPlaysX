@@ -63,7 +63,7 @@ public class PopOutFrame extends JFrame {
 	}
 	
 	public JFrame getParent() {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s.getParent(%s)", PopOutFrame.class.getSimpleName(),this.hashCode()));
+		//Constants.printVerboseMessage(Level.INFO, String.format("%s.getParent(%s)", PopOutFrame.class.getSimpleName(),this.hashCode()));
 		return parent;
 	}
 	

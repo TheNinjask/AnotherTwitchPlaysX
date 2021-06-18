@@ -1,5 +1,6 @@
 package pt.theninjask.AnotherTwitchPlaysX;
 
+import java.awt.KeyboardFocusManager;
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +24,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
 
 public class App {
 
@@ -92,6 +94,7 @@ public class App {
 				oauth = cmd.getOptionValue('t');
 			}
 			globalSetUp();
+			
 			if (amountOfSessionOptions >= 3) {
 				LoginPanel.getInstance().setVisible(false);
 				MainFrame.getInstance();
@@ -123,7 +126,7 @@ public class App {
 		DataManager.getInstance().setSession(session);
 		LoginPanel.getInstance().setSession(session);
 		TwitchPlayer.getInstance().setSession(session);
-		MainFrame.getInstance().replacePanel(MainMenuPanel.getInstance());
+		MainFrame.replacePanel(MainMenuPanel.getInstance());
 	}
 
 	private static void globalSetUp() throws Exception {
@@ -148,6 +151,8 @@ public class App {
 			System.setOut(tmp);
 
 			ControlData.setTranslation(Constants.STRING_TO_KEYCODE);
+			
+			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
 		} catch (Exception | Error e) {
 			System.setOut(tmp);
 			throw e;

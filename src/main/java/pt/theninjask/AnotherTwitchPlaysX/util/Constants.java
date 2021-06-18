@@ -39,8 +39,8 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.exception.ModNotLoadedException;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.Mod;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ModPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 
 public final class Constants {
 
@@ -218,8 +218,8 @@ public final class Constants {
 		return map;
 	}
 
-	public static ModPanel loadMod(File modFile) throws Exception {
-		ModPanel mod = null;
+	public static ATPXMod loadMod(File modFile) throws Exception {
+		ATPXMod mod = null;
 		try {
 			switch (JarVerifier.getInstance().verifyJar(modFile)) {
 			case MAIN:
@@ -253,7 +253,7 @@ public final class Constants {
 			Enumeration<JarEntry> e = jarFile.entries();
 
 			URLClassLoader cl = URLClassLoader.newInstance(new URL[] { modFile.toURI().toURL() },
-					ModPanel.class.getClassLoader());
+					ATPXMod.class.getClassLoader());
 
 			while (e.hasMoreElements()) {
 				JarEntry je = e.nextElement();
@@ -264,12 +264,12 @@ public final class Constants {
 				String className = je.getName().substring(0, je.getName().lastIndexOf("."));
 				className = className.replace('/', '.');
 				Class<?> c = cl.loadClass(className);
-				if (ModPanel.class.isAssignableFrom(c)) {
-					Mod annotation = c.getDeclaredAnnotation(Mod.class);
+				if (ATPXMod.class.isAssignableFrom(c)) {
+					ATPXModProps annotation = c.getAnnotation(ATPXModProps.class);
 					Object tmp = c.getConstructor().newInstance();
 
 					if (mod == null && annotation != null && annotation.main()) {
-						mod = (ModPanel) tmp;
+						mod = (ATPXMod) tmp;
 						break;
 					}
 				}

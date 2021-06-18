@@ -86,7 +86,7 @@ Here a plugin to help you create one that also excludes unnecessary dependencies
 </plugin>
 ```
 
-It will be required for the mod at least 1 class (it will be the first that it finds) with the annotation `@Mod` with the value `main` as `true` which is by default and must have an public constructor with no params.
+It will be required for the mod at least 1 class (it will be the first that it finds) that extends the class `ATPXMod` (and contains `@ATPXModProps`, which will have by default, with the value `main` as `true` which is by default) and must have an public constructor with no params.
 
 Also there will be 3 types of mods:
 * First Party - That will show no problems.
@@ -108,12 +108,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.Mod;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ModPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-@Mod(hasPanel = false)
-public class HelloWorld implements ModPanel {
+@ATPXModProps(hasPanel = false)
+public class HelloWorld extends ATPXMod {
 
 	public HelloWorld() {
 		JButton modButton = MainMenuPanel.getInstance().getModButton();

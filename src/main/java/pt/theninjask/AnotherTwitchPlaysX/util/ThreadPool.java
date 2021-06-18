@@ -72,6 +72,7 @@ public class ThreadPool {
 	 * if false means the pool is capped out most likely
 	 * it is asking for more execution than it executes or task is null.
 	 */
+	@Deprecated
 	public static boolean executeQueue(Runnable task) {
 		try {			
 			poolQueue.executor.execute(task);

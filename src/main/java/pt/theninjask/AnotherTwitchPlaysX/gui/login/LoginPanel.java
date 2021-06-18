@@ -220,7 +220,7 @@ public class LoginPanel extends JPanel {
 					session
 					);
 			TwitchPlayer.getInstance().setSession(session);
-			MainFrame.getInstance().replacePanel(MainMenuPanel.getInstance());
+			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		});
 		return tmp;
 	}

@@ -20,7 +20,8 @@ import javax.swing.JTextArea;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 
-import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.util.ComponentResizer;
@@ -210,7 +211,7 @@ public class TwitchChatFrame extends JFrame {
 	}
 
 	@Handler
-	public void onMessage(ChannelMessageEvent event) {
+	public void onMessage(ActorMessageEvent<User> event) {
 		synchronized (scroll) {
 			synchronized (chat) {
 				updateChatSize();

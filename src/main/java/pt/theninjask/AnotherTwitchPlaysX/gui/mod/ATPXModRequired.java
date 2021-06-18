@@ -2,10 +2,10 @@ package pt.theninjask.AnotherTwitchPlaysX.gui.mod;
 
 import javax.swing.JPanel;
 
-public interface ModPanel {
+public interface ATPXModRequired {
 
 	public void refresh();
-	
+
 	public JPanel getJPanelInstance();
-	
+
 }

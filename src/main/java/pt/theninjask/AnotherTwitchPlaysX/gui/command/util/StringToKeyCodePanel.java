@@ -51,7 +51,7 @@ public class StringToKeyCodePanel extends JPanel {
 		
 		back = new JButton("Back");
 		back.addActionListener(l->{
-			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
+			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		down.add(back, BorderLayout.CENTER);
 		reset = new JButton("Reset");

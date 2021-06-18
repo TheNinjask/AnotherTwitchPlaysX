@@ -58,7 +58,7 @@ public class CommandTableModel{
 		JButton edit = new JButton("Edit");
 		edit.setMargin(new Insets(0, 0, 0, 0));
 		edit.addActionListener(l->{
-			MainFrame.getInstance().replacePanel(new CommandPanel(data));
+			MainFrame.replacePanel(new CommandPanel(data));
 		});
 		JButton remove = new JButton("Remove");
 		remove.setMargin(new Insets(0, 0, 0, 0));

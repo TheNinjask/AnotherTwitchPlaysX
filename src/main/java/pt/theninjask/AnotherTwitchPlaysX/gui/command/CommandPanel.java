@@ -158,7 +158,8 @@ public class CommandPanel extends JPanel {
 		cooldownFormatter.setValueClass(Integer.class);
 		cooldownFormatter.setMinimum(0);
 		cooldownFormatter.setMaximum(60);
-
+		cooldownFormatter.setAllowsInvalid(false);
+		
 		JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		cooldownPanel.setOpaque(false);
 		JLabel cooldownLabel = new JLabel("Cmd Cooldown (sec): ");
@@ -399,7 +400,7 @@ public class CommandPanel extends JPanel {
 				}
 			}
 			MouseCoords.getInstance().clearListeners();
-			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
+			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		bMenu.add(back);
 
@@ -455,7 +456,7 @@ public class CommandPanel extends JPanel {
 		delete.addActionListener(l -> {
 			if (saved != null)
 				DataManager.getInstance().getCommands().remove(saved);
-			MainFrame.getInstance().replacePanel(AllCommandPanel.getInstance());
+			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		bMenu.add(delete);
 

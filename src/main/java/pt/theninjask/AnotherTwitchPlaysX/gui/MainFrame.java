@@ -100,13 +100,13 @@ public class MainFrame extends JFrame {
 			}
 	}
 	
-	public void replacePanel(JPanel newPanel) {
+	public static void replacePanel(JPanel newPanel) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.replacePanel()", MainFrame.class.getSimpleName()));
-		this.remove(currentPanel);
-		this.currentPanel = newPanel;
-		this.add(newPanel);
-		this.revalidate();
-		this.repaint();
+		singleton.remove(singleton.currentPanel);
+		singleton.currentPanel = newPanel;
+		singleton.add(newPanel);
+		singleton.revalidate();
+		singleton.repaint();
 	}
 	
 }
