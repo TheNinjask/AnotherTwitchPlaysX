@@ -106,6 +106,8 @@ public class TwitchChatFrame extends JFrame {
 
 	private JPanel messagePanel;
 
+	private JTextField input;
+
 	private TwitchChatFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", TwitchChatFrame.class.getSimpleName()));
 		this.type = ChatType.MINECRAFT;
@@ -190,8 +192,8 @@ public class TwitchChatFrame extends JFrame {
 
 	private JPanel inputChat() {
 		messagePanel = new JPanel(new BorderLayout());
-		JTextField input = new JTextField();
-		input.setBorder(null);
+		input = new JTextField();
+		input.setBorder(BorderFactory.createLineBorder(Constants.TWITCH_COLOR_COMPLEMENT, 1));
 		input.addKeyListener(new KeyListener() {
 
 			@Override
@@ -327,6 +329,7 @@ public class TwitchChatFrame extends JFrame {
 	public void setColor(Color text, Color bg) {
 		synchronized (chat) {
 			chat.setForeground(text);
+			input.setBorder(BorderFactory.createLineBorder(text, 1));
 			setBGColor(bg);
 		}
 	}
