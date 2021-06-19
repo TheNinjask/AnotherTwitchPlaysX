@@ -1,10 +1,13 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui.chat;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -14,9 +17,12 @@ import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 
@@ -26,7 +32,9 @@ import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.util.ComponentResizer;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.mock.ChannelMessageEventMock;
 
 public class TwitchChatFrame extends JFrame {
 
@@ -89,13 +97,15 @@ public class TwitchChatFrame extends JFrame {
 	private ChatType type;
 
 	private ChatMode mode;
-	
-	private int posX,posY;
+
+	private int posX, posY;
 
 	private ComponentResizer cr;
-	
+
 	private AtomicBoolean enabledDR;
-	
+
+	private JPanel messagePanel;
+
 	private TwitchChatFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", TwitchChatFrame.class.getSimpleName()));
 		this.type = ChatType.MINECRAFT;
@@ -105,33 +115,38 @@ public class TwitchChatFrame extends JFrame {
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
-		this.add(insertChat());
+		this.setLayout(new BorderLayout());
+
+		this.add(insertChat(), BorderLayout.CENTER);
+
+		this.add(inputChat(), BorderLayout.SOUTH);
+		showInputMessage(false);
 		setUndecorated(true);
 		this.setBackground(Constants.TWITCH_COLOR);
 		scroll.getParent().setBackground(null);
-		
-		Border border = BorderFactory.createLineBorder(new Color(0, 0, 0, 0),5);
+
+		Border border = BorderFactory.createLineBorder(new Color(0, 0, 0, 0), 5);
 		this.getRootPane().setBorder(border);
 		cr = new ComponentResizer();
 		cr.setMinimumSize(this.getMinimumSize());
-		
+
 		enabledDR = new AtomicBoolean(false);
 		enableDragAndResize();
-		 /*for (MouseListener elem : getMouseListeners()) {
-			chat.addMouseListener(elem);
-		}
-		for (MouseMotionListener elem : getMouseMotionListeners()) {
-			chat.addMouseMotionListener(elem);
-		}*/
+		/*
+		 * for (MouseListener elem : getMouseListeners()) { chat.addMouseListener(elem);
+		 * } for (MouseMotionListener elem : getMouseMotionListeners()) {
+		 * chat.addMouseMotionListener(elem); }
+		 */
 	}
-	
+
 	public static TwitchChatFrame getInstance() {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", TwitchChatFrame.class.getSimpleName()));
+		Constants.printVerboseMessage(Level.INFO,
+				String.format("%s.getInstance()", TwitchChatFrame.class.getSimpleName()));
 		singleton.setTitle(
 				String.format("%s's Twitch Chat", DataManager.getInstance().getSession().getChannel().substring(1)));
 		return singleton;
 	}
-	
+
 	private JScrollPane insertChat() {
 		scroll = new JScrollPane();
 		chat = new JTextArea();
@@ -156,7 +171,7 @@ public class TwitchChatFrame extends JFrame {
 
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
-		
+
 		chat.setOpaque(false);
 		chat.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		this.addComponentListener(new ComponentAdapter() {
@@ -172,33 +187,68 @@ public class TwitchChatFrame extends JFrame {
 		});
 		return scroll;
 	}
-	
-	public void enableDragAndResize() {
-		if(enabledDR.get())
-			return;
-		chat.addMouseListener(new MouseAdapter()
-		{
-		   public void mousePressed(MouseEvent e)
-		   {
-		      posX=e.getX();
-		      posY=e.getY();
-		   }
-		});
 
-		chat.addMouseMotionListener(new MouseAdapter()
-		{
-		     public void mouseDragged(MouseEvent evt)
-		     {
-				setLocation (evt.getXOnScreen()-posX,evt.getYOnScreen()-posY);
-							
-		     }
+	private JPanel inputChat() {
+		messagePanel = new JPanel(new BorderLayout());
+		JTextField input = new JTextField();
+		input.setBorder(null);
+		input.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					onMessage(new ChannelMessageEventMock(DataManager.getInstance().getSession().getNickname(),
+							input.getText()));
+					TwitchPlayer.getInstance().sendMessage(input.getText());
+					input.setText("");
+				}
+			}
+		});
+		messagePanel.add(input, BorderLayout.CENTER);
+		JButton send = new JButton("Send");
+		send.addActionListener(l -> {
+			onMessage(
+					new ChannelMessageEventMock(DataManager.getInstance().getSession().getNickname(), input.getText()));
+			TwitchPlayer.getInstance().sendMessage(input.getText());
+			input.setText("");
+		});
+		messagePanel.add(send, BorderLayout.EAST);
+		return messagePanel;
+	}
+
+	public void enableDragAndResize() {
+		if (enabledDR.get())
+			return;
+		chat.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				posX= e.getX() - (chat.getWidth() - scroll.getWidth());
+				posY= e.getY() - (chat.getHeight() - scroll.getHeight());
+			}
+		});
+		chat.addMouseMotionListener(new MouseAdapter() {
+			public void mouseDragged(MouseEvent evt) {
+				setLocation(evt.getXOnScreen() - posX, 
+						evt.getYOnScreen() - posY);
+
+			}
 		});
 		cr.registerComponent(this);
 		enabledDR.set(true);
 	}
-	
+
 	public void disableDragAndResize() {
-		if(!enabledDR.get())
+		if (!enabledDR.get())
 			return;
 		for (MouseListener elem : chat.getMouseListeners()) {
 			chat.removeMouseListener(elem);
@@ -323,5 +373,9 @@ public class TwitchChatFrame extends JFrame {
 		Color currentColor = getBGColor();
 		this.mode = mode;
 		setBGColor(currentColor);
+	}
+
+	public void showInputMessage(boolean show) {
+		messagePanel.setVisible(show);
 	}
 }

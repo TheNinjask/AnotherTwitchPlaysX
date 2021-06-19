@@ -43,10 +43,10 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.ChatMode;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.ChatType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.embedded.EmbeddedModMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.SponsorBot;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
@@ -105,6 +105,8 @@ public class MainMenuPanel extends JPanel {
 	private JPanel twitchChatTransparencyModePanel;
 
 	private List<Runnable> eventsWithStart;
+
+	private JCheckBox twitchChatInput;
 	
 	private MainMenuPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainMenuPanel.class.getSimpleName()));
@@ -122,8 +124,9 @@ public class MainMenuPanel extends JPanel {
 		twitchChatFont();
 		twitchChatFontSize();
 		twitchChatTransparencyModePanel();
+		setTwitchChatInput();
 		twitchChatOptions = new ArrayList<JComponent>(Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatFontPanel,
-				twitchChatFontSizePanel, twitchChatTransparencyModePanel, twitchChatOnTop));
+				twitchChatFontSizePanel, twitchChatTransparencyModePanel, twitchChatInput, twitchChatOnTop));
 		this.add(twitchChatOptionsLabel());
 		this.add(twitchChatOptionsPanel());
 		this.add(twitchChatSlider());
@@ -485,6 +488,22 @@ public class MainMenuPanel extends JPanel {
 		});
 
 		return twitchChatOnTop;
+	}
+	
+	private JCheckBox setTwitchChatInput() {
+		twitchChatInput = new JCheckBox();
+
+		twitchChatInput.setText("Show Input TextBox in Chat?");
+		twitchChatInput.setHorizontalTextPosition(JCheckBox.LEFT);
+		twitchChatInput.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitchChatInput.setHorizontalAlignment(JCheckBox.CENTER);
+		twitchChatInput.setOpaque(false);
+		twitchChatInput.setFocusable(false);
+		twitchChatInput.addActionListener(l -> {
+				TwitchChatFrame.getInstance().showInputMessage(twitchChatInput.isSelected());
+		});
+
+		return twitchChatInput;
 	}
 
 	private JPanel twitchChatMode() {
