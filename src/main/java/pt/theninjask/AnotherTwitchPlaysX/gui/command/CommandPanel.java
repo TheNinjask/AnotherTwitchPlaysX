@@ -157,7 +157,7 @@ public class CommandPanel extends JPanel {
 		NumberFormatter cooldownFormatter = new NumberFormatter(format);
 		cooldownFormatter.setValueClass(Integer.class);
 		cooldownFormatter.setMinimum(0);
-		cooldownFormatter.setMaximum(60);
+		cooldownFormatter.setMaximum(3600);
 		cooldownFormatter.setAllowsInvalid(false);
 		
 		JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -204,7 +204,7 @@ public class CommandPanel extends JPanel {
 					break;
 				case KeyEvent.VK_UP:
 				case KeyEvent.VK_KP_UP:
-					if (cooldownVal == 60*1000)
+					if (cooldownVal == 3600*1000)
 						break;
 					updated = cooldownVal + 1*1000;
 					current.getCooldown().setTimer(updated);
@@ -231,7 +231,7 @@ public class CommandPanel extends JPanel {
 		typeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		typePanel.add(typeLabel);
 		type = new JComboBox<CommandType>(CommandType.getAll());
-		type.setSelectedItem(CommandType.UNISON);
+		type.setSelectedItem(current.getType());
 		type.addActionListener(l -> {
 			current.setType(type.getItemAt(type.getSelectedIndex()));
 		});
