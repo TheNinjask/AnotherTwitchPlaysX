@@ -27,14 +27,14 @@ public class EmbeddedModMenuPanel extends JPanel {
 	
 	private static EmbeddedModMenuPanel singleton = new EmbeddedModMenuPanel();
 	
-	private static final int ICON_WIDTH = 100;
+	private static final int ICON_WIDTH = 80;
 	
 	private ATPXMod[] mods = {new ChangeStopShortCutMod(), new TestChatCommandsMod(), new StringChatCommandsMod(), new TestCommandsMod()};
 	
 	private EmbeddedModMenuPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", EmbeddedModMenuPanel.class.getSimpleName()));
 		this.setBackground(Constants.TWITCH_COLOR);
-		this.setLayout(new GridLayout(3, 1));
+		this.setLayout(new GridLayout(4, 1));
 		
 		JLabel title = new JLabel("Secret Embedded Mod Menu");
 		title.setHorizontalAlignment(JLabel.CENTER);
@@ -44,6 +44,12 @@ public class EmbeddedModMenuPanel extends JPanel {
 		icon.setImage(icon.getImage().getScaledInstance(ICON_WIDTH, icon.getIconHeight()*ICON_WIDTH/icon.getIconWidth(), Image.SCALE_DEFAULT));
 		title.setIcon(icon);
 		this.add(title);
+		
+		JLabel warn = new JLabel("(This stuff might not work correctly)");
+		warn.setHorizontalAlignment(JLabel.CENTER);
+		warn.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		
+		this.add(warn);
 		
 		JPanel dummy = new JPanel();
 		dummy.setOpaque(false);

@@ -3,12 +3,19 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +34,16 @@ import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
 
 public class CommandData implements Data {
 
+	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
+		private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+		@Override
+		public synchronized String format(LogRecord lr) {
+			return String.format("[%s]: %s\n", sdf.format(new Date(lr.getMillis())),lr.getMessage());
+		}
+	};
+	
+	private static Logger logger = setUpLogger();
+	
 	private String lead;
 
 	private CommandType type;
@@ -38,7 +55,31 @@ public class CommandData implements Data {
 	private List<Pair<String, CommandVarType>> vars;
 
 	private static AtomicBoolean isSingleActive = new AtomicBoolean(false);
-
+	
+	public static void enableLogging(boolean val) {
+		if(val) {
+			logger.setLevel(Level.ALL);
+		}else {
+			logger.setLevel(Level.OFF);	
+		}
+	}
+	
+	private static final Logger setUpLogger() {
+		Logger logger = Logger.getLogger(CommandData.class.getName());
+		logger.setUseParentHandlers(false);
+		StreamHandler handler = new StreamHandler(System.out, LOGGER_FORMATTER) {
+			 @Override
+			public synchronized void publish(LogRecord record) {
+				 super.publish(record);
+		         super.flush();
+			}
+		};
+		logger.addHandler(handler);
+		//logger.addHandler(new ConsoleHandler());
+		logger.setLevel(Level.OFF);
+		return logger;
+	}
+	
 	public CommandData() {
 		this.lead = "";
 		this.type = CommandType.UNISON;
@@ -248,6 +289,7 @@ public class CommandData implements Data {
 	}
 
 	public void executeUnison() {
+		logger.info(String.format("Started Unison %s with cooldown %s", lead, cooldown.inCooldown()));
 		cooldown.run(() -> {
 			ThreadPool.execute(() -> {
 				for (ControlData elem : controls) {
@@ -256,8 +298,10 @@ public class CommandData implements Data {
 						return;
 					ThreadPool.executeUnison(() -> {
 						try {
+							logger.info(String.format("Started %s of Unison %s", elem.toString(), lead));
 							Robot robot = new SmoothMoveRobot();
 							elem.execute(robot);
+							logger.info(String.format("Ended %s of Unison %s", elem.toString(), lead));
 						} catch (AWTException e) {
 							throw new RuntimeException(e);
 						}
@@ -267,14 +311,11 @@ public class CommandData implements Data {
 				}
 			});
 		});
-		/*
-		 * Robot robot = RobotSingleton.getUnisonInstance().getRobot(); for (ControlData
-		 * elem : controls) { synchronized (robot) { elem.execute(robot); } }
-		 */
-
+		logger.info(String.format("Ended Unison %s", lead));
 	}
 
 	public void executeUnison(Map<String, String> map) {
+		logger.info(String.format("Started Unison %s with cooldown %s with map", lead, cooldown.inCooldown()));
 		cooldown.run(() -> {
 			ThreadPool.execute(() -> {
 				for (ControlData elem : controls) {
@@ -283,8 +324,10 @@ public class CommandData implements Data {
 						return;
 					ThreadPool.executeUnison(() -> {
 						try {
+							logger.info(String.format("Started %s of Unison %s with map", elem.toString(), lead));
 							Robot robot = new SmoothMoveRobot();
 							elem.execute(robot, map);
+							logger.info(String.format("Ended %s of Unison %s with map", elem.toString(), lead));
 						} catch (AWTException e) {
 							throw new RuntimeException(e);
 						}
@@ -294,90 +337,53 @@ public class CommandData implements Data {
 				}
 			});
 		});
-		/*
-		 * Robot robot = RobotSingleton.getUnisonInstance().getRobot(); for (ControlData
-		 * elem : controls) { synchronized (robot) { elem.execute(robot, map); } }
-		 */
-
+		logger.info(String.format("Ended Unison %s with map", lead));
 	}
-
-	/*
-	 * @Deprecated public void executeQueue() {
-	 * Constants.printVerboseMessage(Level.WARNING,
-	 * "Use of Deprecated Method: CommandData.executeQueue()");
-	 * ThreadPool.execute(() -> { Robot robot =
-	 * RobotSingleton.getInstance().getRobot(); synchronized (robot) { for
-	 * (ControlData elem : controls) { ThreadPool.executeQueue(() -> {
-	 * elem.execute(robot); }); if (elem.getAftermathDelay() != null)
-	 * robot.delay(elem.getAftermathDelay()); } } }); /* Robot robot =
-	 * RobotSingleton.getQueueInstance().getRobot(); synchronized (robot) { for
-	 * (ControlData elem : controls) { elem.execute(robot); } }
-	 * 
-	 * }
-	 */
-
-	/*
-	 * @Deprecated public void executeQueue(Map<String, String> map) {
-	 * Constants.printVerboseMessage(Level.WARNING,
-	 * "Use of Deprecated Method: CommandData.executeQueue(Map<String, String> map)"
-	 * ); ThreadPool.execute(() -> { Robot robot =
-	 * RobotSingleton.getInstance().getRobot(); synchronized (robot) { for
-	 * (ControlData elem : controls) { ThreadPool.executeQueue(() -> {
-	 * elem.execute(robot, map); }); if (elem.getAftermathDelay() != null)
-	 * robot.delay(elem.getAftermathDelay()); } } }); /* Robot robot =
-	 * RobotSingleton.getQueueInstance().getRobot(); synchronized (robot) { for
-	 * (ControlData elem : controls) { elem.execute(robot, map); } }
-	 * 
-	 * }
-	 */
-
 	public void executeSingle() {
+		logger.info(String.format("Started Single %s with cooldown %s", lead, cooldown.inCooldown()));
 		cooldown.run(() -> {
 			ThreadPool.execute(() -> {
 				Robot robot = RobotSingleton.getInstance().getRobot();
-				synchronized (robot) {
-					// I think the code below is not necessary
-					// due to robot already restricting using
-					// executeSingle simultaneously
-					// if(isSingleActive.get()) {
-					// return;
-					// }
+					if(isSingleActive.get()) {
+						return;
+					}
 					isSingleActive.set(true);
 					for (ControlData elem : controls) {
 						ThreadPool.executeSingle(() -> {
+							logger.info(String.format("Started %s of Single %s", elem.toString(), lead));
 							elem.execute(robot);
+							logger.info(String.format("Ended %s of Single %s", elem.toString(), lead));
 						});
 						if (elem.getAftermathDelay() != null)
 							robot.delay(elem.getAftermathDelay());
 					}
 					isSingleActive.set(false);
-				}
 			});
 		});
+		logger.info(String.format("Ended Single %s", lead));
 	}
 
 	public void executeSingle(Map<String, String> map) {
+		logger.info(String.format("Started Single %s with cooldown %s with map", lead, cooldown.inCooldown()));
 		cooldown.run(() -> {
 			ThreadPool.execute(() -> {
 				Robot robot = RobotSingleton.getInstance().getRobot();
-				synchronized (robot) {
-					// I think the code below is not necessary
-					// due to robot already restricting using
-					// executeSingle simultaneously
-					// if(isSingleActive.get()) {
-					// return;
-					// }
+					if(isSingleActive.get()) {
+						return;
+					}
 					isSingleActive.set(true);
 					for (ControlData elem : controls) {
 						ThreadPool.executeSingle(() -> {
+							logger.info(String.format("Started %s of Single %s with map", elem.toString(), lead));
 							elem.execute(robot, map);
+							logger.info(String.format("Ended %s of Single %s with map", elem.toString(), lead));
 						});
 						if (elem.getAftermathDelay() != null)
 							robot.delay(elem.getAftermathDelay());
 					}
 					isSingleActive.set(false);
-				}
 			});
 		});
+		logger.info(String.format("Ended Single %s with map", lead));
 	}
 }

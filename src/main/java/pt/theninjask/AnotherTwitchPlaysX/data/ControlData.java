@@ -438,4 +438,9 @@ public class ControlData implements Data {
 		ControlData.translation = translation;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("Control %s(%s)", key, type.toString());
+	}
+	
 }

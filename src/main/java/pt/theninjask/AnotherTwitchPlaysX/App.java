@@ -19,6 +19,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.jnativehook.GlobalScreen;
 
+import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
@@ -42,6 +43,8 @@ public class App {
 		verbose.addOption(new Option("w", "verboseWarning", false, "Sets Verbose to WARN"));
 		options.addOptionGroup(verbose);
 
+		options.addOption("p", "printCommand", false, "Print Commands execution");
+		
 		options.addOption("d", "debug", false, "Enables printStackTrace()");
 		options.addOption("s", "disableSession", false,
 				"Disables access to SessionData from DataManager (might \"brick\" app)\nMight be useful to check when a external mod gains access");
@@ -73,6 +76,10 @@ public class App {
 			if (cmd.hasOption('s')) {
 				Constants.disableSession = true;
 				Constants.printVerboseMessage(Level.INFO, "DisableSession Set to True");
+			}
+			if(cmd.hasOption('p')) {
+				CommandData.enableLogging(true);
+				Constants.printVerboseMessage(Level.INFO, "Enabled print commands exetution");
 			}
 			String nickname = null;
 			String channel = null;

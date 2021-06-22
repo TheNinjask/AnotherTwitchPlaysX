@@ -8,20 +8,23 @@ import java.text.NumberFormat;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.text.NumberFormatter;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
+import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.TaskCooldown;
 import pt.theninjask.AnotherTwitchPlaysX.util.mock.ChannelMessageEventMock;
 
-@ATPXModProps(keepLoaded = false, popout = true)
+@ATPXModProps(keepLoaded = false)
 public class TestCommandsMod extends ATPXMod {
 
 	private JPanel mainPanel;
@@ -29,6 +32,8 @@ public class TestCommandsMod extends ATPXMod {
 	private String[] users = { "TheNinjask", "Dragonboil", "Drakekax", "GoncaAC", "JoGoKa?" };
 
 	private TaskCooldown worker;
+
+	private JComboBox<JComboItem<CommandData>> selec;
 
 	public TestCommandsMod() {
 
@@ -79,7 +84,7 @@ public class TestCommandsMod extends ATPXMod {
 			}
 		});
 		cooldownPanel.add(cooldown);
-		
+
 		//
 		NumberFormatter delayFormatter = new NumberFormatter(format);
 		delayFormatter.setValueClass(Integer.class);
@@ -122,21 +127,36 @@ public class TestCommandsMod extends ATPXMod {
 		});
 		delayPanel.add(delay);
 		//
-		
+
 		JButton start = new JButton("Start!");
 		start.addActionListener(l -> {
-			if(worker.inCooldown()){
+			if (worker.inCooldown()) {
 				Constants.showMessageDialog("Task is on cooldown", "Still in progress...");
+				return;
+			}
+			if (selec.getItemAt(selec.getSelectedIndex()) != null
+					&& selec.getItemAt(selec.getSelectedIndex()).get() != null) {
+				try {
+					Thread.sleep(Long.parseLong(cooldown.getText()) * 1000);
+					worker.run(() -> {
+						ChannelMessageEventMock mockMessage = new ChannelMessageEventMock(
+								users[ThreadLocalRandom.current().nextInt(users.length)],
+								selec.getItemAt(selec.getSelectedIndex()).get().getRegexExample());
+						selec.getItemAt(selec.getSelectedIndex()).get().onMessage(mockMessage);
+					});
+				} catch (Exception e) {
+					Constants.showExceptionDialog(e);
+				}
 				return;
 			}
 			worker.run(() -> {
 				try {
-					Thread.sleep(Long.parseLong(cooldown.getText())*1000);
+					Thread.sleep(Long.parseLong(cooldown.getText()) * 1000);
 					for (CommandData cmd : DataManager.getInstance().getCommands()) {
 						ChannelMessageEventMock mockMessage = new ChannelMessageEventMock(
 								users[ThreadLocalRandom.current().nextInt(users.length)], cmd.getRegexExample());
 						cmd.onMessage(mockMessage);
-						Thread.sleep(Long.parseLong(delay.getText())*1000);
+						Thread.sleep(Long.parseLong(delay.getText()) * 1000);
 					}
 				} catch (Exception e) {
 					Constants.showExceptionDialog(e);
@@ -147,12 +167,26 @@ public class TestCommandsMod extends ATPXMod {
 
 		mainPanel.add(cooldownPanel);
 		mainPanel.add(delayPanel);
+
+		JButton back = new JButton("Back");
+		back.addActionListener(l -> {
+			MainFrame.replacePanel(EmbeddedModMenuPanel.getInstance());
+		});
+		mainPanel.add(back);
+		JLabel selecLabel = new JLabel("Select:");
+		selecLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		mainPanel.add(selecLabel);
+		selec = new JComboBox<JComboItem<CommandData>>();
+		mainPanel.add(selec);
 	}
 
 	@Override
 	public void refresh() {
-		// TODO Auto-generated method stub
-
+		selec.removeAllItems();
+		selec.addItem(new JComboItem<CommandData>(null, "ALL"));
+		for (CommandData cmd : DataManager.getInstance().getCommands()) {
+			selec.addItem(new JComboItem<CommandData>(cmd, cmd.getLead()));
+		}
 	}
 
 	@Override
