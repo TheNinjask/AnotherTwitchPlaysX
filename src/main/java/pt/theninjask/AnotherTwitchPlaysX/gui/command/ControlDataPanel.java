@@ -46,7 +46,7 @@ public class ControlDataPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 	private ControlData data;
 
 	private List<ControlDataPanel> in;
@@ -117,6 +117,8 @@ public class ControlDataPanel extends JPanel {
 
 	private JButton finalYType;
 
+	private static String jComboBoxVarNone = DataManager.getLanguage().getControlData().getVarNone();
+	
 	private class JComboBoxVar extends JComboBox<JComboItem<Pair<String, CommandVarType>>> {
 
 		/**
@@ -131,11 +133,12 @@ public class ControlDataPanel extends JPanel {
 		private AtomicBoolean disable = new AtomicBoolean(false);
 
 		private String varOf;
+		
 
 		public JComboBoxVar(CommandVarType type, String varOf) {
 			super();
 			this.vars = new HashMap<String, JComboItem<Pair<String, CommandVarType>>>();
-			this.addItem(new JComboItem<Pair<String, CommandVarType>>(null, "NONE"));
+			this.addItem(new JComboItem<Pair<String, CommandVarType>>(null, jComboBoxVarNone));
 			this.setSelectedIndex(0);
 			this.type = type;
 			this.varOf = varOf;
@@ -144,19 +147,24 @@ public class ControlDataPanel extends JPanel {
 					return;
 				if (getSelectedIndex() < 0)
 					return;
-				switch (getItemAt(getSelectedIndex()).toString()) {
-				case "NONE":
+				if (getSelectedIndex() == 1) {
+					data.getMap().remove(this.varOf);
+					return;
+				}
+				data.getMap().put(this.varOf, getItemAt(getSelectedIndex()).get().getLeft());
+				/*switch (getItemAt(getSelectedIndex()).toString()) {
+				case None:
 					data.getMap().remove(this.varOf);
 					break;
 				default:
 					data.getMap().put(this.varOf, getItemAt(getSelectedIndex()).get().getLeft());
 					break;
-				}
+				}*/
 			});
 		}
 
 		public void addItem(Pair<String, CommandVarType> var) {
-			if (var == null || var.getRight() != type || "NONE".equals(var.getLeft())
+			if (var == null || var.getRight() != type || jComboBoxVarNone.equals(var.getLeft())
 					|| vars.containsKey(var.getLeft()))
 				return;
 			JComboItem<Pair<String, CommandVarType>> tmp = new JComboItem<Pair<String, CommandVarType>>(var,
@@ -166,7 +174,7 @@ public class ControlDataPanel extends JPanel {
 		}
 
 		public void removeItem(Pair<String, CommandVarType> var) {
-			if (var == null || var.getRight() != type || "NONE".equals(var.getLeft())
+			if (var == null || var.getRight() != type || jComboBoxVarNone.equals(var.getLeft())
 					|| !vars.containsKey(var.getLeft()))
 				return;
 			if (getItemAt(getSelectedIndex()).get() != null && getItemAt(getSelectedIndex()).get().equals(var))
@@ -182,7 +190,7 @@ public class ControlDataPanel extends JPanel {
 			disable.set(true);
 			vars.clear();
 			super.removeAllItems();
-			addItem(new JComboItem<Pair<String, CommandVarType>>(null, "NONE"));
+			addItem(new JComboItem<Pair<String, CommandVarType>>(null, jComboBoxVarNone));
 			parent.getCurrentCommandData().getVars().forEach(e -> {
 				addVar(e);
 			});
@@ -296,7 +304,7 @@ public class ControlDataPanel extends JPanel {
 			break;
 		}
 		inputPanel.add(content);
-		inputVar = new JComboBoxVar(CommandVarType.STRING, "key");
+		inputVar = new JComboBoxVar(CommandVarType.STRING, ControlData.KEY_VAR);
 		inputVar.setVisible(false);
 		// inputVar.setEnabled(false);
 		var.add(inputVar);
@@ -396,7 +404,7 @@ public class ControlDataPanel extends JPanel {
 			duration.setPreferredSize(new Dimension(50, 20));
 			content.add(duration);
 
-			durationVar = new JComboBoxVar(CommandVarType.DIGIT, "duration");
+			durationVar = new JComboBoxVar(CommandVarType.DIGIT, ControlData.DURATION_VAR);
 			durationVar.setVisible(false);
 			var.add(durationVar);
 			content.add(durationVar);
@@ -482,7 +490,7 @@ public class ControlDataPanel extends JPanel {
 		});
 		content.add(aftermath);
 
-		aftermathVar = new JComboBoxVar(CommandVarType.DIGIT, "aftermathDelay");
+		aftermathVar = new JComboBoxVar(CommandVarType.DIGIT, ControlData.AFTERMATH_VAR);
 		aftermathVar.setVisible(false);
 		var.add(aftermathVar);
 		content.add(aftermathVar);
@@ -578,7 +586,7 @@ public class ControlDataPanel extends JPanel {
 			content.add(xClear);
 			content.add(x);
 
-			xVar = new JComboBoxVar(CommandVarType.DIGIT, "x");
+			xVar = new JComboBoxVar(CommandVarType.DIGIT, ControlData.X_VAR);
 			xVar.setVisible(false);
 			var.add(xVar);
 			content.add(xVar);
@@ -692,7 +700,7 @@ public class ControlDataPanel extends JPanel {
 			content.add(yClear);
 			content.add(y);
 
-			yVar = new JComboBoxVar(CommandVarType.DIGIT, "y");
+			yVar = new JComboBoxVar(CommandVarType.DIGIT, ControlData.Y_VAR);
 			yVar.setVisible(false);
 			var.add(yVar);
 			content.add(yVar);
@@ -821,7 +829,7 @@ public class ControlDataPanel extends JPanel {
 				content.add(finalXClear);
 				content.add(finalX);
 
-				finalXVar = new JComboBoxVar(CommandVarType.DIGIT, "final_x");
+				finalXVar = new JComboBoxVar(CommandVarType.DIGIT, ControlData.FINAL_X_VAR);
 				finalXVar.setVisible(false);
 				var.add(finalXVar);
 				content.add(finalXVar);
@@ -936,7 +944,7 @@ public class ControlDataPanel extends JPanel {
 				content.add(finalYClear);
 				content.add(finalY);
 
-				finalYVar = new JComboBoxVar(CommandVarType.DIGIT, "final_y");
+				finalYVar = new JComboBoxVar(CommandVarType.DIGIT, ControlData.FINAL_Y_VAR);
 				finalYVar.setVisible(false);
 				var.add(finalYVar);
 				content.add(finalYVar);

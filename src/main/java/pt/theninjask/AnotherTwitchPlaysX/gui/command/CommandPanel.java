@@ -51,6 +51,8 @@ public class CommandPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private static String varAdd = DataManager.getLanguage().getCommand().getVarAdd();
+	
 	private CommandData saved;
 
 	private CommandData current;
@@ -247,11 +249,11 @@ public class CommandPanel extends JPanel {
 
 		// TODO?
 		vars = new JComboBox<JComboItem<Pair<String, CommandVarType>>>();
-		vars.addItem(new JComboItem<Pair<String, CommandVarType>>(null, "ADD"));
+		vars.addItem(new JComboItem<Pair<String, CommandVarType>>(null, varAdd));
 		vars.setSelectedItem(null);
 		vars.setFocusable(false);
 		for (Pair<String, CommandVarType> elem : current.getVars()) {
-			if (!elem.getLeft().equals("ADD")) {
+			if (!elem.getLeft().equals(varAdd)) {
 				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(elem, elem.getLeft()));
 				varsBag.remove(elem.getLeft());
 			}
@@ -264,7 +266,20 @@ public class CommandPanel extends JPanel {
 		varsRemove.setFocusable(false);
 		AtomicBoolean disableVars = new AtomicBoolean(false);
 		varsRemove.addActionListener(l -> {
-			switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
+			if(varAdd.equals(vars.getItemAt(vars.getSelectedIndex()).toString()))
+				return;
+			disableVars.set(true);
+			varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getLeft());
+			current.getVars().remove(vars.getItemAt(vars.getSelectedIndex()).get());
+			varsRemove.setVisible(false);
+			varsRemove.setEnabled(false);
+			controls.forEach(c -> {
+				c.removeVar(vars.getItemAt(vars.getSelectedIndex()).get());
+			});
+			vars.removeItemAt(vars.getSelectedIndex());
+			vars.setSelectedItem(null);
+			disableVars.set(false);
+			/*switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
 			default:
 				disableVars.set(true);
 				varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getLeft());
@@ -280,7 +295,7 @@ public class CommandPanel extends JPanel {
 				break;
 			case "ADD":
 				break;
-			}
+			}*/
 		});
 
 		vars.addActionListener(l -> {
@@ -288,7 +303,54 @@ public class CommandPanel extends JPanel {
 				return;
 			if (disableVars.get())
 				return;
-			switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
+			if(varAdd.equals(vars.getItemAt(vars.getSelectedIndex()).toString())) {
+				Optional<String> var = varsBag.stream().findAny();
+				if (!var.isPresent()) {
+					JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarAddWarnMsg());
+					msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+					Constants.showCustomColorMessageDialog(null, msg,
+							DataManager.getLanguage().getCommand().getVarAddWarnTitle(), JOptionPane.WARNING_MESSAGE,
+							null, Constants.TWITCH_COLOR);
+					vars.setSelectedItem(null);
+					varsRemove.setVisible(false);
+					varsRemove.setEnabled(false);
+					return;
+				}
+
+				JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarType());
+				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				String[] opt = { DataManager.getLanguage().getCommand().getVarDigit(),
+						DataManager.getLanguage().getCommand().getVarString() };
+				int resp = Constants.showCustomColorOptionDialog(null, msg,
+						DataManager.getLanguage().getCommand().getVarTitle(), JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE, null, opt, null, Constants.TWITCH_COLOR);
+				CommandVarType type;
+				switch (resp) {
+				case JOptionPane.YES_OPTION:
+					type = CommandVarType.DIGIT;
+					break;
+				case JOptionPane.NO_OPTION:
+					type = CommandVarType.STRING;
+					break;
+				case JOptionPane.CLOSED_OPTION:
+				default:
+					return;
+				}
+				Pair<String, CommandVarType> tmp = new Pair<String, CommandVarType>(var.get(), type);
+				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(tmp, tmp.getLeft()));
+				vars.setSelectedIndex(vars.getItemCount() - 1);
+				varsBag.remove(var.get());
+				current.getVars().add(tmp);
+				controls.forEach(c -> {
+					c.addVar(tmp);
+				});
+				varsRemove.setVisible(true);
+				varsRemove.setEnabled(true);
+				return;
+			}
+			varsRemove.setVisible(true);
+			varsRemove.setEnabled(true);
+			/*switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
 			case "ADD":
 				Optional<String> var = varsBag.stream().findAny();
 				if (!var.isPresent()) {
@@ -337,7 +399,7 @@ public class CommandPanel extends JPanel {
 				varsRemove.setVisible(true);
 				varsRemove.setEnabled(true);
 				break;
-			}
+			}*/
 		});
 		// vars.setEnabled(false);
 		varsPanel.add(vars);

@@ -90,6 +90,10 @@ public interface ControlDataLang {
 		return "[x]";
 	}
 	
+	public default String getVarNone() {
+		return "NONE";
+	}
+	
 	public default String getIndex() {
 		return "#index";
 	}
