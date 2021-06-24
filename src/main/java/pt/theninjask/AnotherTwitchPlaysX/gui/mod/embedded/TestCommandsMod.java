@@ -152,7 +152,7 @@ public class TestCommandsMod extends ATPXMod {
 			worker.run(() -> {
 				try {
 					Thread.sleep(Long.parseLong(cooldown.getText()) * 1000);
-					for (CommandData cmd : DataManager.getInstance().getCommands()) {
+					for (CommandData cmd : DataManager.getCommands()) {
 						ChannelMessageEventMock mockMessage = new ChannelMessageEventMock(
 								users[ThreadLocalRandom.current().nextInt(users.length)], cmd.getRegexExample());
 						cmd.onMessage(mockMessage);
@@ -184,7 +184,7 @@ public class TestCommandsMod extends ATPXMod {
 	public void refresh() {
 		selec.removeAllItems();
 		selec.addItem(new JComboItem<CommandData>(null, "ALL"));
-		for (CommandData cmd : DataManager.getInstance().getCommands()) {
+		for (CommandData cmd : DataManager.getCommands()) {
 			selec.addItem(new JComboItem<CommandData>(cmd, cmd.getLead()));
 		}
 	}

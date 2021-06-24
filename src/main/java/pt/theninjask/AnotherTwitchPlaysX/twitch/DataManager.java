@@ -6,6 +6,7 @@ import java.util.logging.Level;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class DataManager {
@@ -14,9 +15,13 @@ public class DataManager {
 	
 	private SessionData session;
 	
+	public static boolean disableSession = false;
+	
 	public static final SessionData DUMMY_SESSION = new SessionData("dummy","dummy","dummy");
 	
 	private List<CommandData> commands;
+	
+	private Lang language;
 	
 	private DataManager() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", DataManager.class.getSimpleName()));
@@ -28,31 +33,41 @@ public class DataManager {
 		this.commands = commands;
 	}
 	
-	public static DataManager getInstance() {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", DataManager.class.getSimpleName()));
+	/*public static DataManager getInstance() {
+		//Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", DataManager.class.getSimpleName()));
 		return singleton;
-	}
+	}*/
 
-	public SessionData getSession() {
+	public static SessionData getSession() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.getSession()", DataManager.class.getSimpleName()));
-		if(Constants.disableSession)
+		if(disableSession)
 			return DUMMY_SESSION;
-		return session;
+		return singleton.session;
 	}
 
-	public void setSession(SessionData session) {
+	public static void setSession(SessionData session) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setSession()", DataManager.class.getSimpleName()));
-		this.session = session;
+		singleton.session = session;
 	}
 	
-	public List<CommandData> getCommands(){
+	public static List<CommandData> getCommands(){
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.getCommands()", DataManager.class.getSimpleName()));
-		return commands;
+		return singleton.commands;
 	}
 	
-	public void setCommands(List<CommandData> commands) {
+	public static void setCommands(List<CommandData> commands) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setCommands()", DataManager.class.getSimpleName()));
-		this.commands = commands;
+		singleton.commands = commands;
+	}
+
+	public static Lang getLanguage() {
+		//Constants.printVerboseMessage(Level.INFO, String.format("%s.getLanguage()", DataManager.class.getSimpleName()));
+		return singleton.language;
+	}
+
+	public static void setLanguage(Lang language) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.setLanguage()", DataManager.class.getSimpleName()));
+		singleton.language = language;
 	}
 	
 }

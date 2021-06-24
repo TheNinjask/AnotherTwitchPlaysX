@@ -124,7 +124,7 @@ public class TestChatCommandsMod extends ATPXMod {
 	@Handler
 	public void onMessage(ActorMessageEvent<User> event) {
 		ThreadPool.execute(() -> {
-			DataManager.getInstance().getCommands().forEach(cmd -> {
+			DataManager.getCommands().forEach(cmd -> {
 				cmd.onMessage(event);
 			});
 		});

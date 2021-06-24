@@ -23,12 +23,12 @@ public class JTableCommand extends JTable {
 		this.setEnabled(false);
 		table = new CommandTableModel();
 		this.setModel(table.getModel());
-		this.getColumn("Syntax").setCellRenderer(new JTableButtonRenderer());
-		this.getColumn("Syntax").setPreferredWidth(75);
-		this.getColumn("Edit").setCellRenderer(new JTableButtonRenderer());
-		this.getColumn("Edit").setPreferredWidth(50);
-		this.getColumn("Remove").setCellRenderer(new JTableButtonRenderer());
-		this.getColumn("Remove").setPreferredWidth(85);
+		this.getColumn(CommandTableModel.SYNTAX_COLUMN).setCellRenderer(new JTableButtonRenderer());
+		this.getColumn(CommandTableModel.SYNTAX_COLUMN).setPreferredWidth(75);
+		this.getColumn(CommandTableModel.EDIT_COLUMN).setCellRenderer(new JTableButtonRenderer());
+		this.getColumn(CommandTableModel.EDIT_COLUMN).setPreferredWidth(50);
+		this.getColumn(CommandTableModel.REMOVE_COLUMN).setCellRenderer(new JTableButtonRenderer());
+		this.getColumn(CommandTableModel.REMOVE_COLUMN).setPreferredWidth(85);
 		this.addMouseListener(new JTableButtonMouseListener(this));
 	}
 	

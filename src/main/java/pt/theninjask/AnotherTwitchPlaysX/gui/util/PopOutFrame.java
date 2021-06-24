@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class PopOutFrame extends JFrame {
@@ -26,7 +27,7 @@ public class PopOutFrame extends JFrame {
 		this.parent = null;
 		this.add(comp);
 		
-		this.setTitle(Constants.TITLE);
+		this.setTitle(DataManager.getLanguage().getTitle());
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
@@ -43,7 +44,7 @@ public class PopOutFrame extends JFrame {
 		this.parent.setEnabled(false);
 		this.add(comp);
 		
-		this.setTitle(Constants.TITLE);
+		this.setTitle(DataManager.getLanguage().getTitle());
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());

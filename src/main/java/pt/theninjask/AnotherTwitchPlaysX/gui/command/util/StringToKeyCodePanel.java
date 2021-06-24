@@ -10,6 +10,7 @@ import javax.swing.JScrollPane;
 
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class StringToKeyCodePanel extends JPanel {
@@ -49,12 +50,12 @@ public class StringToKeyCodePanel extends JPanel {
 		
 		down = new JPanel(new BorderLayout());
 		
-		back = new JButton("Back");
+		back = new JButton(DataManager.getLanguage().getStringToKeyCode().getBack());
 		back.addActionListener(l->{
 			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		down.add(back, BorderLayout.CENTER);
-		reset = new JButton("Reset");
+		reset = new JButton(DataManager.getLanguage().getStringToKeyCode().getReset());
 		reset.addActionListener(l->{
 			Constants.resetStringToKeyCode();
 			ArrayList<String> tmpy = new ArrayList<String>(Constants.STRING_TO_KEYCODE.keySet());

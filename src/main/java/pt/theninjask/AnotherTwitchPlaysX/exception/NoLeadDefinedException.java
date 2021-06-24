@@ -1,5 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.exception;
 
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+
 public class NoLeadDefinedException extends RuntimeException {
 
 	/**
@@ -8,7 +10,7 @@ public class NoLeadDefinedException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	
 	public NoLeadDefinedException() {
-		super("No Lead provided");
+		super(DataManager.getLanguage().getExceptions().getNoLeadDefined());
 	}
 
 }

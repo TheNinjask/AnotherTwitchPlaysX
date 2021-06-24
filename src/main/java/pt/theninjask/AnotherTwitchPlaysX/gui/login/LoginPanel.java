@@ -65,12 +65,12 @@ public class LoginPanel extends JPanel {
 	}
 	
 	private JTextField nickLabel() {
-		JTextField tmp = new JTextField(Constants.TWITCH_FIELD);
+		JTextField tmp = new JTextField(DataManager.getLanguage().getLogin().getTwitchField());
 		tmp.setEditable(false);
 		tmp.setBorder(null);
 		tmp.setHorizontalAlignment(JTextField.RIGHT);
 		tmp.setOpaque(false);
-		tmp.setToolTipText(Constants.TWITCH_FIELD_TIP);
+		tmp.setToolTipText(DataManager.getLanguage().getLogin().getTwitchFieldTip());
 		tmp.setFocusable(false);
 		tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		return tmp;
@@ -93,13 +93,13 @@ public class LoginPanel extends JPanel {
 	}
 	
 	private JTextField channelLabel() {
-		JTextField tmp = new JTextField(Constants.CHANNEL_FIELD);
+		JTextField tmp = new JTextField(DataManager.getLanguage().getLogin().getChannelField());
 		tmp.setEditable(false);
 		tmp.setBorder(null);
 		tmp.setHorizontalAlignment(JTextField.RIGHT);
 		tmp.setOpaque(false);
 		tmp.setFocusable(false);
-		tmp.setToolTipText(Constants.CHANNEL_FIELD_TIP);
+		tmp.setToolTipText(DataManager.getLanguage().getLogin().getChannelFieldTip());
 		tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		return tmp;
 	}
@@ -118,7 +118,7 @@ public class LoginPanel extends JPanel {
 		tmp.add(insertOAuth());
 		tmp.add(openTwitchOauth());
 		
-		JCheckBox tmpCheck = new JCheckBox("Show Token");
+		JCheckBox tmpCheck = new JCheckBox(DataManager.getLanguage().getLogin().getShowToken());
 		tmpCheck.setFocusable(false);
 		tmpCheck.setOpaque(false);
 		tmpCheck.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
@@ -136,13 +136,13 @@ public class LoginPanel extends JPanel {
 	}
 	
 	private JTextField oauthLabel() {
-		JTextField tmp = new JTextField(Constants.OAUTH_FIELD);
+		JTextField tmp = new JTextField(DataManager.getLanguage().getLogin().getOAuthField());
 		tmp.setEditable(false);
 		tmp.setBorder(null);
 		tmp.setHorizontalAlignment(JTextField.RIGHT);
 		tmp.setOpaque(false);
 		tmp.setFocusable(false);
-		tmp.setToolTipText(Constants.OAUTH_FIELD_TIP);
+		tmp.setToolTipText(DataManager.getLanguage().getLogin().getOAuthFieldTip());
 		tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		return tmp;
 	}
@@ -155,7 +155,7 @@ public class LoginPanel extends JPanel {
 	}
 	
 	private JButton openTwitchOauth() {
-		openOauth = new JButton(Constants.TWITCH_CHAT_OAUTH_BUTTON);
+		openOauth = new JButton(DataManager.getLanguage().getLogin().getOAuthButton());
 		openOauth.setFocusable(false);
 		openOauth.setMargin(new Insets(2,10,2,10));
 		openOauth.addActionListener(e->{
@@ -174,29 +174,29 @@ public class LoginPanel extends JPanel {
 	}
 
 	private JButton gotoMainMenu() {
-		JButton tmp = new JButton(Constants.LOGIN_BUTTON);
+		JButton tmp = new JButton(DataManager.getLanguage().getLogin().getLoginButton());
 		tmp.setFocusable(false);
 		tmp.addActionListener(e->{
 			if(!(nickname.getText().length()>0)) {
-				JLabel msg = new JLabel("Please insert your twitch username.");
+				JLabel msg = new JLabel(DataManager.getLanguage().getLogin().getMissingUsernameMsg());
 				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-				Constants.showCustomColorMessageDialog(null, msg, "Missing Username", JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
+				Constants.showCustomColorMessageDialog(null, msg, DataManager.getLanguage().getLogin().getMissingUsernameTitle(), JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
 				return;
 			}
 			if(!(channel.getText().length()>0)) {
-				JLabel msg = new JLabel("Please insert your twitch channel name.");
+				JLabel msg = new JLabel(DataManager.getLanguage().getLogin().getMissingChannelMsg());
 				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-				Constants.showCustomColorMessageDialog(null, msg, "Missing Channel Name", JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
+				Constants.showCustomColorMessageDialog(null, msg, DataManager.getLanguage().getLogin().getMissingChannelTitle(), JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
 				return;
 			}
 			if(!(oauth.getPassword().length>0)) {
-				String[] options = {"Ok", "Go to get OAuth Token"};
-				JLabel msg = new JLabel("Please insert your OAuth Token");
+				String[] options = {DataManager.getLanguage().getOkOpt(), DataManager.getLanguage().getLogin().getMissingOAuthGet()};
+				JLabel msg = new JLabel(DataManager.getLanguage().getLogin().getMissingOAuthMsg());
 				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				switch(Constants.showCustomColorOptionDialog(
 						null,
 						msg, 
-						"Missing OAuth", 
+						DataManager.getLanguage().getLogin().getMissingOAuthTitle(), 
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE,
 						null,
@@ -216,7 +216,7 @@ public class LoginPanel extends JPanel {
 					String.format("#%s", channel.getText()),
 					new String(oauth.getPassword())
 					);
-			DataManager.getInstance().setSession(
+			DataManager.setSession(
 					session
 					);
 			TwitchPlayer.getInstance().setSession(session);
@@ -228,7 +228,7 @@ public class LoginPanel extends JPanel {
 	private JCheckBox insertRememberSession() {
 		rememberSession = new JCheckBox();
 		rememberSession.setOpaque(false);
-		rememberSession.setText("Remember Session?");
+		rememberSession.setText(DataManager.getLanguage().getLogin().getRememberSession());
 		rememberSession.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		return rememberSession;
 	}

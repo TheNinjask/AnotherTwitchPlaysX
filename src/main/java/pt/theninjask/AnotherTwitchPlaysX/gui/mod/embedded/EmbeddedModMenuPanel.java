@@ -15,6 +15,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 
@@ -36,7 +37,7 @@ public class EmbeddedModMenuPanel extends JPanel {
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new GridLayout(4, 1));
 		
-		JLabel title = new JLabel("Secret Embedded Mod Menu");
+		JLabel title = new JLabel(DataManager.getLanguage().getEmbeddedModMenu().getLabel());
 		title.setHorizontalAlignment(JLabel.CENTER);
 		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		ImageIcon icon = new ImageIcon(this.getClass()
@@ -45,7 +46,7 @@ public class EmbeddedModMenuPanel extends JPanel {
 		title.setIcon(icon);
 		this.add(title);
 		
-		JLabel warn = new JLabel("(This stuff might not work correctly)");
+		JLabel warn = new JLabel(DataManager.getLanguage().getEmbeddedModMenu().getWarning());
 		warn.setHorizontalAlignment(JLabel.CENTER);
 		warn.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		
@@ -77,14 +78,14 @@ public class EmbeddedModMenuPanel extends JPanel {
 		dummy = new JPanel();
 		dummy.setOpaque(false);
 		
-		JButton back = new JButton("Go Back");
+		JButton back = new JButton(DataManager.getLanguage().getEmbeddedModMenu().getGoBack());
 		back.addActionListener(l->{
 			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		});
 		dummy.add(back);
 		this.add(dummy);
 		
-		MainMenuPanel.getInstance().getModButton().setText("Mod");
+		MainMenuPanel.getInstance().getModButton().setText(DataManager.getLanguage().getMainMenu().getMod());
 	}
 	
 	public static EmbeddedModMenuPanel getInstance() {

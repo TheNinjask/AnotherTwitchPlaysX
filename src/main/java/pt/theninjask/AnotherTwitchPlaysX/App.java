@@ -25,6 +25,7 @@ import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
+import pt.theninjask.AnotherTwitchPlaysX.lan.en.EnglishLang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
@@ -74,7 +75,7 @@ public class App {
 				Constants.printVerboseMessage(Level.INFO, "Debug Set to True");
 			}
 			if (cmd.hasOption('s')) {
-				Constants.disableSession = true;
+				DataManager.disableSession = true;
 				Constants.printVerboseMessage(Level.INFO, "DisableSession Set to True");
 			}
 			if(cmd.hasOption('p')) {
@@ -124,16 +125,16 @@ public class App {
 	}
 
 	private static void skipLoginPanel(String nickname, String channel, String oauth) {
-		Constants.printVerboseMessage(Level.INFO, "App.skipLoginPanel()");
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.skipLoginPanel()",App.class.getSimpleName()));
 		SessionData session = new SessionData(nickname, String.format("#%s", channel), oauth);
-		DataManager.getInstance().setSession(session);
+		DataManager.setSession(session);
 		LoginPanel.getInstance().setSession(session);
 		TwitchPlayer.getInstance().setSession(session);
 		MainFrame.replacePanel(MainMenuPanel.getInstance());
 	}
 
 	private static void globalSetUp() throws Exception {
-		Constants.printVerboseMessage(Level.INFO, "App.globalSetUp()");
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.globalSetUp()",App.class.getSimpleName()));
 		PrintStream tmp = System.out;
 		try {
 			// Get the logger for "com.github.kwhat.jnativehook" and set the level to off.
@@ -154,7 +155,7 @@ public class App {
 			System.setOut(tmp);
 
 			ControlData.setTranslation(Constants.STRING_TO_KEYCODE);
-
+			DataManager.setLanguage(new EnglishLang());
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
 		} catch (Exception | Error e) {
 			System.setOut(tmp);

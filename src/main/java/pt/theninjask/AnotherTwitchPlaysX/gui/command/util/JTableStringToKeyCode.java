@@ -21,8 +21,8 @@ public class JTableStringToKeyCode extends JTable {
 		this.setEnabled(false);
 		table = new StringToKeyCodeTableModel();
 		this.setModel(table.getModel());
-		this.getColumn("Remove").setCellRenderer(new JTableButtonRenderer());
-		this.getColumn("Remove").setPreferredWidth(10);
+		this.getColumn(StringToKeyCodeTableModel.REMOVE_COLUMN).setCellRenderer(new JTableButtonRenderer());
+		this.getColumn(StringToKeyCodeTableModel.REMOVE_COLUMN).setPreferredWidth(10);
 		this.addMouseListener(new JTableButtonMouseListener(this));
 	}
 	

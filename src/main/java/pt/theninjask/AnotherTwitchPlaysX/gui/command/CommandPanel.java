@@ -138,7 +138,7 @@ public class CommandPanel extends JPanel {
 
 		JPanel leadPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		leadPanel.setOpaque(false);
-		JLabel leadLabel = new JLabel("Lead: ");
+		JLabel leadLabel = new JLabel(DataManager.getLanguage().getCommand().getLead());
 		leadLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		leadPanel.add(leadLabel);
 		lead = new JTextField("");
@@ -159,15 +159,15 @@ public class CommandPanel extends JPanel {
 		cooldownFormatter.setMinimum(0);
 		cooldownFormatter.setMaximum(3600);
 		cooldownFormatter.setAllowsInvalid(false);
-		
+
 		JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		cooldownPanel.setOpaque(false);
-		JLabel cooldownLabel = new JLabel("Cmd Cooldown (sec): ");
+		JLabel cooldownLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdCooldown());
 		cooldownLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		cooldownPanel.add(cooldownLabel);
 		cooldown = new JFormattedTextField(cooldownFormatter);
 		if (current.getCooldown() != null)
-			cooldown.setText(Long.toString(current.getCooldown().getTimer()/1000));
+			cooldown.setText(Long.toString(current.getCooldown().getTimer() / 1000));
 		cooldown.setBorder(null);
 		cooldown.setPreferredSize(new Dimension(62, 20));
 		cooldown.getDocument().addDocumentListener(new DocumentListener() {
@@ -189,7 +189,7 @@ public class CommandPanel extends JPanel {
 
 			private void update() {
 				try {
-					current.getCooldown().setTimer(Long.parseLong(cooldown.getText())*1000);
+					current.getCooldown().setTimer(Long.parseLong(cooldown.getText()) * 1000);
 				} catch (NumberFormatException e) {
 				}
 			}
@@ -204,30 +204,30 @@ public class CommandPanel extends JPanel {
 					break;
 				case KeyEvent.VK_UP:
 				case KeyEvent.VK_KP_UP:
-					if (cooldownVal == 3600*1000)
+					if (cooldownVal == 3600 * 1000)
 						break;
-					updated = cooldownVal + 1*1000;
+					updated = cooldownVal + 1 * 1000;
 					current.getCooldown().setTimer(updated);
-					cooldown.setText(Long.toString(updated/1000));
+					cooldown.setText(Long.toString(updated / 1000));
 					break;
 				case KeyEvent.VK_DOWN:
 				case KeyEvent.VK_KP_DOWN:
-					updated = cooldownVal - 1*1000;
+					updated = cooldownVal - 1 * 1000;
 					if (updated < 0)
 						break;
 					current.getCooldown().setTimer(updated);
-					cooldown.setText(Long.toString(updated/1000));
+					cooldown.setText(Long.toString(updated / 1000));
 					break;
 				}
 			}
 		});
-		
+
 		cooldownPanel.add(cooldown);
 		mainPanel.add(cooldownPanel);
 
 		JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		typePanel.setOpaque(false);
-		JLabel typeLabel = new JLabel("Type: ");
+		JLabel typeLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdType());
 		typeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		typePanel.add(typeLabel);
 		type = new JComboBox<CommandType>(CommandType.getAll());
@@ -241,7 +241,7 @@ public class CommandPanel extends JPanel {
 
 		JPanel varsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		varsPanel.setOpaque(false);
-		JLabel varsLabel = new JLabel("Vars: ");
+		JLabel varsLabel = new JLabel(DataManager.getLanguage().getCommand().getVars());
 		varsLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		varsPanel.add(varsLabel);
 
@@ -257,7 +257,7 @@ public class CommandPanel extends JPanel {
 			}
 		}
 
-		varsRemove = new JButton("Remove");
+		varsRemove = new JButton(DataManager.getLanguage().getCommand().getRemove());
 		varsRemove.setMargin(new Insets(0, 0, 0, 0));
 		varsRemove.setVisible(false);
 		varsRemove.setEnabled(false);
@@ -292,9 +292,10 @@ public class CommandPanel extends JPanel {
 			case "ADD":
 				Optional<String> var = varsBag.stream().findAny();
 				if (!var.isPresent()) {
-					JLabel msg = new JLabel("Standard (and Already In) Variables Ran Out!");
+					JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarAddWarnMsg());
 					msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-					Constants.showCustomColorMessageDialog(null, msg, "Ran Out Of Vars", JOptionPane.WARNING_MESSAGE,
+					Constants.showCustomColorMessageDialog(null, msg,
+							DataManager.getLanguage().getCommand().getVarAddWarnTitle(), JOptionPane.WARNING_MESSAGE,
 							null, Constants.TWITCH_COLOR);
 					vars.setSelectedItem(null);
 					varsRemove.setVisible(false);
@@ -302,10 +303,12 @@ public class CommandPanel extends JPanel {
 					break;
 				}
 
-				JLabel msg = new JLabel("Type of variable");
+				JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarType());
 				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-				String[] opt = { "Digit", "String" };
-				int resp = Constants.showCustomColorOptionDialog(null, msg, "Choose type", JOptionPane.YES_NO_OPTION,
+				String[] opt = { DataManager.getLanguage().getCommand().getVarDigit(),
+						DataManager.getLanguage().getCommand().getVarString() };
+				int resp = Constants.showCustomColorOptionDialog(null, msg,
+						DataManager.getLanguage().getCommand().getVarTitle(), JOptionPane.YES_NO_OPTION,
 						JOptionPane.QUESTION_MESSAGE, null, opt, null, Constants.TWITCH_COLOR);
 				CommandVarType type;
 				switch (resp) {
@@ -343,7 +346,7 @@ public class CommandPanel extends JPanel {
 
 		JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		modePanel.setOpaque(false);
-		JLabel modeLabel = new JLabel("View Mode: ");
+		JLabel modeLabel = new JLabel(DataManager.getLanguage().getCommand().getViewMode());
 		modeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		modePanel.add(modeLabel);
 		mode = new JButton("Normal");
@@ -382,14 +385,15 @@ public class CommandPanel extends JPanel {
 		back.addActionListener(l -> {
 			if (saved == null || !saved.equals(current)) {
 				JTextArea msg = new JTextArea();
-				msg.setText("This command has not saved changes!");
+				msg.setText(DataManager.getLanguage().getCommand().getNotSavedMsg());
 				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				msg.setFocusable(false);
 				msg.setOpaque(false);
-				String[] options = { "Ok", "Go Back" };
-				int resp = Constants.showCustomColorOptionDialog(null, msg, "COMMAND NOT SAVED",
-						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, null,
-						Constants.TWITCH_COLOR);
+				String[] options = { DataManager.getLanguage().getOkOpt(),
+						DataManager.getLanguage().getGoBackOpt() };
+				int resp = Constants.showCustomColorOptionDialog(null, msg,
+						DataManager.getLanguage().getCommand().getNotSavedTitle(), JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE, null, options, null, Constants.TWITCH_COLOR);
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -404,20 +408,23 @@ public class CommandPanel extends JPanel {
 		});
 		bMenu.add(back);
 
-		syntax = new JButton("Syntax");
+		syntax = new JButton(DataManager.getLanguage().getCommand().getSyntax());
 		syntax.setFocusable(false);
 		syntax.addActionListener(l -> {
 			try {
 
 				JPanel tmp = new JPanel(new GridLayout(2, 1));
 				tmp.setOpaque(false);
-				JLabel syntaxLabel = new JLabel(String.format("Syntax: %s", current.getRegex()));
+				JLabel syntaxLabel = new JLabel(
+						String.format(DataManager.getLanguage().getCommand().getSyntaxFull(), current.getRegex()));
 				syntaxLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				tmp.add(syntaxLabel);
-				JLabel egLabel = new JLabel(String.format("Example: %s", current.getRegexExample()));
+				JLabel egLabel = new JLabel(String.format(DataManager.getLanguage().getCommand().getSyntaxDemo(),
+						current.getRegexExample()));
 				egLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				tmp.add(egLabel);
-				Constants.showCustomColorMessageDialog(null, tmp, "Syntax of command", JOptionPane.PLAIN_MESSAGE, null,
+				Constants.showCustomColorMessageDialog(null, tmp,
+						DataManager.getLanguage().getCommand().getSyntaxTitle(), JOptionPane.PLAIN_MESSAGE, null,
 						Constants.TWITCH_COLOR);
 			} catch (Exception e) {
 				Constants.showExpectedExceptionDialog(e);
@@ -425,38 +432,38 @@ public class CommandPanel extends JPanel {
 		});
 		bMenu.add(syntax);
 
-		help = new JButton("Help");
+		help = new JButton(DataManager.getLanguage().getCommand().getHelp());
 		help.setEnabled(false);
 		help.setFocusable(false);
 		bMenu.add(help);
 
-		save = new JButton("Save");
+		save = new JButton(DataManager.getLanguage().getCommand().getSave());
 		save.setFocusable(false);
 		save.addActionListener(l -> {
 			if (saved != null) {
-				int index = DataManager.getInstance().getCommands().indexOf(saved);
-				DataManager.getInstance().getCommands().remove(saved);
+				int index = DataManager.getCommands().indexOf(saved);
+				DataManager.getCommands().remove(saved);
 				current.getControls().clear();
 				for (ControlDataPanel elem : controls) {
 					current.getControls().add(elem.getControlData());
 				}
 				saved = current;
-				DataManager.getInstance().getCommands().add(index, current);
+				DataManager.getCommands().add(index, current);
 			} else {
 				for (ControlDataPanel elem : controls) {
 					current.getControls().add(elem.getControlData());
 				}
 				saved = current;
-				DataManager.getInstance().getCommands().add(current);
+				DataManager.getCommands().add(current);
 			}
 		});
 		bMenu.add(save);
 
-		delete = new JButton("Delete");
+		delete = new JButton(DataManager.getLanguage().getCommand().getDelete());
 		delete.setFocusable(false);
 		delete.addActionListener(l -> {
 			if (saved != null)
-				DataManager.getInstance().getCommands().remove(saved);
+				DataManager.getCommands().remove(saved);
 			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		bMenu.add(delete);
@@ -570,16 +577,19 @@ public class CommandPanel extends JPanel {
 	private JPanel displayAdd() {
 		addPanel = new JPanel(new GridBagLayout());
 		addPanel.setOpaque(false);
-		add = new JButton("ADD");
+		add = new JButton(DataManager.getLanguage().getCommand().getAddControl());
 		add.setFocusable(false);
 		add.addActionListener(l -> {
 			JTextArea msg = new JTextArea();
-			msg.setText("Choose a type");
+			msg.setText(DataManager.getLanguage().getCommand().getAddChooseControlType());
 			msg.setOpaque(false);
 			msg.setFocusable(false);
 			msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-			String[] options = { "Keyboard", "Mouse Click", "Mouse Drag" };
-			int resp = Constants.showCustomColorOptionDialog(null, msg, "Adding New Control",
+			String[] options = { DataManager.getLanguage().getCommand().getAddKeyboard(),
+					DataManager.getLanguage().getCommand().getAddMouseClick(),
+					DataManager.getLanguage().getCommand().getAddMouseDrag() };
+			int resp = Constants.showCustomColorOptionDialog(null, msg,
+					DataManager.getLanguage().getCommand().getAddChooseControlTypeTitle(),
 					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, null,
 					Constants.TWITCH_COLOR);
 			ControlData cData = new ControlData();

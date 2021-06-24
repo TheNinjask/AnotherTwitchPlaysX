@@ -80,12 +80,12 @@ public class AllCommandPanel extends JPanel {
 		tmp.setFocusable(false);
 		tmp.setOpaque(false);
 		
-		create = new JButton("New");
+		create = new JButton(DataManager.getLanguage().getAllCommand().getCreate());
 		create.setFocusable(false);
 		create.setOpaque(false);
 		create.addActionListener(l->{
 			replacePanel(mainCommandPanel);
-			DataManager.getInstance().setCommands(new ArrayList<CommandData>());
+			DataManager.setCommands(new ArrayList<CommandData>());
 		});
 		tmp.add(create);
 		
@@ -93,7 +93,7 @@ public class AllCommandPanel extends JPanel {
 		right.setFocusable(false);
 		right.setOpaque(false);
 		
-		load = new JButton("Load");
+		load = new JButton(DataManager.getLanguage().getAllCommand().getLoad());
 		load.setFocusable(false);
 		load.setOpaque(false);
 		load.addActionListener(l->{
@@ -102,7 +102,7 @@ public class AllCommandPanel extends JPanel {
 				if(file!=null) {
 					ObjectMapper mapper = new ObjectMapper();
 					List<CommandData> commands = mapper.readValue(file, mapper.getTypeFactory().constructCollectionType(List.class, CommandData.class));
-					DataManager.getInstance().setCommands(commands);
+					DataManager.setCommands(commands);
 					refreshTable();
 					replacePanel(mainCommandPanel);
 				}
@@ -112,7 +112,7 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(load);
 		
-		back = new JButton("Back");
+		back = new JButton(DataManager.getLanguage().getAllCommand().getBack());
 		back.setFocusable(false);
 		back.setOpaque(false);
 		back.addActionListener(l->{
@@ -129,7 +129,7 @@ public class AllCommandPanel extends JPanel {
 		mainCommandPanel.setFocusable(false);
 		mainCommandPanel.setOpaque(false);
 		
-		JLabel title = new JLabel("List of commands");
+		JLabel title = new JLabel(DataManager.getLanguage().getAllCommand().getListOfCmds());
 		title.setHorizontalAlignment(JLabel.CENTER);
 		title.setFont(new Font(title.getFont().getName(), title.getFont().getStyle(), 25));
 		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
@@ -159,25 +159,25 @@ public class AllCommandPanel extends JPanel {
 		
 		right.setOpaque(false);
 		
-		insert = new JButton("Insert");
+		insert = new JButton(DataManager.getLanguage().getAllCommand().getInsert());
 		insert.setFocusable(false);
 		insert.addActionListener(l->{
 			//table.addRow(new CommandData());
 			MainFrame.replacePanel(new CommandPanel());
 		});
 		right.add(insert);
-		keycodes = new JButton("Codes");
+		keycodes = new JButton(DataManager.getLanguage().getAllCommand().getCodes());
 		keycodes.setFocusable(false);
 		keycodes.addActionListener(l->{
 			MainFrame.replacePanel(StringToKeyCodePanel.getInstance());
 		});
 		right.add(keycodes);
-		help = new JButton("Help");
+		help = new JButton(DataManager.getLanguage().getAllCommand().getHelp());
 		help.setEnabled(false);
 		help.setFocusable(false);
 		right.add(help);
 		
-		popout = new JButton("Pop Out");
+		popout = new JButton(DataManager.getLanguage().getAllCommand().getPopOut());
 		popout.setFocusable(false);
 		popout.addActionListener(l->{
 			new PopOutFrame(left, MainFrame.getInstance()).addWindowListener(new WindowAdapter() {
@@ -191,22 +191,22 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(popout);
 		
-		save = new JButton("Save");
+		save = new JButton(DataManager.getLanguage().getAllCommand().getSave());
 		save.setFocusable(false);
 		save.addActionListener(l->{
 			File file = Constants.showSaveFile(new File("commands.json"),new FileNameExtensionFilter("JSON", "json"), this);
 			if(file!=null){
 				try {
 					ObjectMapper objectMapper = new ObjectMapper();
-					JTextField tmp = new JTextField(String.format("Commands saved in %s", file.getAbsolutePath()));
+					JTextField tmp = new JTextField(String.format(DataManager.getLanguage().getAllCommand().getSaveMsg(), file.getAbsolutePath()));
 					tmp.setEditable(false);
 					tmp.setBorder(null);
 					tmp.setOpaque(false);
 					tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-					objectMapper.writeValue(file, DataManager.getInstance().getCommands());
+					objectMapper.writeValue(file, DataManager.getCommands());
 					Constants.showCustomColorMessageDialog(null, 
 							tmp, 
-							"Saving Commands", JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);			
+							DataManager.getLanguage().getAllCommand().getSaveTitle(), JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);			
 				} catch (IOException e) {
 					Constants.showExceptionDialog(e);
 				}
@@ -214,7 +214,7 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(save);
 		
-		load = new JButton("Load");
+		load = new JButton(DataManager.getLanguage().getAllCommand().getLoad());
 		load.setFocusable(false);
 		load.addActionListener(l->{
 			try {
@@ -222,7 +222,7 @@ public class AllCommandPanel extends JPanel {
 			if(file!=null) {
 				ObjectMapper mapper = new ObjectMapper();
 				List<CommandData> tmp = mapper.readValue(file, mapper.getTypeFactory().constructCollectionType(List.class, CommandData.class));
-				DataManager.getInstance().setCommands(tmp);
+				DataManager.setCommands(tmp);
 				refreshTable();
 			}
 		} catch (IOException e) {
@@ -231,7 +231,7 @@ public class AllCommandPanel extends JPanel {
 		});
 		right.add(load);
 		
-		back = new JButton("Back");
+		back = new JButton(DataManager.getLanguage().getAllCommand().getBack());
 		back.setFocusable(false);
 		back.addActionListener(l->{
 			MainFrame.replacePanel(MainMenuPanel.getInstance());
@@ -255,7 +255,7 @@ public class AllCommandPanel extends JPanel {
 	
 	private void refreshTable() {
 		if(table!=null)
-			this.table.clearAndSet(DataManager.getInstance().getCommands());
+			this.table.clearAndSet(DataManager.getCommands());
 	}
 	
 	public JPanel getCurrentPanel() {

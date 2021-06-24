@@ -146,7 +146,7 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private JButton connectButton() {
-		connectButton = new JButton("Connect");
+		connectButton = new JButton(DataManager.getLanguage().getMainMenu().getConnect());
 		connectButton.setFocusable(false);
 		connectButton.addActionListener(l -> {
 			if (TwitchPlayer.getInstance().isConnected()) {
@@ -154,17 +154,17 @@ public class MainMenuPanel extends JPanel {
 				sponsor.setSelected(false);
 				SponsorBot.getInstance().stop();
 				TwitchPlayer.getInstance().disconnect();
-				connectButton.setText("Connect");
+				connectButton.setText(DataManager.getLanguage().getMainMenu().getConnect());
 				twitchChatButton.setEnabled(false);
-				twitchChatButton.setText("Show Twitch Chat");
+				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
 				gameButton.setEnabled(false);
-				gameButton.setText("Start");
+				gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
 				changeSessionButton.setEnabled(true);
 				TwitchChatFrame.getInstance().setVisible(false);
 				TwitchChatFrame.getInstance().clearChat();
 			} else {
 				TwitchPlayer.getInstance().setupAndConnect();
-				connectButton.setText("Disconnect");
+				connectButton.setText(DataManager.getLanguage().getMainMenu().getDisconnect());
 				twitchChatButton.setEnabled(true);
 				if (shouldGameButtonBeEnabled())
 					gameButton.setEnabled(true);
@@ -177,13 +177,13 @@ public class MainMenuPanel extends JPanel {
 
 	private JPanel commandsButton() {
 		JPanel tmp = new JPanel(new BorderLayout());
-		commandsButton = new JButton("Set Commands");
+		commandsButton = new JButton(DataManager.getLanguage().getMainMenu().getSetCommands());
 		commandsButton.setFocusable(false);
 		commandsButton.addActionListener(l -> {
 			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		tmp.add(commandsButton, BorderLayout.CENTER);
-		modButton = new JButton("Mod");
+		modButton = new JButton(DataManager.getLanguage().getMainMenu().getMod());
 		modButton.setFocusable(false);
 		//modButton.setEnabled(false);
 		modButton.addActionListener(l -> {
@@ -221,7 +221,7 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private boolean shouldGameButtonBeEnabled() {
-		if (DataManager.getInstance().getCommands().isEmpty())
+		if (DataManager.getCommands().isEmpty())
 			return false;
 		if (TwitchPlayer.getInstance().isConnected())
 			return true;
@@ -229,17 +229,17 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private JButton gameButton() {
-		gameButton = new JButton("Start");
+		gameButton = new JButton(DataManager.getLanguage().getMainMenu().getStart());
 		gameButton.setFocusable(false);
 		gameButton.setEnabled(false);
 		gameButton.addActionListener(l -> {
 			if (isAppStarted.get()) {
 				try {
 					GlobalScreen.unregisterNativeHook();
-					for (CommandData elem : DataManager.getInstance().getCommands()) {
+					for (CommandData elem : DataManager.getCommands()) {
 						TwitchPlayer.getInstance().unregisterEventListener(elem);
 					}
-					gameButton.setText("Start");
+					gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
 					commandsButton.setEnabled(true);
 					connectButton.setEnabled(true);
 					isAppStarted.set(false);
@@ -251,10 +251,10 @@ public class MainMenuPanel extends JPanel {
 				}
 			} else {
 				try {
-					gameButton.setText("Stop");
+					gameButton.setText(DataManager.getLanguage().getMainMenu().getStop());
 					commandsButton.setEnabled(false);
 					connectButton.setEnabled(false);
-					for (CommandData elem : DataManager.getInstance().getCommands()) {
+					for (CommandData elem : DataManager.getCommands()) {
 						TwitchPlayer.getInstance().registerEventListener(elem);
 					}
 					GlobalScreen.registerNativeHook();
@@ -275,10 +275,10 @@ public class MainMenuPanel extends JPanel {
 							if (e.getKeyCode() == Constants.stopKey) {
 								try {
 									GlobalScreen.unregisterNativeHook();
-									for (CommandData elem : DataManager.getInstance().getCommands()) {
+									for (CommandData elem : DataManager.getCommands()) {
 										TwitchPlayer.getInstance().unregisterEventListener(elem);
 									}
-									gameButton.setText("Start");
+									gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
 									commandsButton.setEnabled(true);
 									connectButton.setEnabled(true);
 									MainFrame.getInstance().setState(JFrame.NORMAL);
@@ -304,7 +304,7 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private JButton changeSessionButton() {
-		changeSessionButton = new JButton("Change Session");
+		changeSessionButton = new JButton(DataManager.getLanguage().getMainMenu().getChangeSession());
 		changeSessionButton.setFocusable(false);
 		changeSessionButton.addActionListener(l -> {
 			MainFrame.replacePanel(LoginPanel.getInstance());
@@ -313,25 +313,25 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private JButton twitchChatButton() {
-		twitchChatButton = new JButton("Show Twitch Chat");
+		twitchChatButton = new JButton(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
 		twitchChatButton.setFocusable(false);
 		twitchChatButton.setEnabled(false);
 		twitchChatButton.addActionListener(l -> {
 			if (TwitchChatFrame.getInstance().isVisible()) {
 				TwitchChatFrame.getInstance().setVisible(false);
-				twitchChatButton.setText("Show Twitch Chat");
+				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
 				TwitchChatFrame.getInstance().clearChat();
 				TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
 			} else {
 				TwitchChatFrame.getInstance().setVisible(true);
-				twitchChatButton.setText("Hide Twitch Chat");
+				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getHideTwitchChat());
 				TwitchPlayer.getInstance().registerEventListener(TwitchChatFrame.getInstance());
 			}
 		});
 		TwitchChatFrame.getInstance().addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
-				twitchChatButton.setText("Show Twitch Chat");
+				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
 				TwitchChatFrame.getInstance().clearChat();
 				TwitchPlayer.getInstance().unregisterEventListener(TwitchChatFrame.getInstance());
 			}
@@ -351,13 +351,13 @@ public class MainMenuPanel extends JPanel {
 
 	private JLabel twitchChatSliderLabel() {
 		JLabel label = new JLabel();
-		label.setText(String.format(Constants.CURRENT_CHAT_SIZE, twitchChatSize.getValue()));
+		label.setText(String.format(DataManager.getLanguage().getMainMenu().getCurrentChatSize(), twitchChatSize.getValue()));
 		label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		label.setFocusable(false);
 		twitchChatSize.addChangeListener(e -> {
 			int value = twitchChatSize.getValue();
-			label.setText(String.format(Constants.CURRENT_CHAT_SIZE,
-					value < TwitchChatFrame.MSG_DISPLAY_INFINITE ? value : "Infinite"));
+			label.setText(String.format(DataManager.getLanguage().getMainMenu().getCurrentChatSize(),
+					value < TwitchChatFrame.MSG_DISPLAY_INFINITE ? value : DataManager.getLanguage().getMainMenu().getInfinite()));
 			TwitchChatFrame.getInstance().setMessageCap(value);
 			TwitchChatFrame.getInstance().updateChatSize();
 		});
@@ -370,7 +370,7 @@ public class MainMenuPanel extends JPanel {
 		tmp.setOpaque(false);
 		tmp.setFocusable(false);
 		JLabel label = new JLabel();
-		label.setText("Twitch Chat Options");
+		label.setText(DataManager.getLanguage().getMainMenu().getTwitchChatOptions());
 		label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setFocusable(false);
@@ -398,9 +398,9 @@ public class MainMenuPanel extends JPanel {
 		twitchChatColorModePanel = new JPanel(new FlowLayout());
 		twitchChatColorModePanel.setOpaque(false);
 		ButtonGroup group = new ButtonGroup();
-		JRadioButton light = new JRadioButton("Light Mode");
-		JRadioButton night = new JRadioButton("Night Mode");
-		JRadioButton twitch = new JRadioButton("Twitch Mode");
+		JRadioButton light = new JRadioButton(DataManager.getLanguage().getMainMenu().getLightMode());
+		JRadioButton night = new JRadioButton(DataManager.getLanguage().getMainMenu().getNightMode());
+		JRadioButton twitch = new JRadioButton(DataManager.getLanguage().getMainMenu().getTwitchMode());
 		light.setOpaque(false);
 		light.setFocusable(false);
 		light.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
@@ -433,9 +433,9 @@ public class MainMenuPanel extends JPanel {
 		twitchChatTransparencyModePanel = new JPanel(new FlowLayout());
 		twitchChatTransparencyModePanel.setOpaque(false);
 		ButtonGroup group = new ButtonGroup();
-		JRadioButton transp = new JRadioButton("Transparent");
-		JRadioButton semisolid = new JRadioButton("Semi-Solid");
-		JRadioButton solid = new JRadioButton("Solid");
+		JRadioButton transp = new JRadioButton(DataManager.getLanguage().getMainMenu().getTransparent());
+		JRadioButton semisolid = new JRadioButton(DataManager.getLanguage().getMainMenu().getSemiSolid());
+		JRadioButton solid = new JRadioButton(DataManager.getLanguage().getMainMenu().getSolid());
 		transp.setOpaque(false);
 		transp.setFocusable(false);
 		transp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
@@ -467,19 +467,19 @@ public class MainMenuPanel extends JPanel {
 	private JCheckBox setTwitchChatOnTop() {
 		twitchChatOnTop = new JCheckBox();
 
-		twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
+		twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsTwitchChatOnTop());
 		twitchChatOnTop.setHorizontalTextPosition(JCheckBox.LEFT);
 		twitchChatOnTop.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		twitchChatOnTop.setHorizontalAlignment(JCheckBox.CENTER);
 		twitchChatOnTop.setOpaque(false);
 		twitchChatOnTop.setFocusable(false);
-		twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
+		twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsTwitchChatOnTop());
 		twitchChatOnTop.addActionListener(l -> {
 			if (twitchChatOnTop.isSelected()) {
 				TwitchChatFrame.getInstance().setAlwaysOnTop(true);
 				TwitchChatFrame.getInstance().disableDragAndResize();
 			} else {
-				twitchChatOnTop.setText(Constants.IS_TWITCH_CHAT_ON_TOP);
+				twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsTwitchChatOnTop());
 				TwitchChatFrame.getInstance().setAlwaysOnTop(false);
 				TwitchChatFrame.getInstance().enableDragAndResize();
 				MainFrame.getInstance().toFront();
@@ -493,7 +493,7 @@ public class MainMenuPanel extends JPanel {
 	private JCheckBox setTwitchChatInput() {
 		twitchChatInput = new JCheckBox();
 
-		twitchChatInput.setText("Show Input TextBox in Chat?");
+		twitchChatInput.setText(DataManager.getLanguage().getMainMenu().getShowInputTextBoxInChat());
 		twitchChatInput.setHorizontalTextPosition(JCheckBox.LEFT);
 		twitchChatInput.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		twitchChatInput.setHorizontalAlignment(JCheckBox.CENTER);
@@ -562,7 +562,7 @@ public class MainMenuPanel extends JPanel {
 		twitchChatFontPanel = new JPanel(new FlowLayout());
 		twitchChatFontPanel.setFocusable(false);
 		twitchChatFontPanel.setOpaque(false);
-		JLabel tmp = new JLabel("Font:");
+		JLabel tmp = new JLabel(DataManager.getLanguage().getMainMenu().getFont());
 		tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		twitchChatFontPanel.add(tmp);
 		twitchChatFont = new JComboBox<String>(
@@ -579,16 +579,17 @@ public class MainMenuPanel extends JPanel {
 		twitchChatFontSizePanel = new JPanel(new BorderLayout());
 		twitchChatFontSizePanel.setFocusable(false);
 		twitchChatFontSizePanel.setOpaque(false);
-		JLabel tmp = new JLabel("Font Size: (12)");
+		twitchChatFontSize = new JSlider(5, 50, 12);
+		
+		JLabel tmp = new JLabel(String.format(DataManager.getLanguage().getMainMenu().getFontSize(), twitchChatFontSize.getValue()));
 		tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		twitchChatFontSizePanel.add(tmp, BorderLayout.WEST);
-		twitchChatFontSize = new JSlider(5, 50, 12);
-
+		
 		twitchChatFontSize.setMajorTickSpacing(45);
 		twitchChatFontSize.setOpaque(false);
 		twitchChatFontSize.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		twitchChatFontSize.addChangeListener(l -> {
-			tmp.setText(String.format("Font Size: (%s)", twitchChatFontSize.getValue()));
+			tmp.setText(String.format(DataManager.getLanguage().getMainMenu().getFontSize(), twitchChatFontSize.getValue()));
 			TwitchChatFrame.getInstance().setFontSize(twitchChatFontSize.getValue());
 		});
 
@@ -598,7 +599,7 @@ public class MainMenuPanel extends JPanel {
 
 	private JCheckBox sponsorMeInChat() {
 		sponsor = new JCheckBox();
-		sponsor.setText("Sponsor Me(Creator) in chat?");
+		sponsor.setText(DataManager.getLanguage().getMainMenu().getSponsorCreator());
 		sponsor.setHorizontalTextPosition(JCheckBox.LEFT);
 		sponsor.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		sponsor.setHorizontalAlignment(JCheckBox.CENTER);
@@ -607,14 +608,14 @@ public class MainMenuPanel extends JPanel {
 		sponsor.setEnabled(false);
 		sponsor.addActionListener(l -> {
 			if (sponsor.isSelected()) {
-				String[] options = { "Got it", "Nevermind" };
+				String[] options = { DataManager.getLanguage().getMainMenu().getGotIt(), DataManager.getLanguage().getMainMenu().getNevermind() };
 				JTextArea label = new JTextArea();
 				label.setText(
-						"Before going any further, I wanna leave it clear that this app will use the account of the OAuth provided to send messages for me in chat.\nSo don't worry that the account is not being hacked.\nJust wanted to state to not provoke any worry or/and confusion.\nIf you want to do it but are scared of this, you can use a burner account the app will still work.");
+						DataManager.getLanguage().getMainMenu().getSponsorMsgFirst());
 				label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				label.setFocusable(false);
 				label.setOpaque(false);
-				int resp = Constants.showCustomColorOptionDialog(null, label, "Thank you for wanting to sponsor me!",
+				int resp = Constants.showCustomColorOptionDialog(null, label, DataManager.getLanguage().getMainMenu().getSponsorTitle(),
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, null,
 						Constants.TWITCH_COLOR);
 				switch (resp) {
@@ -626,9 +627,9 @@ public class MainMenuPanel extends JPanel {
 					sponsor.setSelected(false);
 					return;
 				}
-				String[] options2 = { "Yes and not check message", "Yes and check message", "Nevermind" };
+				String[] options2 = { DataManager.getLanguage().getMainMenu().getYesNoCheck(), DataManager.getLanguage().getMainMenu().getYesCheck(), DataManager.getLanguage().getMainMenu().getNevermind() };
 				resp = Constants.showCustomColorOptionDialog(null, sponsorPanel(),
-						"Thank you for wanting to sponsor me!", JOptionPane.YES_NO_CANCEL_OPTION,
+						DataManager.getLanguage().getMainMenu().getSponsorTitle(), JOptionPane.YES_NO_CANCEL_OPTION,
 						JOptionPane.PLAIN_MESSAGE, null, options2, null, Constants.TWITCH_COLOR);
 				switch (resp) {
 				case JOptionPane.YES_OPTION:
@@ -644,11 +645,11 @@ public class MainMenuPanel extends JPanel {
 					sponsor.setSelected(false);
 					return;
 				}
-				label.setText(String.format("The message will be:\n%s", SponsorBot.getSponsorMsg()));
+				label.setText(String.format(DataManager.getLanguage().getMainMenu().getSponsorMsgDemo(), SponsorBot.getSponsorMsg()));
 				label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				label.setFocusable(false);
 				label.setOpaque(false);
-				resp = Constants.showCustomColorOptionDialog(null, label, "Thank you for wanting to sponsor me!",
+				resp = Constants.showCustomColorOptionDialog(null, label, DataManager.getLanguage().getMainMenu().getSponsorTitle(),
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, null,
 						Constants.TWITCH_COLOR);
 				switch (resp) {
@@ -681,12 +682,12 @@ public class MainMenuPanel extends JPanel {
 		sponsorSlider.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 
 		JLabel label = new JLabel();
-		label.setText(String.format("Sponsor me every %s min.", sponsorSlider.getValue()));
+		label.setText(String.format(DataManager.getLanguage().getMainMenu().getSponsorMsgTime(), sponsorSlider.getValue()));
 		label.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		label.setFocusable(false);
 		sponsorSlider.addChangeListener(e -> {
 			int value = sponsorSlider.getValue();
-			label.setText(String.format("Sponsor me every %s min.", value));
+			label.setText(String.format(DataManager.getLanguage().getMainMenu().getSponsorMsgTime(), value));
 			// TwitchChatFrame.getInstance().setMessageCap(value);
 			// TwitchChatFrame.getInstance().updateChatSize();
 		});

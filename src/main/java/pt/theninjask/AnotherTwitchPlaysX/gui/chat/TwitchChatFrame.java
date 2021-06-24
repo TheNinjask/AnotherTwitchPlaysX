@@ -145,7 +145,7 @@ public class TwitchChatFrame extends JFrame {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.getInstance()", TwitchChatFrame.class.getSimpleName()));
 		singleton.setTitle(
-				String.format("%s's Twitch Chat", DataManager.getInstance().getSession().getChannel().substring(1)));
+				String.format(DataManager.getLanguage().getTwitchChat().getTitle(), DataManager.getSession().getChannel().substring(1)));
 		return singleton;
 	}
 
@@ -210,7 +210,7 @@ public class TwitchChatFrame extends JFrame {
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					onMessage(new ChannelMessageEventMock(DataManager.getInstance().getSession().getNickname(),
+					onMessage(new ChannelMessageEventMock(DataManager.getSession().getNickname(),
 							input.getText()));
 					TwitchPlayer.getInstance().sendMessage(input.getText());
 					input.setText("");
@@ -218,10 +218,10 @@ public class TwitchChatFrame extends JFrame {
 			}
 		});
 		messagePanel.add(input, BorderLayout.CENTER);
-		JButton send = new JButton("Send");
+		JButton send = new JButton(DataManager.getLanguage().getTwitchChat().getSend());
 		send.addActionListener(l -> {
 			onMessage(
-					new ChannelMessageEventMock(DataManager.getInstance().getSession().getNickname(), input.getText()));
+					new ChannelMessageEventMock(DataManager.getSession().getNickname(), input.getText()));
 			TwitchPlayer.getInstance().sendMessage(input.getText());
 			input.setText("");
 		});

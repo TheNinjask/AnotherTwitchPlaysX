@@ -1,5 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.exception;
 
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+
 public class AlreadyConnectedException extends RuntimeException {
 
 	/**
@@ -8,7 +10,7 @@ public class AlreadyConnectedException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	
 	public AlreadyConnectedException() {
-		super("TwitchPlayer is already connected");
+		super(DataManager.getLanguage().getExceptions().getAlreadyConnected());
 	}
 
 }

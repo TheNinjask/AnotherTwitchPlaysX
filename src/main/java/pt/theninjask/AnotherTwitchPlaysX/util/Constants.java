@@ -40,6 +40,7 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.exception.ModNotLoadedException;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 
 public final class Constants {
@@ -52,35 +53,14 @@ public final class Constants {
 
 	public static final ImageIcon ICON = new ImageIcon(Constants.ICON_PATH);
 
-	public static final String TITLE = "Another TwitchPlaysX";
-
 	public static final String TWITCH_CHAT_OAUTH = "https://twitchapps.com/tmi/";
 
-	public static final String TWITCH_CHAT_OAUTH_BUTTON = "Get OAuth";
+	// TODO check
+	// public static final String DEFAULT_ERROR_TITLE = "An error has occurred!";
 
-	public static final String DEFAULT_ERROR_TITLE = "An error has occurred!";
-
-	public static final String BROWSER_NOT_SUPPORTED = "Browsing is not supported!";
-
-	public static final String LOGIN_BUTTON = "Let's Start!";
-
-	public static final String TWITCH_FIELD = "Name: ";
-
-	public static final String CHANNEL_FIELD = "Channel: ";
-
-	public static final String OAUTH_FIELD = "OAuth: ";
-
-	public static final String TWITCH_FIELD_TIP = "Twitch Username";
-
-	public static final String CHANNEL_FIELD_TIP = "Twitch Channel Name";
-
-	public static final String OAUTH_FIELD_TIP = "Token for authentication";
-
-	public static final String SAVING_SESSION_MSG = "Session saved in %s!";
-
-	public static final String CURRENT_CHAT_SIZE = "Current Twitch Chat size: %s messages";
-
-	public static final String IS_TWITCH_CHAT_ON_TOP = "Set Twitch Chat Always On Top & Locked?";
+	// TODO check
+	// public static final String BROWSER_NOT_SUPPORTED = "Browsing is not
+	// supported!";
 
 	public static final int TITLE_SCREEN_ICON_WIDTH = 25;
 
@@ -97,9 +77,14 @@ public final class Constants {
 	@Deprecated
 	public static final Color BLUE_COLOR = new Color(0x123456);
 
-	public static final String MOD_WARN = "You are loading a mod that was not made by the creator of this app nor verified by them!\nProceed at your own risk.";
+	// TODO check
+	// public static final String MOD_WARN = "You are loading a mod that was not
+	// made by the creator of this app nor verified by them!\nProceed at your own
+	// risk.";
 
-	public static final String MOD_INFO = "You are loading a third party mod that was validated by the creator of this app!";
+	// TODO check
+	// public static final String MOD_INFO = "You are loading a third party mod that
+	// was validated by the creator of this app!";
 
 	public static int stopKey = NativeKeyEvent.VC_ESCAPE;
 
@@ -107,43 +92,43 @@ public final class Constants {
 
 	public static boolean debug = false;
 
-	public static boolean disableSession = false;
+	// public static boolean disableSession = false;
 
 	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
-		//private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
+		// private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
 		private static final String format = "[%1$s] %2$s %n";
+
 		@Override
 		public synchronized String format(LogRecord lr) {
-			return String.format(format, lr.getLevel().getLocalizedName(),
-					lr.getMessage());
+			return String.format(format, lr.getLevel().getLocalizedName(), lr.getMessage());
 		}
 	};
-	
+
 	private static final Logger LOGGER = setUpLogger();
-	
+
 	private static final Logger setUpLogger() {
 
 		class DualConsoleHandler extends StreamHandler {
 
-		    private final ConsoleHandler stderrHandler = new ConsoleHandler();
+			private final ConsoleHandler stderrHandler = new ConsoleHandler();
 
-		    public DualConsoleHandler(Formatter format) {
-		        super(System.out, format);
-		        stderrHandler.setFormatter(format);
-		    }
+			public DualConsoleHandler(Formatter format) {
+				super(System.out, format);
+				stderrHandler.setFormatter(format);
+			}
 
-		    @Override
-		    public void publish(LogRecord record) {
-		        if (record.getLevel().intValue() <= Level.INFO.intValue()) {
-		            super.publish(record);
-		            super.flush();
-		        } else {
-		            stderrHandler.publish(record);
-		            stderrHandler.flush();
-		        }
-		    }
+			@Override
+			public void publish(LogRecord record) {
+				if (record.getLevel().intValue() <= Level.INFO.intValue()) {
+					super.publish(record);
+					super.flush();
+				} else {
+					stderrHandler.publish(record);
+					stderrHandler.flush();
+				}
+			}
 		}
-		
+
 		Logger logger = Logger.getGlobal();
 		logger.setUseParentHandlers(false);
 		StreamHandler handler = new DualConsoleHandler(LOGGER_FORMATTER);
@@ -155,7 +140,7 @@ public final class Constants {
 	public static void setLoggerLevel(Level level) {
 		LOGGER.setLevel(level);
 	}
-	
+
 	public static void printVerboseMessage(Level level, Throwable message) {
 		LOGGER.log(level, message.getClass().getSimpleName());
 		if (debug)
@@ -225,19 +210,21 @@ public final class Constants {
 			case MAIN:
 				break;
 			case THIRD_PARTY:
-				JTextArea msg = new JTextArea(MOD_INFO);
+				JTextArea msg = new JTextArea(DataManager.getLanguage().getConstants().getModInfo());
 				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
 				msg.setOpaque(false);
-				showCustomColorMessageDialog(null, msg, "Mod Info", JOptionPane.INFORMATION_MESSAGE, null,
-						TWITCH_COLOR);
+				showCustomColorMessageDialog(null, msg,
+						DataManager.getLanguage().getConstants().getModInfoTitle(),
+						JOptionPane.INFORMATION_MESSAGE, null, TWITCH_COLOR);
 				break;
 			case UNKNOWN:
 			default:
-				msg = new JTextArea(MOD_WARN);
+				msg = new JTextArea(DataManager.getLanguage().getConstants().getModWarn());
 				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
 				msg.setOpaque(false);
-				int resp = showCustomColorOptionDialog(null, msg, "Mod Warning", JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, null, null, TWITCH_COLOR);
+				int resp = showCustomColorOptionDialog(null, msg,
+						DataManager.getLanguage().getConstants().getModWarnTitle(),
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null, TWITCH_COLOR);
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -419,7 +406,9 @@ public final class Constants {
 				showExceptionDialog(e1);
 			}
 		} else {
-			JOptionPane.showMessageDialog(null, Constants.BROWSER_NOT_SUPPORTED, Constants.DEFAULT_ERROR_TITLE,
+			JOptionPane.showMessageDialog(null,
+					DataManager.getLanguage().getConstants().getBrowserNotSupported(),
+					DataManager.getLanguage().getConstants().getDefaultErrorTitle(),
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

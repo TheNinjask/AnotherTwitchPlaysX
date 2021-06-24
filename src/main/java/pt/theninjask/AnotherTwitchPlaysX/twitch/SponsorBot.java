@@ -33,7 +33,7 @@ public class SponsorBot implements Runnable{
 	
 	public static String getSponsorMsg() {
 		return String.format(SPONSOR_MSG, 
-				DataManager.getInstance().getSession().getNickname(),
+				DataManager.getSession().getNickname(),
 				"https://github.com/TheNinjask/AnotherTwitchPlaysX");
 	}
 	

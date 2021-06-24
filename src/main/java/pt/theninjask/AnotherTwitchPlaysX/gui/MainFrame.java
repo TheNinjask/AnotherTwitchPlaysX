@@ -37,7 +37,7 @@ public class MainFrame extends JFrame {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainFrame.class.getSimpleName()));
 		this.onStart();
 		this.getContentPane().setBackground(Constants.TWITCH_COLOR);
-		this.setTitle(Constants.TITLE);
+		this.setTitle(DataManager.getLanguage().getTitle());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
@@ -65,13 +65,13 @@ public class MainFrame extends JFrame {
 			try {
 				ObjectMapper objectMapper = new ObjectMapper();
 				File file = new File("session.json");
-				JTextField tmp = new JTextField(String.format(Constants.SAVING_SESSION_MSG, file.getAbsolutePath()));
+				JTextField tmp = new JTextField(String.format(DataManager.getLanguage().getSavingSession(), file.getAbsolutePath()));
 				tmp.setEditable(false);
 				tmp.setBorder(null);
 				tmp.setOpaque(false);
-				tmp.setToolTipText(Constants.CHANNEL_FIELD_TIP);
+				//tmp.setToolTipText(Constants.CHANNEL_FIELD_TIP);
 				tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-				objectMapper.writeValue(file, DataManager.getInstance().getSession());
+				objectMapper.writeValue(file, DataManager.getSession());
 				Constants.showCustomColorMessageDialog(null, 
 						tmp, 
 						"Saving Session", JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);			
@@ -93,7 +93,7 @@ public class MainFrame extends JFrame {
 			try {
 				ObjectMapper objectMapper = new ObjectMapper();
 				SessionData session = objectMapper.readValue(sessionFile, SessionData.class);
-				DataManager.getInstance().setSession(session);
+				DataManager.setSession(session);
 				LoginPanel.getInstance().setSession(session);
 			} catch (IOException e) {
 				Constants.showExceptionDialog(e);

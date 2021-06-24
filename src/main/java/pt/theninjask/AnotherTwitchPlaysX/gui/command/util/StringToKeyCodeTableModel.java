@@ -6,20 +6,25 @@ import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class StringToKeyCodeTableModel {
 
 	private DefaultTableModel table;
 
+	public static final String KEYCODE_COLUMN = "KeyCode";
+	
+	public static final String REMOVE_COLUMN = "Remove";
+	
 	public StringToKeyCodeTableModel() {
 		table = new DefaultTableModel();
-		table.addColumn("KeyCode");
-		table.addColumn("Remove");
+		table.addColumn(KEYCODE_COLUMN);
+		table.addColumn(REMOVE_COLUMN);
 	}
 
 	public void addRow(String keyText) {
-		JButton remove = new JButton("Remove");
+		JButton remove = new JButton(DataManager.getLanguage().getStringToKeyCode().getRemove());
 		remove.setMargin(new Insets(0, 0, 0, 0));
 		remove.addActionListener(l -> {
 			Constants.STRING_TO_KEYCODE.remove(keyText);
