@@ -351,7 +351,7 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 			NumberFormatter durationFormatter = new NumberFormatter(format);
 			durationFormatter.setValueClass(Integer.class);
 			durationFormatter.setMinimum(0);
-			durationFormatter.setMaximum(60);
+			durationFormatter.setMaximum(60 * 1000);
 			durationFormatter.setAllowsInvalid(false);
 			JPanel durationPanel = new JPanel(new BorderLayout());
 			durationPanel.setOpaque(false);
@@ -364,7 +364,7 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 			normal.add(duration);
 			duration.setBorder(null);
 			if (data.getDuration() != null)
-				duration.setText(Integer.toString(data.getDuration() / 1000));
+				duration.setText(Integer.toString(data.getDuration()));
 			duration.getDocument().addDocumentListener(new DocumentListener() {
 
 				@Override
@@ -384,7 +384,7 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 
 				private void update() {
 					try {
-						data.setDuration(Integer.parseInt(duration.getText()) * 1000);
+						data.setDuration(Integer.parseInt(duration.getText()));
 					} catch (NumberFormatException e) {
 					}
 				}
@@ -407,20 +407,20 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 							break;
 						if (durationVal == 60 * 1000)
 							break;
-						updated = durationVal + 1 * 1000;
+						updated = durationVal + 1;
 						data.setDuration(updated);
-						duration.setText(Integer.toString(updated / 1000));
+						duration.setText(Integer.toString(updated));
 						break;
 					case KeyEvent.VK_DOWN:
 					case KeyEvent.VK_KP_DOWN:
 						durationVal = data.getDuration();
 						if (durationVal == null)
 							break;
-						updated = durationVal - 1 * 1000;
+						updated = durationVal - 1;
 						if (updated < 0)
 							break;
 						data.setDuration(updated);
-						duration.setText(Integer.toString(updated / 1000));
+						duration.setText(Integer.toString(updated));
 						break;
 					}
 				}
@@ -448,13 +448,13 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 		NumberFormatter aftermathFormatter = new NumberFormatter(format);
 		aftermathFormatter.setValueClass(Integer.class);
 		aftermathFormatter.setMinimum(0);
-		aftermathFormatter.setMaximum(60);
+		aftermathFormatter.setMaximum(60 * 1000);
 		aftermathFormatter.setAllowsInvalid(false);
 		aftermath = new JFormattedTextField(aftermathFormatter);
 		normal.add(aftermath);
 		aftermath.setBorder(null);
 		if (data.getAftermathDelay() != null)
-			aftermath.setText(Integer.toString(data.getAftermathDelay() / 1000));
+			aftermath.setText(Integer.toString(data.getAftermathDelay()));
 		aftermath.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
@@ -474,7 +474,7 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 
 			private void update() {
 				try {
-					data.setAftermathDelay(Integer.parseInt(aftermath.getText()) * 1000);
+					data.setAftermathDelay(Integer.parseInt(aftermath.getText()));
 				} catch (NumberFormatException e) {
 				}
 			}
@@ -494,20 +494,20 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 						break;
 					if (aftermathVal == 60 * 1000)
 						break;
-					updated = aftermathVal + 1 * 1000;
+					updated = aftermathVal + 1;
 					data.setAftermathDelay(updated);
-					aftermath.setText(Integer.toString(updated / 1000));
+					aftermath.setText(Integer.toString(updated));
 					break;
 				case KeyEvent.VK_DOWN:
 				case KeyEvent.VK_KP_DOWN:
 					aftermathVal = data.getAftermathDelay();
 					if (aftermathVal == null)
 						break;
-					updated = aftermathVal - 1 * 1000;
+					updated = aftermathVal - 1;
 					if (updated < 0)
 						break;
 					data.setAftermathDelay(updated);
-					aftermath.setText(Integer.toString(updated / 1000));
+					aftermath.setText(Integer.toString(updated));
 					break;
 				}
 			}

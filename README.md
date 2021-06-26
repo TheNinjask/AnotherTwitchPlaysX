@@ -42,7 +42,7 @@ I am a bit bad at explaining in text but if you use the app I hope it is intuiti
 * The commands have (minimum for now) support for variables! e.g. type in chat !test 1 2 can correspond to move mouse to (1,2)
 * Support for mods (if someone develops)
 * Display twitch chat (wow really? that so hard /s)
-* and more! ("and more!" may not be included.)
+* and more! ("and more!" may not be included. b̴̜̀͂ư̷̡̡͝t̷̫́͜ ̵̞͐́͜i̵̧̹͛f̷̟͐͠ͅ ̴̢̳̑y̶̪̚o̶̢̜̅ù̷̖ ̶̤̃̽h̸̨͍̐o̶̫̎ḽ̵͌͠ḍ̶̠̅̔ ̴̤͇̏͝s̵̨̛͛h̴͕̠̎̈́i̶͉͕͝f̶̱̿̀͜t̸͓̰͑ ̶̰̣̓w̷̤̲͌̓h̸̛̟è̸̳̹ń̶̟̾ ̶̝̣͌p̷̼͐͝r̵̰̖̔e̶̻̘̕s̷̜̽̌s̷̬̔i̵̘͍͊͊n̷̘̒͝g̴̬̈́͌ ̸̮̀t̵̻̲̎h̷̛̺͝e̷͉̮͋̈́ ̴̟̋͜"̷̦̄̂M̸̼͌o̸̞͌̈d̸͉̭̈́"̴̯͝͝ ̵̣̙͗b̸̗̓͜ũ̷̞ţ̸́͝t̵̞͍̊ȍ̷͓̜́n̷̪̄,̶̳̼̔ ̸̟͐̉ͅI̷̛̬̕ ̷̤̈́̃c̸̟̉ȁ̷̙̲̄n̵̮̭̅̇ ̵̱͂̐ȃ̶̖̚r̶̬͇̐r̸̗̰̾̅a̸͙̜͌n̷̝̗̕g̸̮̺͐e̴̜̾͒ ̶̲̀͋ṡ̶̙̣ȍ̶̧̒m̵̲̌͒ͅè̵̪t̴̜̭́̓ĥ̷͈͙̈́ǐ̴͓͔ň̶̦g̴̩̋́)
 
 ## Modding
 

@@ -35,11 +35,11 @@ public interface ControlDataLang {
 	}
 	
 	public default String getDuration() {
-		return "Duration (sec):";
+		return "Duration (ms):";
 	}
 	
 	public default String getAftermath() {
-		return "Aftermath (sec):";
+		return "Aftermath (ms):";
 	}
 	
 	public default String getX() {
