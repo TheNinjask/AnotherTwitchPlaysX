@@ -2,6 +2,8 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 
 import java.awt.MouseInfo;
 import java.awt.Robot;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -448,7 +450,19 @@ public class ControlData implements Data {
 	
 	@Override
 	public String toString() {
-		return String.format("Control %s(%s)", key, type.toString());
+		if(type == ControlType.KEY)
+			return String.format("Control %s(%s)", KeyEvent.getKeyText(key), type.toString());
+		else
+			switch (key) {
+			case MouseEvent.BUTTON1_DOWN_MASK:
+				return String.format("Control %s(%s)", "Button Left", type.toString());
+			case MouseEvent.BUTTON3_DOWN_MASK:
+				return String.format("Control %s(%s)", "Button Right", type.toString());
+			case MouseEvent.BUTTON2_DOWN_MASK:
+				return String.format("Control %s(%s)", "Button Middle", type.toString());
+			default:
+				return String.format("Control %s(%s)", key, type.toString());
+			}
 	}
 	
 }
