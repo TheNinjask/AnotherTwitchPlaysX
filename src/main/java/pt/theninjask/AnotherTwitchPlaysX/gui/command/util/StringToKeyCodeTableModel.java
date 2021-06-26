@@ -6,10 +6,12 @@ import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class StringToKeyCodeTableModel {
+public class StringToKeyCodeTableModel implements OnUpdateLanguage{
 
 	private DefaultTableModel table;
 
@@ -47,6 +49,17 @@ public class StringToKeyCodeTableModel {
 
 	public void clear() {
 		table.setRowCount(0);
+	}
+
+	@Override
+	public void updateLang(Lang session) {
+		for(int i=0; i<table.getRowCount(); i++) {
+			Object remove = table.getValueAt(i, 1);
+			if(remove instanceof JButton)
+				((JButton) remove).setText(session.getStringToKeyCode().getRemove());
+			
+		}
+		
 	}
 
 }

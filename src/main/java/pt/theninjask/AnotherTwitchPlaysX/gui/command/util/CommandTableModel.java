@@ -13,10 +13,12 @@ import javax.swing.table.TableModel;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.CommandPanel;
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class CommandTableModel {
+public class CommandTableModel implements OnUpdateLanguage{
 
 	private DefaultTableModel table;
 
@@ -87,6 +89,22 @@ public class CommandTableModel {
 
 	public void clear() {
 		table.setRowCount(0);
+	}
+
+	@Override
+	public void updateLang(Lang session) {
+		for(int i=0; i<table.getRowCount(); i++) {
+			Object syntax = table.getValueAt(i, 1);
+			Object edit = table.getValueAt(i, 2);
+			Object remove = table.getValueAt(i, 3);
+			if(syntax instanceof JButton)
+				((JButton) syntax).setText(session.getCommand().getSyntax());
+			if(edit instanceof JButton)
+				((JButton) edit).setText(session.getCommand().getEdit());
+			if(remove instanceof JButton)
+				((JButton) remove).setText(session.getCommand().getRemove());
+			
+		}
 	}
 
 }

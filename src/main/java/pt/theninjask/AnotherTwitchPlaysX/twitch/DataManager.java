@@ -15,6 +15,13 @@ public class DataManager {
 	
 	private SessionData session;
 	
+	@FunctionalInterface
+	public interface OnUpdateSession{
+		void updateSession(SessionData session);
+	}
+	
+	private List<OnUpdateSession> sessionEvents = new ArrayList<OnUpdateSession>();
+	
 	public static boolean disableSession = false;
 	
 	public static final SessionData DUMMY_SESSION = new SessionData("dummy","dummy","dummy");
@@ -22,6 +29,13 @@ public class DataManager {
 	private List<CommandData> commands;
 	
 	private Lang language;
+	
+	@FunctionalInterface
+	public interface OnUpdateLanguage{
+		void updateLang(Lang session);
+	}
+	
+	private List<OnUpdateLanguage> langEvents = new ArrayList<OnUpdateLanguage>();
 	
 	private DataManager() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", DataManager.class.getSimpleName()));
@@ -48,6 +62,17 @@ public class DataManager {
 	public static void setSession(SessionData session) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setSession()", DataManager.class.getSimpleName()));
 		singleton.session = session;
+		for (OnUpdateSession elem : singleton.sessionEvents) {
+			elem.updateSession(session);
+		}
+	}
+	
+	public static void registerSessionEvent(OnUpdateSession event) {
+		singleton.sessionEvents.add(event);
+	}
+	
+	public static void unregisterSessionEvent(OnUpdateSession event) {
+		singleton.sessionEvents.remove(event);
 	}
 	
 	public static List<CommandData> getCommands(){
@@ -68,6 +93,17 @@ public class DataManager {
 	public static void setLanguage(Lang language) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setLanguage()", DataManager.class.getSimpleName()));
 		singleton.language = language;
+		for (OnUpdateLanguage elem : singleton.langEvents) {
+			elem.updateLang(language);
+		}
+	}
+	
+	public static void registerLangEvent(OnUpdateLanguage event) {
+		singleton.langEvents.add(event);
+	}
+	
+	public static void unregisterLangEvent(OnUpdateLanguage event) {
+		singleton.langEvents.remove(event);
 	}
 	
 }

@@ -10,10 +10,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class PopOutFrame extends JFrame {
+public class PopOutFrame extends JFrame implements OnUpdateLanguage{
 
 	/**
 	 * 
@@ -35,7 +37,14 @@ public class PopOutFrame extends JFrame {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		comp.requestFocusInWindow();
+		//DataManager.registerLangEvent(this);
 		this.setVisible(true);
+		/*this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent event) {
+				DataManager.unregisterLangEvent("this");
+			}
+		});*/
 	}
 	
 	public PopOutFrame(JComponent comp, JFrame parentInc) {
@@ -49,9 +58,11 @@ public class PopOutFrame extends JFrame {
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
 		this.setBackground(Constants.TWITCH_COLOR);
+		//DataManager.registerLangEvent(this);
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
+				//DataManager.unregisterLangEvent("this");
 				parent.setEnabled(true);
 				parent.revalidate();
 				parent.repaint();
@@ -66,6 +77,11 @@ public class PopOutFrame extends JFrame {
 	public JFrame getParent() {
 		//Constants.printVerboseMessage(Level.INFO, String.format("%s.getParent(%s)", PopOutFrame.class.getSimpleName(),this.hashCode()));
 		return parent;
+	}
+
+	@Override
+	public void updateLang(Lang session) {
+		this.setTitle(session.getTitle());
 	}
 	
 }

@@ -33,20 +33,22 @@ import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.data.MouseCoordsType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords.MouseCoordsListener;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
-public class ControlDataPanel extends JPanel {
+public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private ControlData data;
 
 	private List<ControlDataPanel> in;
@@ -117,8 +119,30 @@ public class ControlDataPanel extends JPanel {
 
 	private JButton finalYType;
 
+	private JLabel inputLabel;
+
+	private JLabel na;
+
+	private JLabel durationLabel;
+
+	private JLabel aftermathLabel;
+
+	private JLabel xLabel;
+
+	private JLabel yLabel;
+
+	private JLabel cycleLabel;
+
+	private JLabel finalXLabel;
+
+	private JLabel finalYLabel;
+
+	private JLabel indexLabel;
+
+	private JButton cycle;
+
 	private static String jComboBoxVarNone = DataManager.getLanguage().getControlData().getVarNone();
-	
+
 	private class JComboBoxVar extends JComboBox<JComboItem<Pair<String, CommandVarType>>> {
 
 		/**
@@ -133,7 +157,6 @@ public class ControlDataPanel extends JPanel {
 		private AtomicBoolean disable = new AtomicBoolean(false);
 
 		private String varOf;
-		
 
 		public JComboBoxVar(CommandVarType type, String varOf) {
 			super();
@@ -152,14 +175,12 @@ public class ControlDataPanel extends JPanel {
 					return;
 				}
 				data.getMap().put(this.varOf, getItemAt(getSelectedIndex()).get().getLeft());
-				/*switch (getItemAt(getSelectedIndex()).toString()) {
-				case None:
-					data.getMap().remove(this.varOf);
-					break;
-				default:
-					data.getMap().put(this.varOf, getItemAt(getSelectedIndex()).get().getLeft());
-					break;
-				}*/
+				/*
+				 * switch (getItemAt(getSelectedIndex()).toString()) { case None:
+				 * data.getMap().remove(this.varOf); break; default:
+				 * data.getMap().put(this.varOf, getItemAt(getSelectedIndex()).get().getLeft());
+				 * break; }
+				 */
 			});
 		}
 
@@ -228,7 +249,7 @@ public class ControlDataPanel extends JPanel {
 		JPanel content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		content.setOpaque(false);
 		inputPanel.setOpaque(false);
-		JLabel inputLabel = new JLabel(
+		inputLabel = new JLabel(
 				data.getType() == ControlType.KEY ? DataManager.getLanguage().getControlData().getTypeKey()
 						: DataManager.getLanguage().getControlData().getTypeButton());
 		inputLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
@@ -278,9 +299,12 @@ public class ControlDataPanel extends JPanel {
 			normal.add(opt);
 			opt.setFocusable(false);
 			opt.addItem(new JComboItem<Integer>(null, DataManager.getLanguage().getControlData().getButtonNone()));
-			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON1_DOWN_MASK, DataManager.getLanguage().getControlData().getButtonLeft()));
-			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON3_DOWN_MASK, DataManager.getLanguage().getControlData().getButtonRight()));
-			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON2_DOWN_MASK, DataManager.getLanguage().getControlData().getButtonMiddle()));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON1_DOWN_MASK,
+					DataManager.getLanguage().getControlData().getButtonLeft()));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON3_DOWN_MASK,
+					DataManager.getLanguage().getControlData().getButtonRight()));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON2_DOWN_MASK,
+					DataManager.getLanguage().getControlData().getButtonMiddle()));
 			opt.addActionListener(l -> {
 				this.data.setKey(opt.getItemAt(opt.getSelectedIndex()).get());
 			});
@@ -297,7 +321,7 @@ public class ControlDataPanel extends JPanel {
 		// case MOUSE_MOV:
 		case MOUSE_WHEEL:
 		default:
-			JLabel na = new JLabel(DataManager.getLanguage().getNA());
+			na = new JLabel(DataManager.getLanguage().getNA());
 			normal.add(na);
 			na.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			content.add(na);
@@ -333,7 +357,7 @@ public class ControlDataPanel extends JPanel {
 			durationPanel.setOpaque(false);
 			content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 			content.setOpaque(false);
-			JLabel durationLabel = new JLabel(DataManager.getLanguage().getControlData().getDuration());
+			durationLabel = new JLabel(DataManager.getLanguage().getControlData().getDuration());
 			durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			durationPanel.add(durationLabel, BorderLayout.WEST);
 			duration = new JFormattedTextField(durationFormatter);
@@ -418,7 +442,7 @@ public class ControlDataPanel extends JPanel {
 		aftermathPanel.setOpaque(false);
 		content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		content.setOpaque(false);
-		JLabel aftermathLabel = new JLabel(DataManager.getLanguage().getControlData().getAftermath());
+		aftermathLabel = new JLabel(DataManager.getLanguage().getControlData().getAftermath());
 		aftermathLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		aftermathPanel.add(aftermathLabel, BorderLayout.WEST);
 		NumberFormatter aftermathFormatter = new NumberFormatter(format);
@@ -509,7 +533,8 @@ public class ControlDataPanel extends JPanel {
 			xPanel.setOpaque(false);
 			content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 			content.setOpaque(false);
-			JLabel xLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getX(), MouseCoords.getInstance().getX().get()));
+			xLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getX(),
+					MouseCoords.getInstance().getX().get()));
 			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			xPanel.add(xLabel, BorderLayout.WEST);
 			x = new JFormattedTextField(xFormatter);
@@ -618,7 +643,8 @@ public class ControlDataPanel extends JPanel {
 			yPanel.setOpaque(false);
 			content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 			content.setOpaque(false);
-			JLabel yLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getY(), MouseCoords.getInstance().getY().get()));
+			yLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getY(),
+					MouseCoords.getInstance().getY().get()));
 			yLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 			yPanel.add(yLabel, BorderLayout.WEST);
 			NumberFormatter yFormatter = new NumberFormatter(format);
@@ -729,14 +755,16 @@ public class ControlDataPanel extends JPanel {
 
 			center.add(yPanel);
 			listener = (eX, eY) -> {
-				xLabel.setText(String.format(DataManager.getLanguage().getControlData().getX(), MouseCoords.getInstance().getX().get()));
-				yLabel.setText(String.format(DataManager.getLanguage().getControlData().getY(), MouseCoords.getInstance().getY().get()));
+				xLabel.setText(String.format(DataManager.getLanguage().getControlData().getX(),
+						MouseCoords.getInstance().getX().get()));
+				yLabel.setText(String.format(DataManager.getLanguage().getControlData().getY(),
+						MouseCoords.getInstance().getY().get()));
 			};
 			MouseCoords.getInstance().registerListener(listener);
 			if (data.getType() == ControlType.MOUSE_DRAG) {
 				JPanel cyclePanel = new JPanel(new BorderLayout());
 				cyclePanel.setOpaque(false);
-				JLabel cycleLabel = new JLabel(DataManager.getLanguage().getControlData().getInitialCoords());
+				cycleLabel = new JLabel(DataManager.getLanguage().getControlData().getInitialCoords());
 				cycleLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				cycleLabel.setHorizontalAlignment(JLabel.CENTER);
 				cyclePanel.add(cycleLabel, BorderLayout.CENTER);
@@ -752,7 +780,8 @@ public class ControlDataPanel extends JPanel {
 				finalXPanel.setOpaque(false);
 				content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 				content.setOpaque(false);
-				JLabel finalXLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getFinalX(), MouseCoords.getInstance().getX().get()));
+				finalXLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getFinalX(),
+						MouseCoords.getInstance().getX().get()));
 				finalXLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				finalXPanel.add(finalXLabel, BorderLayout.WEST);
 				finalX = new JFormattedTextField(finalXFormatter);
@@ -862,7 +891,8 @@ public class ControlDataPanel extends JPanel {
 				finalYPanel.setOpaque(false);
 				content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 				content.setOpaque(false);
-				JLabel finalYLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getFinalY(), MouseCoords.getInstance().getY().get()));
+				finalYLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getFinalY(),
+						MouseCoords.getInstance().getY().get()));
 				finalYLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				finalYPanel.add(finalYLabel, BorderLayout.WEST);
 				NumberFormatter finalYFormatter = new NumberFormatter(format);
@@ -974,14 +1004,16 @@ public class ControlDataPanel extends JPanel {
 
 				// center.add(yPanel);
 				listenerFinal = (eX, eY) -> {
-					finalXLabel.setText(String.format(DataManager.getLanguage().getControlData().getFinalX(), MouseCoords.getInstance().getX().get()));
-					finalYLabel.setText(String.format(DataManager.getLanguage().getControlData().getFinalY(), MouseCoords.getInstance().getY().get()));
+					finalXLabel.setText(String.format(DataManager.getLanguage().getControlData().getFinalX(),
+							MouseCoords.getInstance().getX().get()));
+					finalYLabel.setText(String.format(DataManager.getLanguage().getControlData().getFinalY(),
+							MouseCoords.getInstance().getY().get()));
 				};
 				MouseCoords.getInstance().registerListener(listenerFinal);
 				/*
 				 * 
 				 */
-				JButton cycle = new JButton(">");
+				cycle = new JButton(">");
 				cycle.setFocusable(false);
 				cycle.addActionListener(l -> {
 					switch (cycle.getText()) {
@@ -1002,7 +1034,8 @@ public class ControlDataPanel extends JPanel {
 						cycle.setText(">");
 						break;
 					default:
-						// NEVER
+						// Never
+						cycleLabel.setText(DataManager.getLanguage().getNA());
 						break;
 					}
 					center.revalidate();
@@ -1018,7 +1051,7 @@ public class ControlDataPanel extends JPanel {
 
 		// JPanel indexPanel = new JPanel();
 		// indexPanel.setOpaque(false);
-		JLabel indexLabel = new JLabel(DataManager.getLanguage().getControlData().getIndex());
+		indexLabel = new JLabel(DataManager.getLanguage().getControlData().getIndex());
 		indexLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		left.add(indexLabel);
 		index = new JComboBox<Integer>();
@@ -1237,5 +1270,86 @@ public class ControlDataPanel extends JPanel {
 
 	public JButton getFinalYType() {
 		return finalYType;
+	}
+
+	@Override
+	public void updateLang(Lang session) {
+		jComboBoxVarNone = session.getControlData().getVarNone();
+		inputLabel.setText(data.getType() == ControlType.KEY ? session.getControlData().getTypeKey()
+				: session.getControlData().getTypeButton());
+		if (key != null && data.getKey() == null)
+			key.setText(session.getControlData().getKeyNone());
+		if (opt != null) {
+			// this approach seems meh
+			int ind = opt.getSelectedIndex();
+			opt.removeAllItems();
+			opt.addItem(new JComboItem<Integer>(null, session.getControlData().getButtonNone()));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON1_DOWN_MASK,
+					DataManager.getLanguage().getControlData().getButtonLeft()));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON3_DOWN_MASK,
+					DataManager.getLanguage().getControlData().getButtonRight()));
+			opt.addItem(new JComboItem<Integer>(MouseEvent.BUTTON2_DOWN_MASK,
+					DataManager.getLanguage().getControlData().getButtonMiddle()));
+			opt.setSelectedIndex(ind);
+		}
+		if (na != null)
+			na.setText(session.getNA());
+		if (durationLabel != null)
+			durationLabel.setText(session.getControlData().getDuration());
+		aftermathLabel.setText(session.getControlData().getAftermath());
+		if (xLabel != null)
+			xLabel.setText(session.getControlData().getX());
+		if (xClear != null)
+			xClear.setText(session.getControlData().getXClear());
+		if (xType != null) {
+			if (data.getInDepthCursor().getX().getRight() == MouseCoordsType.ABS)
+				xType.setText(session.getControlData().getAbs());
+			else
+				xType.setText(session.getControlData().getRel());
+		}
+		if (yLabel != null)
+			yLabel.setText(session.getControlData().getY());
+		if (yClear != null)
+			yClear.setText(session.getControlData().getYClear());
+		if (yType != null) {
+			if (data.getInDepthCursor().getY().getRight() == MouseCoordsType.ABS)
+				yType.setText(session.getControlData().getAbs());
+			else
+				yType.setText(session.getControlData().getRel());
+		}
+		if (finalXLabel != null)
+			finalXLabel.setText(session.getControlData().getFinalX());
+		if (finalXClear != null)
+			finalXClear.setText(session.getControlData().getFinalXClear());
+		if (finalXType != null) {
+			if (data.getInDepthCursor().getFinalX().getRight() == MouseCoordsType.ABS)
+				finalXType.setText(session.getControlData().getAbs());
+			else
+				finalXType.setText(session.getControlData().getRel());
+		}
+		if (finalYLabel != null)
+			finalYLabel.setText(session.getControlData().getFinalY());
+		if (finalYClear != null)
+			finalYClear.setText(session.getControlData().getFinalYClear());
+		if (finalYType != null) {
+			if (data.getInDepthCursor().getFinalY().getRight() == MouseCoordsType.ABS)
+				finalYType.setText(session.getControlData().getAbs());
+			else
+				finalYType.setText(session.getControlData().getRel());
+		}
+		if (cycle != null && cycleLabel != null)
+			switch (cycle.getText()) {
+			case ">":
+				cycleLabel.setText(session.getControlData().getInitialCoords());
+				break;
+			case "<":
+				cycleLabel.setText(session.getControlData().getFinalCoords());
+				break;
+			default:
+				cycleLabel.setText(session.getNA());
+				break;
+			}
+		indexLabel.setText(session.getControlData().getIndex());
+		remove.setText(session.getControlData().getRemove());
 	}
 }

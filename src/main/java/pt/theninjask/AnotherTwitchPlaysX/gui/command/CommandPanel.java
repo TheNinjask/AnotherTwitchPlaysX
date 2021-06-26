@@ -38,13 +38,15 @@ import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.ControlDataPanel.Type;
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
-public class CommandPanel extends JPanel {
+public class CommandPanel extends JPanel implements OnUpdateLanguage{
 
 	/**
 	 * 
@@ -94,27 +96,30 @@ public class CommandPanel extends JPanel {
 
 	private JTextField cooldown;
 
+	private JLabel leadLabel;
+
+	private JLabel cooldownLabel;
+
+	private JLabel typeLabel;
+
+	private JLabel varsLabel;
+
+	private JLabel modeLabel;
+
 	public CommandPanel() {
-		Constants.printVerboseMessage(Level.INFO,
-				String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
-		this.current = new CommandData();
-		this.saved = null;
-		controls = new ArrayList<ControlDataPanel>();
-		this.setBackground(Constants.TWITCH_COLOR);
-		this.setLayout(new GridLayout(2, 1));
-		JPanel tmp = new JPanel(new BorderLayout());
-		tmp.setOpaque(false);
-		tmp.add(buildPanelString(), BorderLayout.CENTER);
-		tmp.add(buttonMenu(), BorderLayout.EAST);
-		this.add(tmp);
-		this.add(controlScroll());
+		this(null);
 	}
 
 	public CommandPanel(CommandData data) {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
-		this.current = data.clone();
-		this.saved = data;
+		if(data == null) {
+			this.current = new CommandData();
+			this.saved = null;
+		}else {
+			this.current = data.clone();
+			this.saved = data;			
+		}
 		controls = new ArrayList<ControlDataPanel>();
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new GridLayout(2, 1));
@@ -124,6 +129,7 @@ public class CommandPanel extends JPanel {
 		tmp.add(buttonMenu(), BorderLayout.EAST);
 		this.add(tmp);
 		this.add(controlScroll());
+		//DataManager.registerLangEvent(this);
 	}
 
 	private JPanel buildPanelString() {
@@ -140,7 +146,7 @@ public class CommandPanel extends JPanel {
 
 		JPanel leadPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		leadPanel.setOpaque(false);
-		JLabel leadLabel = new JLabel(DataManager.getLanguage().getCommand().getLead());
+		leadLabel = new JLabel(DataManager.getLanguage().getCommand().getLead());
 		leadLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		leadPanel.add(leadLabel);
 		lead = new JTextField("");
@@ -164,7 +170,7 @@ public class CommandPanel extends JPanel {
 
 		JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		cooldownPanel.setOpaque(false);
-		JLabel cooldownLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdCooldown());
+		cooldownLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdCooldown());
 		cooldownLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		cooldownPanel.add(cooldownLabel);
 		cooldown = new JFormattedTextField(cooldownFormatter);
@@ -229,7 +235,7 @@ public class CommandPanel extends JPanel {
 
 		JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		typePanel.setOpaque(false);
-		JLabel typeLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdType());
+		typeLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdType());
 		typeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		typePanel.add(typeLabel);
 		type = new JComboBox<CommandType>(CommandType.getAll());
@@ -243,7 +249,7 @@ public class CommandPanel extends JPanel {
 
 		JPanel varsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		varsPanel.setOpaque(false);
-		JLabel varsLabel = new JLabel(DataManager.getLanguage().getCommand().getVars());
+		varsLabel = new JLabel(DataManager.getLanguage().getCommand().getVars());
 		varsLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		varsPanel.add(varsLabel);
 
@@ -408,7 +414,7 @@ public class CommandPanel extends JPanel {
 
 		JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		modePanel.setOpaque(false);
-		JLabel modeLabel = new JLabel(DataManager.getLanguage().getCommand().getViewMode());
+		modeLabel = new JLabel(DataManager.getLanguage().getCommand().getViewMode());
 		modeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		modePanel.add(modeLabel);
 		mode = new JButton("Normal");
@@ -466,6 +472,7 @@ public class CommandPanel extends JPanel {
 				}
 			}
 			MouseCoords.getInstance().clearListeners();
+			//DataManager.unregisterLangEvent(this);
 			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		bMenu.add(back);
@@ -749,5 +756,25 @@ public class CommandPanel extends JPanel {
 
 	public JButton getAdd() {
 		return add;
+	}
+
+	@Override
+	public void updateLang(Lang session) {
+		varAdd = session.getCommand().getVarAdd();
+		leadLabel.setText(session.getCommand().getLead());
+		cooldownLabel.setText(session.getCommand().getCmdCooldown());
+		typeLabel.setText(session.getCommand().getCmdType());
+		varsLabel.setText(session.getCommand().getVars());
+		varsRemove.setText(session.getCommand().getRemove());
+		modeLabel.setText(session.getCommand().getViewMode());
+		syntax.setText(session.getCommand().getSyntax());
+		help.setText(session.getCommand().getHelp());
+		save.setText(session.getCommand().getSave());
+		delete.setText(session.getCommand().getDelete());
+		add.setText(session.getCommand().getAddControl());
+		for (ControlDataPanel elem : controls) {
+			elem.updateLang(session);
+		}
+		
 	}
 }

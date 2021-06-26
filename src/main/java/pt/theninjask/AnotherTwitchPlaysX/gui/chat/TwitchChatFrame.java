@@ -31,12 +31,14 @@ import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.util.ComponentResizer;
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.mock.ChannelMessageEventMock;
 
-public class TwitchChatFrame extends JFrame {
+public class TwitchChatFrame extends JFrame implements OnUpdateLanguage{
 
 	/**
 	 * 
@@ -108,6 +110,8 @@ public class TwitchChatFrame extends JFrame {
 
 	private JTextField input;
 
+	private JButton send;
+
 	private TwitchChatFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", TwitchChatFrame.class.getSimpleName()));
 		this.type = ChatType.MINECRAFT;
@@ -134,11 +138,7 @@ public class TwitchChatFrame extends JFrame {
 
 		enabledDR = new AtomicBoolean(false);
 		enableDragAndResize();
-		/*
-		 * for (MouseListener elem : getMouseListeners()) { chat.addMouseListener(elem);
-		 * } for (MouseMotionListener elem : getMouseMotionListeners()) {
-		 * chat.addMouseMotionListener(elem); }
-		 */
+		//DataManager.registerLangEvent(this);
 	}
 
 	public static TwitchChatFrame getInstance() {
@@ -218,7 +218,7 @@ public class TwitchChatFrame extends JFrame {
 			}
 		});
 		messagePanel.add(input, BorderLayout.CENTER);
-		JButton send = new JButton(DataManager.getLanguage().getTwitchChat().getSend());
+		send = new JButton(DataManager.getLanguage().getTwitchChat().getSend());
 		send.addActionListener(l -> {
 			onMessage(
 					new ChannelMessageEventMock(DataManager.getSession().getNickname(), input.getText()));
@@ -380,5 +380,13 @@ public class TwitchChatFrame extends JFrame {
 
 	public void showInputMessage(boolean show) {
 		messagePanel.setVisible(show);
+	}
+
+	@Override
+	public void updateLang(Lang session) {
+		send.setText(session.getTwitchChat().getSend());
+		singleton.setTitle(
+				String.format(session.getTwitchChat().getTitle(), DataManager.getSession().getChannel().substring(1)));
+		
 	}
 }

@@ -27,28 +27,30 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.command.util.JTableCommand;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.util.StringToKeyCodePanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class AllCommandPanel extends JPanel {
+public class AllCommandPanel extends JPanel implements OnUpdateLanguage {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private static AllCommandPanel singleton = new AllCommandPanel();
-	
+
 	private JPanel currentPanel = newOrLoadPanel();
-	
+
 	private JPanel mainCommandPanel;
-	
+
 	private JButton create;
-	
+
 	private JButton load;
-	
+
 	private JButton back;
-	
+
 	private JTableCommand table;
 
 	private JButton insert;
@@ -61,47 +63,56 @@ public class AllCommandPanel extends JPanel {
 
 	private JButton keycodes;
 
+	private JLabel title;
+
+	private JButton firstLoad;
+
+	private JButton firstBack;
+
 	private AllCommandPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", AllCommandPanel.class.getSimpleName()));
 		this.setBackground(Constants.TWITCH_COLOR);
 		this.setLayout(new BorderLayout());
 		this.add(currentPanel, BorderLayout.CENTER);
 		mainCommandPanel();
+		//DataManager.registerLangEvent(this);
 	}
-	
+
 	public static AllCommandPanel getInstance() {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", AllCommandPanel.class.getSimpleName()));
+		Constants.printVerboseMessage(Level.INFO,
+				String.format("%s.getInstance()", AllCommandPanel.class.getSimpleName()));
 		singleton.refreshTable();
 		return singleton;
 	}
-	
+
 	private JPanel newOrLoadPanel() {
-		JPanel tmp = new JPanel(new GridLayout(1,2,75,0));
+		JPanel tmp = new JPanel(new GridLayout(1, 2, 75, 0));
 		tmp.setFocusable(false);
 		tmp.setOpaque(false);
-		
+
 		create = new JButton(DataManager.getLanguage().getAllCommand().getCreate());
 		create.setFocusable(false);
 		create.setOpaque(false);
-		create.addActionListener(l->{
+		create.addActionListener(l -> {
 			replacePanel(mainCommandPanel);
 			DataManager.setCommands(new ArrayList<CommandData>());
 		});
 		tmp.add(create);
-		
-		JPanel right = new JPanel(new GridLayout(2,1,0,100));
+
+		JPanel right = new JPanel(new GridLayout(2, 1, 0, 100));
 		right.setFocusable(false);
 		right.setOpaque(false);
-		
-		load = new JButton(DataManager.getLanguage().getAllCommand().getLoad());
-		load.setFocusable(false);
-		load.setOpaque(false);
-		load.addActionListener(l->{
+
+		firstLoad = new JButton(DataManager.getLanguage().getAllCommand().getLoad());
+		firstLoad.setFocusable(false);
+		firstLoad.setOpaque(false);
+		firstLoad.addActionListener(l -> {
 			try {
 				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
-				if(file!=null) {
+				if (file != null) {
 					ObjectMapper mapper = new ObjectMapper();
-					List<CommandData> commands = mapper.readValue(file, mapper.getTypeFactory().constructCollectionType(List.class, CommandData.class));
+					List<CommandData> commands = mapper.readValue(file,
+							mapper.getTypeFactory().constructCollectionType(List.class, CommandData.class));
 					DataManager.setCommands(commands);
 					refreshTable();
 					replacePanel(mainCommandPanel);
@@ -110,16 +121,16 @@ public class AllCommandPanel extends JPanel {
 				Constants.showExpectedExceptionDialog(e);
 			}
 		});
-		right.add(load);
-		
-		back = new JButton(DataManager.getLanguage().getAllCommand().getBack());
-		back.setFocusable(false);
-		back.setOpaque(false);
-		back.addActionListener(l->{
+		right.add(firstLoad);
+
+		firstBack = new JButton(DataManager.getLanguage().getAllCommand().getBack());
+		firstBack.setFocusable(false);
+		firstBack.setOpaque(false);
+		firstBack.addActionListener(l -> {
 			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		});
-		right.add(back);
-		
+		right.add(firstBack);
+
 		tmp.add(right);
 		return tmp;
 	}
@@ -128,47 +139,45 @@ public class AllCommandPanel extends JPanel {
 		mainCommandPanel = new JPanel(new BorderLayout());
 		mainCommandPanel.setFocusable(false);
 		mainCommandPanel.setOpaque(false);
-		
-		JLabel title = new JLabel(DataManager.getLanguage().getAllCommand().getListOfCmds());
+
+		title = new JLabel(DataManager.getLanguage().getAllCommand().getListOfCmds());
 		title.setHorizontalAlignment(JLabel.CENTER);
 		title.setFont(new Font(title.getFont().getName(), title.getFont().getStyle(), 25));
 		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 		title.setFocusable(false);
 		mainCommandPanel.add(title, BorderLayout.NORTH);
-		
+
 		JPanel body = new JPanel(new BorderLayout());
 		body.setOpaque(false);
-		
+
 		JScrollPane left = new JScrollPane();
 		left.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		table = new JTableCommand();
-		
-		
-		//for(int i=0; i<25;i++)
-		//	table.addRow(new CommandData());
-		
-		
+
+		// for(int i=0; i<25;i++)
+		// table.addRow(new CommandData());
+
 		left.setViewportView(table);
 		left.setFocusable(false);
 		left.setEnabled(false);
-		//left.add(list);
-		
+		// left.add(list);
+
 		body.add(left, BorderLayout.CENTER);
-		
+
 		JPanel right = new JPanel(new GridLayout(7, 1));
-		
+
 		right.setOpaque(false);
-		
+
 		insert = new JButton(DataManager.getLanguage().getAllCommand().getInsert());
 		insert.setFocusable(false);
-		insert.addActionListener(l->{
-			//table.addRow(new CommandData());
+		insert.addActionListener(l -> {
+			// table.addRow(new CommandData());
 			MainFrame.replacePanel(new CommandPanel());
 		});
 		right.add(insert);
 		keycodes = new JButton(DataManager.getLanguage().getAllCommand().getCodes());
 		keycodes.setFocusable(false);
-		keycodes.addActionListener(l->{
+		keycodes.addActionListener(l -> {
 			MainFrame.replacePanel(StringToKeyCodePanel.getInstance());
 		});
 		right.add(keycodes);
@@ -176,10 +185,10 @@ public class AllCommandPanel extends JPanel {
 		help.setEnabled(false);
 		help.setFocusable(false);
 		right.add(help);
-		
+
 		popout = new JButton(DataManager.getLanguage().getAllCommand().getPopOut());
 		popout.setFocusable(false);
-		popout.addActionListener(l->{
+		popout.addActionListener(l -> {
 			new PopOutFrame(left, MainFrame.getInstance()).addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent event) {
@@ -190,61 +199,64 @@ public class AllCommandPanel extends JPanel {
 			});
 		});
 		right.add(popout);
-		
+
 		save = new JButton(DataManager.getLanguage().getAllCommand().getSave());
 		save.setFocusable(false);
-		save.addActionListener(l->{
-			File file = Constants.showSaveFile(new File("commands.json"),new FileNameExtensionFilter("JSON", "json"), this);
-			if(file!=null){
+		save.addActionListener(l -> {
+			File file = Constants.showSaveFile(new File("commands.json"), new FileNameExtensionFilter("JSON", "json"),
+					this);
+			if (file != null) {
 				try {
 					ObjectMapper objectMapper = new ObjectMapper();
-					JTextField tmp = new JTextField(String.format(DataManager.getLanguage().getAllCommand().getSaveMsg(), file.getAbsolutePath()));
+					JTextField tmp = new JTextField(String
+							.format(DataManager.getLanguage().getAllCommand().getSaveMsg(), file.getAbsolutePath()));
 					tmp.setEditable(false);
 					tmp.setBorder(null);
 					tmp.setOpaque(false);
 					tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 					objectMapper.writeValue(file, DataManager.getCommands());
-					Constants.showCustomColorMessageDialog(null, 
-							tmp, 
-							DataManager.getLanguage().getAllCommand().getSaveTitle(), JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);			
+					Constants.showCustomColorMessageDialog(null, tmp,
+							DataManager.getLanguage().getAllCommand().getSaveTitle(), JOptionPane.INFORMATION_MESSAGE,
+							null, Constants.TWITCH_COLOR);
 				} catch (IOException e) {
 					Constants.showExceptionDialog(e);
 				}
 			}
 		});
 		right.add(save);
-		
+
 		load = new JButton(DataManager.getLanguage().getAllCommand().getLoad());
 		load.setFocusable(false);
-		load.addActionListener(l->{
+		load.addActionListener(l -> {
 			try {
-			File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
-			if(file!=null) {
-				ObjectMapper mapper = new ObjectMapper();
-				List<CommandData> tmp = mapper.readValue(file, mapper.getTypeFactory().constructCollectionType(List.class, CommandData.class));
-				DataManager.setCommands(tmp);
-				refreshTable();
+				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
+				if (file != null) {
+					ObjectMapper mapper = new ObjectMapper();
+					List<CommandData> tmp = mapper.readValue(file,
+							mapper.getTypeFactory().constructCollectionType(List.class, CommandData.class));
+					DataManager.setCommands(tmp);
+					refreshTable();
+				}
+			} catch (IOException e) {
+				Constants.showExpectedExceptionDialog(e);
 			}
-		} catch (IOException e) {
-			Constants.showExpectedExceptionDialog(e);
-		}
 		});
 		right.add(load);
-		
+
 		back = new JButton(DataManager.getLanguage().getAllCommand().getBack());
 		back.setFocusable(false);
-		back.addActionListener(l->{
+		back.addActionListener(l -> {
 			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		});
 		right.add(back);
-		
+
 		body.add(right, BorderLayout.EAST);
-		
+
 		mainCommandPanel.add(body, BorderLayout.CENTER);
-		
+
 		return mainCommandPanel;
 	}
-	
+
 	private void replacePanel(JPanel newPanel) {
 		this.remove(currentPanel);
 		this.currentPanel = newPanel;
@@ -252,20 +264,20 @@ public class AllCommandPanel extends JPanel {
 		this.revalidate();
 		this.repaint();
 	}
-	
+
 	private void refreshTable() {
-		if(table!=null)
+		if (table != null)
 			this.table.clearAndSet(DataManager.getCommands());
 	}
-	
+
 	public JPanel getCurrentPanel() {
 		return currentPanel;
 	}
-	
+
 	public void setCurrentPanel(JPanel newer) {
 		this.currentPanel = newer;
 	}
-	
+
 	public JButton getCreate() {
 		return create;
 	}
@@ -305,5 +317,23 @@ public class AllCommandPanel extends JPanel {
 	public JButton getKeycodes() {
 		return keycodes;
 	}
-	
+
+	@Override
+	public void updateLang(Lang session) {
+		create.setText(session.getAllCommand().getCreate());
+		firstLoad.setText(session.getAllCommand().getLoad());
+		firstBack.setText(session.getAllCommand().getBack());
+
+		title.setText(session.getAllCommand().getListOfCmds());
+		insert.setText(session.getAllCommand().getInsert());
+		keycodes.setText(session.getAllCommand().getCodes());
+		help.setText(session.getAllCommand().getHelp());
+		popout.setText(session.getAllCommand().getPopOut());
+		save.setText(session.getAllCommand().getSave());
+		load.setText(session.getAllCommand().getLoad());
+		back.setText(session.getAllCommand().getBack());
+		table.updateLang(session);
+
+	}
+
 }

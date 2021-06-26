@@ -18,11 +18,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements OnUpdateLanguage{
 
 	/**
 	 * 
@@ -46,6 +48,7 @@ public class MainFrame extends JFrame {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		this.setResizable(false);
+		//DataManager.registerLangEvent(this);
 		this.setVisible(true);
 		this.addWindowListener(new WindowAdapter() {
 			@Override
@@ -107,6 +110,11 @@ public class MainFrame extends JFrame {
 		singleton.add(newPanel);
 		singleton.revalidate();
 		singleton.repaint();
+	}
+
+	@Override
+	public void updateLang(Lang session) {
+		this.setTitle(session.getTitle());	
 	}
 	
 }

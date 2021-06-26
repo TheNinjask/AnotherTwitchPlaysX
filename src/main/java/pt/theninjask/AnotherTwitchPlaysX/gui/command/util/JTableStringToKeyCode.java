@@ -4,7 +4,10 @@ import java.util.List;
 
 import javax.swing.JTable;
 
-public class JTableStringToKeyCode extends JTable {
+import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
+import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
+
+public class JTableStringToKeyCode extends JTable implements OnUpdateLanguage{
 
 	/**
 	 * 
@@ -39,6 +42,11 @@ public class JTableStringToKeyCode extends JTable {
 		for (String key : keys) {
 			table.addRow(key);
 		}
+	}
+
+	@Override
+	public void updateLang(Lang session) {
+		table.updateLang(session);
 	}
 
 }

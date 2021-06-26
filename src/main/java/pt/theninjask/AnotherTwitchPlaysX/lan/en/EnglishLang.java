@@ -14,25 +14,25 @@ import pt.theninjask.AnotherTwitchPlaysX.lan.TwitchChatLang;
 
 public class EnglishLang implements Lang{
 
-	private ExceptionsLang exceptionsLang = new EnglishExceptionLang();
+	private ExceptionsLang exceptionsLang = new ExceptionsLang(){};
 	
-	private ConstantsLang constantsLang = new EnglishConstantsLang();
+	private ConstantsLang constantsLang = new ConstantsLang(){};
 	
-	private MainMenuLang mainMenuLang = new EnglishMainMenuLang();
+	private MainMenuLang mainMenuLang = new MainMenuLang() {};
 
-	private LoginLang loginLang = new EnglishLoginLang();
+	private LoginLang loginLang = new LoginLang(){};
 	
-	private EmbeddedModMenuLang embeddedModMenuLang = new EnglishEmbeddedModMenuLang();
+	private EmbeddedModMenuLang embeddedModMenuLang = new EmbeddedModMenuLang(){};
 	
-	private TwitchChatLang twitchChatLang = new EnglishTwitchChatLang();
+	private TwitchChatLang twitchChatLang = new TwitchChatLang(){};
 	
-	private AllCommandLang allCommandLang = new EnglishAllCommandLang();
+	private AllCommandLang allCommandLang = new AllCommandLang(){};
 	
-	private CommandLang commandLang = new EnglishCommandLang();
+	private CommandLang commandLang = new CommandLang(){};
 	
-	private ControlDataLang ControlDataLang = new EnglishControlDataLang();
+	private ControlDataLang ControlDataLang = new ControlDataLang(){};
 	
-	private StringToKeyCodeLang stringToKeyCodeLang = new EnglishStringToKeyCodeLang();
+	private StringToKeyCodeLang stringToKeyCodeLang = new StringToKeyCodeLang(){};
 	
 	@Override
 	public ExceptionsLang getExceptions() {

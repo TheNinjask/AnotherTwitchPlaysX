@@ -42,4 +42,8 @@ public interface Lang {
 		return "Session saved in %s!";
 	};
 	
+	public default String getLanTag() {
+		return "EN";
+	}
+	
 }
