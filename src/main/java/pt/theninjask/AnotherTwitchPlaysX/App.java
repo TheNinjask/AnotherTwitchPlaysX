@@ -106,7 +106,7 @@ public class App {
 				LoginPanel.getInstance().setVisible(true);
 			} else {
 				MainFrame.getInstance();
-				LoginPanel.getInstance().setSession(nickname, String.format("#%s", channel), oauth);
+				LoginPanel.getInstance().setSession(nickname, channel == null? null : String.format("#%s", channel), oauth);
 			}
 		} catch (MissingArgumentException | AlreadySelectedException e) {
 			System.out.println(e.getMessage());
