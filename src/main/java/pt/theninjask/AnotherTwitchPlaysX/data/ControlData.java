@@ -452,7 +452,9 @@ public class ControlData implements Data {
 	public String toString() {
 		if(type == ControlType.KEY)
 			return String.format("Control %s(%s)", KeyEvent.getKeyText(key), type.toString());
-		else
+		else {
+			if(key==null)
+				return String.format("Control %s(%s)", key, type.toString());
 			switch (key) {
 			case MouseEvent.BUTTON1_DOWN_MASK:
 				return String.format("Control %s(%s)", "Button Left", type.toString());
@@ -463,6 +465,7 @@ public class ControlData implements Data {
 			default:
 				return String.format("Control %s(%s)", key, type.toString());
 			}
+		}
 	}
 	
 }

@@ -170,7 +170,7 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 					return;
 				if (getSelectedIndex() < 0)
 					return;
-				if (getSelectedIndex() == 1) {
+				if (getSelectedIndex() == 0) {
 					data.getMap().remove(this.varOf);
 					return;
 				}
