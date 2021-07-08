@@ -2,8 +2,8 @@
 
 [logo]: https://fontmeme.com/permalink/210517/3e4924b31b184892fc5b77d4a4ca094c.png
 
-<span style="display:block;text-align:center">![screenshot](./login.png)
-![screenshot](./main.png)</span>
+![screenshot](./login.png)
+![screenshot2](./main.png)
 
 ### Before Using App Reminder
 
