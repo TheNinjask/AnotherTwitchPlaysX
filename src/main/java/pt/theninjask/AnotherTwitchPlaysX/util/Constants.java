@@ -228,6 +228,8 @@ public final class Constants {
 
 	public static ATPXMod loadMod(File modFile) throws Exception {
 		ATPXMod mod = null;
+		if(modFile==null)
+			return null;
 		try {
 			switch (JarVerifier.getInstance().verifyJar(modFile)) {
 			case MAIN:
