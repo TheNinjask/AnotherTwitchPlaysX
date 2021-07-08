@@ -44,7 +44,7 @@ public class MainFrame extends JFrame{
 		this.onStart();
 		this.getContentPane().setBackground(Constants.TWITCH_COLOR);
 		//this.setTitle(DataManager.getLanguage().getTitle());
-		this.setTitle(String.format("%s - v %s", DataManager.getLanguage().getID(), App.VERSION));
+		this.setTitle(String.format("%s - v%s", DataManager.getLanguage().getID(), App.VERSION));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
@@ -153,7 +153,7 @@ public class MainFrame extends JFrame{
 
 	//@Handler
 	public void updateLang(Lang session) {
-		this.setTitle(String.format("%s - v %s", DataManager.getLanguage().getID(), App.VERSION));
+		this.setTitle(String.format("%s - v%s", DataManager.getLanguage().getID(), App.VERSION));
 	}
 	
 }
