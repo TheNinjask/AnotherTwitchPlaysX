@@ -24,6 +24,7 @@ The Key escape is a special key that can be used to stop the app from running af
 - [Features](#features)
 - [Modding](#modding)
 - [F.A.Q. with out the F.A.](#faq-with-out-the-fa)
+- [Build App](#build-app)
 - [Bugs](#bugs)
 - [Future](#future)
 - [Libraries Used](#libraries-used)
@@ -57,7 +58,7 @@ To make a mod for this app, you start a maven project and add the following [dep
   <version>1.5.0</version>
 </dependency>
 ```
-and when you use mvn package, the .jar created has to be a fat .jar (but it won't require the dependency above.)
+and when you use `mvn package`, the .jar created has to be a fat .jar (but it won't require the dependency above.)
 
 Here a plugin to help you create one that also excludes unnecessary dependencies from the fat .jar file.
 ```
@@ -109,13 +110,11 @@ Example-Changing the Mod Button to say greetings to the user:
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 @ATPXModProps(hasPanel = false)
@@ -234,6 +233,14 @@ I also wanted to be a other way to setup the commands without relying on the UI 
 	.
 	.
 ]
+```
+
+## Build App
+
+Download the sauce and use the command below in the top folder of this project.
+
+```
+mvn -f buildPom.xml clean package
 ```
 
 ## Bugs
