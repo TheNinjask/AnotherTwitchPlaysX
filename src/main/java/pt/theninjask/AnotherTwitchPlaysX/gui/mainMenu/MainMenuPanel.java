@@ -273,8 +273,10 @@ public class MainMenuPanel extends JPanel {
 				try {
 					GlobalScreen.unregisterNativeHook();
 					for (CommandData elem : DataManager.getCommands()) {
-						TwitchPlayer.getInstance().unregisterEventListener(elem);
-						YouTubePlayer.getInstance().unregisterEventListener(elem);
+						if (TwitchPlayer.getInstance().isConnected())
+							TwitchPlayer.getInstance().unregisterEventListener(elem);
+						if (YouTubePlayer.getInstance().isConnected())
+							YouTubePlayer.getInstance().unregisterEventListener(elem);
 					}
 					gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
 					commandsButton.setEnabled(true);
@@ -292,8 +294,10 @@ public class MainMenuPanel extends JPanel {
 					commandsButton.setEnabled(false);
 					connectButton.setEnabled(false);
 					for (CommandData elem : DataManager.getCommands()) {
-						TwitchPlayer.getInstance().registerEventListener(elem);
-						YouTubePlayer.getInstance().registerEventListener(elem);
+						if (TwitchPlayer.getInstance().isConnected())
+							TwitchPlayer.getInstance().registerEventListener(elem);
+						if (YouTubePlayer.getInstance().isConnected())
+							YouTubePlayer.getInstance().registerEventListener(elem);
 					}
 					GlobalScreen.registerNativeHook();
 					GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
@@ -314,8 +318,10 @@ public class MainMenuPanel extends JPanel {
 								try {
 									GlobalScreen.unregisterNativeHook();
 									for (CommandData elem : DataManager.getCommands()) {
-										TwitchPlayer.getInstance().unregisterEventListener(elem);
-										YouTubePlayer.getInstance().unregisterEventListener(elem);
+										if (TwitchPlayer.getInstance().isConnected())
+											TwitchPlayer.getInstance().unregisterEventListener(elem);
+										if (YouTubePlayer.getInstance().isConnected())
+											YouTubePlayer.getInstance().unregisterEventListener(elem);
 									}
 									gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
 									commandsButton.setEnabled(true);

@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,8 +48,8 @@ public class App {
 
 	public static final String NAME = "AnotherTwitchPlaysX";
 
-	public static final String VERSION = "1.5.0";
-	
+	public static final String VERSION = getVersion();
+
 	public static void main(String[] args) {
 
 		int amountOfRequiredTwitchSessionOptions = 0;
@@ -172,6 +173,17 @@ public class App {
 			Constants.showCustomColorMessageDialog(null, exception, e.getClass().getName(), JOptionPane.WARNING_MESSAGE,
 					null, Constants.TWITCH_COLOR);
 		}
+	}
+
+	private static final String getVersion() {
+		String version = "\\Dev";
+		try {
+			Properties p = new Properties();
+			p.load(App.class.getResourceAsStream("/META-INF/maven/pt.theninjask/anothertwitchplaysx/pom.properties"));
+			version = p.getProperty("version", "");
+		} catch (Exception e) {}
+
+		return version;
 	}
 
 	private static void skipMainLoginPanel(String nickname, String channel, String oauth, String secret,
