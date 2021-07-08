@@ -8,11 +8,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,24 +40,40 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
 
+import net.engio.mbassy.bus.MBassador;
+import net.engio.mbassy.bus.config.BusConfiguration;
+import net.engio.mbassy.bus.config.Feature;
+import net.engio.mbassy.bus.config.IBusConfiguration;
+import net.engio.mbassy.bus.error.IPublicationErrorHandler;
+import net.engio.mbassy.bus.error.PublicationError;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.exception.ModNotLoadedException;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 
 public final class Constants {
 
 	private Constants() {
 	}
-
+	
+	public static final String SAVE_PATH = Paths.get(System.getProperty("user.home"),".ATPX").toString();
+	
 	public static final URL ICON_PATH = Constants.class
 			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/image/favicon.png");
 
+	public static final URL TWITCH_LOGO_PATH = Constants.class
+			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/logo/twitch.png");
+	
+	public static final URL YOUTUBE_LOGO_PATH = Constants.class
+			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/logo/youtube.png");
+	
 	public static final ImageIcon ICON = new ImageIcon(Constants.ICON_PATH);
 
 	public static final String TWITCH_CHAT_OAUTH = "https://twitchapps.com/tmi/";
 
+	public static final String YOUTUBE_CHAT_SECRET = "https://console.cloud.google.com/apis/credentials";
+	
 	// TODO check
 	// public static final String DEFAULT_ERROR_TITLE = "An error has occurred!";
 
@@ -92,8 +111,12 @@ public final class Constants {
 
 	public static boolean debug = false;
 
-	// public static boolean disableSession = false;
-
+	public static final PrintStream VOID_STREAM = new PrintStream(new OutputStream() {
+		@Override
+		public void write(int b) throws IOException {
+		}
+	});
+	
 	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
 		// private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
 		private static final String format = "[%1$s] %2$s %n";
@@ -374,14 +397,14 @@ public final class Constants {
 		UIManager.put("Panel.background", panelBG);
 	}
 
-	public static final void showExceptionDialog(Exception e) {
+	public static final void showExceptionDialog(Throwable e) {
 
 		Constants.printVerboseMessage(Level.SEVERE, e);
 
 		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE);
 	}
-
-	public static final void showExpectedExceptionDialog(Exception e) {
+	
+	public static final void showExpectedExceptionDialog(Throwable e) {
 
 		Constants.printVerboseMessage(Level.WARNING, e);
 
@@ -412,4 +435,16 @@ public final class Constants {
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
+	
+	public static MBassador<Object> setupDispatcher() {
+		IBusConfiguration config = new BusConfiguration().addPublicationErrorHandler(new IPublicationErrorHandler() {
+
+			@Override
+			public void handleError(PublicationError error) {
+			}
+		}).addFeature(Feature.SyncPubSub.Default()).addFeature(Feature.AsynchronousHandlerInvocation.Default())
+				.addFeature(Feature.AsynchronousMessageDispatch.Default());
+		return new MBassador<Object>(config);
+	}
+	
 }

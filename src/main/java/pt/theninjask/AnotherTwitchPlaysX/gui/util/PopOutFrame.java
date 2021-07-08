@@ -11,11 +11,10 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class PopOutFrame extends JFrame implements OnUpdateLanguage{
+public class PopOutFrame extends JFrame{
 
 	/**
 	 * 
@@ -79,7 +78,7 @@ public class PopOutFrame extends JFrame implements OnUpdateLanguage{
 		return parent;
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		this.setTitle(session.getTitle());
 	}

@@ -5,9 +5,8 @@ import java.util.List;
 import javax.swing.JTable;
 
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 
-public class JTableStringToKeyCode extends JTable implements OnUpdateLanguage{
+public class JTableStringToKeyCode extends JTable{
 
 	/**
 	 * 
@@ -44,7 +43,7 @@ public class JTableStringToKeyCode extends JTable implements OnUpdateLanguage{
 		}
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		table.updateLang(session);
 	}

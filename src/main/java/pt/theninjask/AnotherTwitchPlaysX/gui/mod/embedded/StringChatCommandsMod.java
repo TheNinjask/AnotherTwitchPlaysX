@@ -17,14 +17,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.TaskCooldown;
 
@@ -220,7 +219,7 @@ public class StringChatCommandsMod extends ATPXMod {
 		}
 
 		@Handler
-		public void onMessage(ActorMessageEvent<User> event) {
+		public void onMessage(ChannelMessageEvent event) {
 			Pattern pattern = Pattern.compile(cmd, Pattern.CASE_INSENSITIVE);
 			Matcher match = pattern.matcher(event.getMessage());
 			if (!match.matches())

@@ -1,6 +1,6 @@
 package pt.theninjask.AnotherTwitchPlaysX.exception;
 
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 
 public class NotVerifyJarException extends RuntimeException {
 

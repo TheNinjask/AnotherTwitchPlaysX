@@ -1,7 +1,11 @@
 package pt.theninjask.AnotherTwitchPlaysX;
 
 import java.awt.KeyboardFocusManager;
+import java.io.File;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,23 +23,34 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.jnativehook.GlobalScreen;
 
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
+
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
-import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
+import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
-import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.login.TwitchLoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.login.YoutubeLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.lan.en.EnglishLang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
 
 public class App {
 
+	public static final String ID = "ATPX";
+
+	public static final String NAME = "AnotherTwitchPlaysX";
+
 	public static void main(String[] args) {
 
-		int amountOfSessionOptions = 0;
+		int amountOfRequiredTwitchSessionOptions = 0;
+		int amountOfRequiredYouTubeSessionOptions = 0;
 
 		Options options = new Options();
 
@@ -45,15 +60,18 @@ public class App {
 		options.addOptionGroup(verbose);
 
 		options.addOption("p", "printCommand", false, "Print Commands execution");
-		
+
 		options.addOption("d", "debug", false, "Enables printStackTrace()");
 		options.addOption("s", "disableSession", false,
 				"Disables access to SessionData from DataManager (might \"brick\" app)\nMight be useful to check when a external mod gains access");
 		options.addOption("h", "help", false, "Prints Help");
 
-		options.addOption("n", "nickname", true, "Twitch Account Nickname");
-		options.addOption("c", "channel", true, "Twitch Channel Name");
-		options.addOption("t", "token", true, "Twitch OAuth Token of nickname");
+		options.addOption("n", "twitchNickname", true, "Twitch Account Nickname");
+		options.addOption("c", "twitchChannel", true, "Twitch Channel Name (Optional Param)");
+		options.addOption("t", "twitchToken", true, "Twitch OAuth Token of nickname");
+
+		options.addOption("y", "youtubeToken", true, "Youtube Client Secret Path");
+		options.addOption("i", "youtubeVideoId", true, "Youtube Video Id (Optional Param)");
 
 		try {
 			CommandLineParser parser = new DefaultParser();
@@ -78,7 +96,7 @@ public class App {
 				DataManager.disableSession = true;
 				Constants.printVerboseMessage(Level.INFO, "DisableSession Set to True");
 			}
-			if(cmd.hasOption('p')) {
+			if (cmd.hasOption('p')) {
 				CommandData.enableLogging(true);
 				Constants.printVerboseMessage(Level.INFO, "Enabled print commands exetution");
 			}
@@ -86,27 +104,57 @@ public class App {
 			String channel = null;
 			String oauth = null;
 			if (cmd.hasOption('n')) {
-				amountOfSessionOptions++;
+				amountOfRequiredTwitchSessionOptions++;
 				nickname = cmd.getOptionValue('n');
 			}
 			if (cmd.hasOption('c')) {
-				amountOfSessionOptions++;
+				// amountOfRequiredTwitchSessionOptions++;
 				channel = cmd.getOptionValue('c');
 			}
 			if (cmd.hasOption('t')) {
-				amountOfSessionOptions++;
+				amountOfRequiredTwitchSessionOptions++;
 				oauth = cmd.getOptionValue('t');
 			}
-			globalSetUp();
 
-			if (amountOfSessionOptions >= 3) {
-				LoginPanel.getInstance().setVisible(false);
+			String secret = null;
+			String videoId = null;
+			if (cmd.hasOption('y')) {
+				String path = cmd.getOptionValue('y');
+				try {
+					File file = new File(path);
+					secret = Files.readString(file.toPath());
+					if (secret != null && !secret.isBlank())
+						amountOfRequiredYouTubeSessionOptions++;
+				} catch (Exception e) {
+				}
+			}
+			if (cmd.hasOption('i')) {
+				videoId = cmd.getOptionValue('i');
+			}
+
+			globalSetUp();
+			channel = channel == null ? null : String.format("#%s", channel);
+			if (amountOfRequiredTwitchSessionOptions >= 2 && amountOfRequiredYouTubeSessionOptions >= 1) {
+				MainLoginPanel.getInstance().setVisible(false);
 				MainFrame.getInstance();
-				skipLoginPanel(nickname, channel, oauth);
-				LoginPanel.getInstance().setVisible(true);
+				skipMainLoginPanel(nickname, channel, oauth, secret, videoId);
+				MainLoginPanel.getInstance().setVisible(true);
 			} else {
 				MainFrame.getInstance();
-				LoginPanel.getInstance().setSession(nickname, channel == null? null : String.format("#%s", channel), oauth);
+				if (amountOfRequiredTwitchSessionOptions >= 2) {
+					TwitchSessionData twitch = new TwitchSessionData(nickname, channel, oauth);
+					DataManager.setTwitchSession(twitch);
+					TwitchLoginPanel.getInstance().setSession(twitch);
+				} else {
+					TwitchLoginPanel.getInstance().setSession(nickname, channel, oauth);
+				}
+				if (amountOfRequiredYouTubeSessionOptions >= 1) {
+					YouTubeSessionData youtube = new YouTubeSessionData(secret, videoId);
+					DataManager.setYouTubeSession(youtube);
+					YoutubeLoginPanel.getInstance().setSession(youtube);
+				} else {
+					YoutubeLoginPanel.getInstance().setSession(secret, videoId);
+				}
 			}
 		} catch (MissingArgumentException | AlreadySelectedException e) {
 			System.out.println(e.getMessage());
@@ -124,17 +172,22 @@ public class App {
 		}
 	}
 
-	private static void skipLoginPanel(String nickname, String channel, String oauth) {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s.skipLoginPanel()",App.class.getSimpleName()));
-		SessionData session = new SessionData(nickname, String.format("#%s", channel), oauth);
-		DataManager.setSession(session);
-		LoginPanel.getInstance().setSession(session);
-		TwitchPlayer.getInstance().setSession(session);
+	private static void skipMainLoginPanel(String nickname, String channel, String oauth, String secret,
+			String videoId) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.skipLoginPanel()", App.class.getSimpleName()));
+		TwitchSessionData twitch = new TwitchSessionData(nickname, channel, oauth);
+		YouTubeSessionData youtube = new YouTubeSessionData(secret, videoId);
+		DataManager.setTwitchSession(twitch);
+		DataManager.setYouTubeSession(youtube);
+		TwitchLoginPanel.getInstance().setSession(twitch);
+		YoutubeLoginPanel.getInstance().setSession(youtube);
+		TwitchPlayer.getInstance().setSession(twitch);
+		YouTubePlayer.getInstance().setSession(youtube);
 		MainFrame.replacePanel(MainMenuPanel.getInstance());
 	}
 
 	private static void globalSetUp() throws Exception {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s.globalSetUp()",App.class.getSimpleName()));
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.globalSetUp()", App.class.getSimpleName()));
 		PrintStream tmp = System.out;
 		try {
 			// Get the logger for "com.github.kwhat.jnativehook" and set the level to off.
@@ -145,14 +198,25 @@ public class App {
 			// Don't forget to disable the parent handlers.
 			logger.setUseParentHandlers(false);
 
+			logger = Logger.getLogger(AuthorizationCodeInstalledApp.class.getName());
+			logger.setLevel(Level.OFF);
+			logger.setUseParentHandlers(false);
 			// This below feels dishonest but I really want the console to be clear
 			// so to prevent printing this is the cheat
 			// TODO add credit other place where it will have more visibility
 			// also this can work as a compatibility test now that I think about it
-			System.setOut(null);
+			System.setOut(Constants.VOID_STREAM);
 			GlobalScreen.registerNativeHook();
 			GlobalScreen.unregisterNativeHook();
 			System.setOut(tmp);
+
+			Path path = Paths.get(Constants.SAVE_PATH);
+			if (!Files.exists(path)) {
+				Files.createDirectory(path);
+				Files.setAttribute(path, "dos:hidden", true);
+			} else if (!Files.isDirectory(path)) {
+				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
+			}
 
 			ControlData.setTranslation(Constants.STRING_TO_KEYCODE);
 			DataManager.setLanguage(new EnglishLang());

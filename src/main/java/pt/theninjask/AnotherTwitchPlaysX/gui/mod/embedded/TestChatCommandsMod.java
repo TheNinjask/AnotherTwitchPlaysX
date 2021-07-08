@@ -14,18 +14,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultCaret;
 
-import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
-
-import net.engio.mbassy.listener.Handler;
-import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame;
-import pt.theninjask.AnotherTwitchPlaysX.gui.chat.TwitchChatFrame.ChatType;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame.ChatType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
-import pt.theninjask.AnotherTwitchPlaysX.util.mock.ChannelMessageEventMock;
 
 @ATPXModProps(keepLoaded = false, popout = true)
 public class TestChatCommandsMod extends ATPXMod {
@@ -72,8 +67,8 @@ public class TestChatCommandsMod extends ATPXMod {
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					onMessage(new ChannelMessageEventMock(users[ThreadLocalRandom.current().nextInt(users.length)],
-							input.getText()));
+					onMessage(users[ThreadLocalRandom.current().nextInt(users.length)],
+							input.getText());
 					input.setText("");
 				}
 			}
@@ -81,8 +76,8 @@ public class TestChatCommandsMod extends ATPXMod {
 		messagePanel.add(input, BorderLayout.CENTER);
 		JButton send = new JButton("Send");
 		send.addActionListener(l -> {
-			onMessage(new ChannelMessageEventMock(users[ThreadLocalRandom.current().nextInt(users.length)],
-					input.getText()));
+			onMessage(users[ThreadLocalRandom.current().nextInt(users.length)],
+					input.getText());
 			input.setText("");
 		});
 		messagePanel.add(send, BorderLayout.EAST);
@@ -121,17 +116,16 @@ public class TestChatCommandsMod extends ATPXMod {
 		return scroll;
 	}
 
-	@Handler
-	public void onMessage(ActorMessageEvent<User> event) {
+	public void onMessage(String nick, String message) {
 		ThreadPool.execute(() -> {
 			DataManager.getCommands().forEach(cmd -> {
-				cmd.onMessage(event);
+				cmd.onMessage(message);
 			});
 		});
 		synchronized (scroll) {
 			synchronized (chat) {
 				updateChatSize();
-				chat.append(String.format(type.getFormat(), event.getActor().getNick(), event.getMessage()));
+				chat.append(String.format(type.getFormat(), nick, message));
 				scroll.repaint();
 				scroll.revalidate();
 			}
@@ -147,7 +141,7 @@ public class TestChatCommandsMod extends ATPXMod {
 	public void updateChatSize() {
 		synchronized (chat) {
 			try {
-				if (messageCap < TwitchChatFrame.MSG_DISPLAY_INFINITE) {
+				if (messageCap < ChatFrame.MSG_DISPLAY_INFINITE) {
 					int toClear = chat.getLineCount() - messageCap - 1;
 					if (toClear >= 0) {
 						chat.replaceRange("", 0, chat.getLineEndOffset(toClear));

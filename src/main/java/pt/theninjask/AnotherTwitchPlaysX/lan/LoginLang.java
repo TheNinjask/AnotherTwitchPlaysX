@@ -7,7 +7,7 @@ public interface LoginLang {
 	}
 
 	public default String getLoginButton() {
-		return "Let's Start!";
+		return "Set this Session";
 	}
 
 	public default String getTwitchField() {
@@ -27,7 +27,7 @@ public interface LoginLang {
 	}
 
 	public default String getChannelFieldTip() {
-		return "Twitch Channel Name";
+		return "Twitch Channel Name (If empty equals Twitch Username)";
 	}
 
 	public default String getOAuthFieldTip() {
@@ -68,6 +68,46 @@ public interface LoginLang {
 	
 	public default String getRememberSession() {
 		return "Remember Session?";
+	}
+	
+	public default String getMissingSecretMsg() {
+		return "Please insert your Client Secret";
+	}
+	
+	public default String getMissingSecretTitle() {
+		return "Missing Client Secret";
+	}
+	
+	public default String getMissingSecretGet() {
+		return "Go to get Client Secret";
+	}
+	
+	public default String getSecretField() {
+		return "Client Secret: ";
+	}
+	
+	public default String getSecretButton() {
+		return "Get Secret";
+	}
+	
+	public default String getSecretClear() {
+		return "[x]";
+	}
+	
+	public default String getSetSecret() {
+		return "Set Secret";
+	}
+	
+	public default String getViewSecret() {
+		return "View Secret";
+	}
+	
+	public default String getVideoField() {
+		return "Video Id: ";
+	}
+	
+	public default String getGoBack() {
+		return "Go Back";
 	}
 	
 }

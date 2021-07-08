@@ -7,10 +7,11 @@ import pt.theninjask.AnotherTwitchPlaysX.lan.ControlDataLang;
 import pt.theninjask.AnotherTwitchPlaysX.lan.EmbeddedModMenuLang;
 import pt.theninjask.AnotherTwitchPlaysX.lan.ExceptionsLang;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
+import pt.theninjask.AnotherTwitchPlaysX.lan.MainLoginLang;
 import pt.theninjask.AnotherTwitchPlaysX.lan.LoginLang;
 import pt.theninjask.AnotherTwitchPlaysX.lan.MainMenuLang;
 import pt.theninjask.AnotherTwitchPlaysX.lan.StringToKeyCodeLang;
-import pt.theninjask.AnotherTwitchPlaysX.lan.TwitchChatLang;
+import pt.theninjask.AnotherTwitchPlaysX.lan.ChatLang;
 
 public class EnglishLang implements Lang{
 
@@ -24,7 +25,7 @@ public class EnglishLang implements Lang{
 	
 	private EmbeddedModMenuLang embeddedModMenuLang = new EmbeddedModMenuLang(){};
 	
-	private TwitchChatLang twitchChatLang = new TwitchChatLang(){};
+	private ChatLang twitchChatLang = new ChatLang(){};
 	
 	private AllCommandLang allCommandLang = new AllCommandLang(){};
 	
@@ -33,6 +34,8 @@ public class EnglishLang implements Lang{
 	private ControlDataLang ControlDataLang = new ControlDataLang(){};
 	
 	private StringToKeyCodeLang stringToKeyCodeLang = new StringToKeyCodeLang(){};
+	
+	private MainLoginLang mainLoginLang = new MainLoginLang() {};
 	
 	@Override
 	public ExceptionsLang getExceptions() {
@@ -60,7 +63,7 @@ public class EnglishLang implements Lang{
 	}
 
 	@Override
-	public TwitchChatLang getTwitchChat() {
+	public ChatLang getChat() {
 		return twitchChatLang;
 	}
 
@@ -82,6 +85,11 @@ public class EnglishLang implements Lang{
 	@Override
 	public StringToKeyCodeLang getStringToKeyCode() {
 		return stringToKeyCodeLang;
+	}
+
+	@Override
+	public MainLoginLang getMainLogin() {
+		return mainLoginLang;
 	}
 
 }

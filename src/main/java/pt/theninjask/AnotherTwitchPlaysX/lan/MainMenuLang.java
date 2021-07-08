@@ -31,15 +31,15 @@ public interface MainMenuLang {
 	}
 	
 	public default String getShowTwitchChat() {
-		return "Show Twitch Chat";
+		return "Show Chat";
 	}
 	
 	public default String getHideTwitchChat() {
-		return "Hide Twitch Chat";
+		return "Hide Chat";
 	}
 	
 	public default String getCurrentChatSize() {
-		return "Current Twitch Chat size: %s messages";
+		return "Current Chat size: %s messages";
 	}
 	
 	public default String getInfinite() {
@@ -47,7 +47,7 @@ public interface MainMenuLang {
 	}
 	
 	public default String getTwitchChatOptions() {
-		return "Twitch Chat Options";
+		return "Chat Options";
 	}
 	
 	public default String getLightMode() {
@@ -75,7 +75,7 @@ public interface MainMenuLang {
 	}
 	
 	public default String getIsTwitchChatOnTop() {
-		return "Set Twitch Chat Always On Top & Locked?";
+		return "Set Chat Always On Top & Locked?";
 	}
 	
 	public default String getShowInputTextBoxInChat() {

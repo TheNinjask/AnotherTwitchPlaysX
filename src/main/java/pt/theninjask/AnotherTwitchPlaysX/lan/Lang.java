@@ -6,6 +6,10 @@ public interface Lang {
 		return "Another TwitchPlaysX";
 	};
 	
+	public default String getID() {
+		return "ATPX";
+	}
+	
 	public ConstantsLang getConstants();
 	
 	public ExceptionsLang getExceptions();
@@ -16,7 +20,7 @@ public interface Lang {
 	
 	public EmbeddedModMenuLang getEmbeddedModMenu();
 	
-	public TwitchChatLang getTwitchChat();
+	public ChatLang getChat();
 	
 	public AllCommandLang getAllCommand();
 	
@@ -25,6 +29,8 @@ public interface Lang {
 	public ControlDataLang getControlData();
 	
 	public StringToKeyCodeLang getStringToKeyCode();
+	
+	public MainLoginLang getMainLogin();
 	
 	public default String getOkOpt() {
 		return "Ok";

@@ -11,11 +11,10 @@ import javax.swing.JScrollPane;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class StringToKeyCodePanel extends JPanel implements OnUpdateLanguage{
+public class StringToKeyCodePanel extends JPanel{
 
 	/**
 	 * 
@@ -66,7 +65,7 @@ public class StringToKeyCodePanel extends JPanel implements OnUpdateLanguage{
 		});
 		down.add(reset, BorderLayout.WEST);
 		this.add(down, BorderLayout.SOUTH);
-		DataManager.registerLangEvent(this);
+		//DataManager.registerLangEvent(this);
 	}
 	
 	public static StringToKeyCodePanel getInstance() {
@@ -93,7 +92,7 @@ public class StringToKeyCodePanel extends JPanel implements OnUpdateLanguage{
 		return down;
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		back.setText(session.getStringToKeyCode().getBack());
 		reset.setText(session.getStringToKeyCode().getReset());

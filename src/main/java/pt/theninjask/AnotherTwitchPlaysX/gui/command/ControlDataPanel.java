@@ -34,15 +34,14 @@ import pt.theninjask.AnotherTwitchPlaysX.data.MouseCoordsType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords.MouseCoordsListener;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
-public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
+public class ControlDataPanel extends JPanel{
 
 	/**
 	 * 
@@ -1272,7 +1271,7 @@ public class ControlDataPanel extends JPanel implements OnUpdateLanguage {
 		return finalYType;
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		jComboBoxVarNone = session.getControlData().getVarNone();
 		inputLabel.setText(data.getType() == ControlType.KEY ? session.getControlData().getTypeKey()

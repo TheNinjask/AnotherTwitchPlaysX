@@ -1,7 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.data;
 
 
-public class SessionData implements Data {
+public class TwitchSessionData implements Data {
 	
 	private String nickname;
 	
@@ -9,9 +9,9 @@ public class SessionData implements Data {
 	
 	private String channel;
 
-	public SessionData() {}
+	public TwitchSessionData() {}
 	
-	public SessionData(String nickname, String channel, String oauth) {
+	public TwitchSessionData(String nickname, String channel, String oauth) {
 		this.nickname = nickname;
 		this.channel = channel;
 		this.oauth = oauth;

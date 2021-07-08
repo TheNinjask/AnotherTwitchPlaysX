@@ -6,9 +6,8 @@ import javax.swing.JTable;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
 
-public class JTableCommand extends JTable implements OnUpdateLanguage{
+public class JTableCommand extends JTable{
 
 	/**
 	 * 
@@ -49,7 +48,7 @@ public class JTableCommand extends JTable implements OnUpdateLanguage{
 		}
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		table.updateLang(session);
 	}

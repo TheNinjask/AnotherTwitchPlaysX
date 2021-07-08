@@ -28,11 +28,10 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.command.util.StringToKeyCodePanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class AllCommandPanel extends JPanel implements OnUpdateLanguage {
+public class AllCommandPanel extends JPanel{
 
 	/**
 	 * 
@@ -318,7 +317,7 @@ public class AllCommandPanel extends JPanel implements OnUpdateLanguage {
 		return keycodes;
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		create.setText(session.getAllCommand().getCreate());
 		firstLoad.setText(session.getAllCommand().getLoad());

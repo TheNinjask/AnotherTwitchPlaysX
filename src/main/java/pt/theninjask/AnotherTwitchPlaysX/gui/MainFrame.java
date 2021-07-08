@@ -16,15 +16,18 @@ import javax.swing.JTextField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import pt.theninjask.AnotherTwitchPlaysX.data.SessionData;
-import pt.theninjask.AnotherTwitchPlaysX.gui.login.LoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.login.TwitchLoginPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.login.YoutubeLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class MainFrame extends JFrame implements OnUpdateLanguage{
+public class MainFrame extends JFrame{
 
 	/**
 	 * 
@@ -33,7 +36,7 @@ public class MainFrame extends JFrame implements OnUpdateLanguage{
 	
 	private static MainFrame singleton = new MainFrame();
 	
-	private JPanel currentPanel = LoginPanel.getInstance();
+	private JPanel currentPanel = MainLoginPanel.getInstance();
 	
 	private MainFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainFrame.class.getSimpleName()));
@@ -53,28 +56,52 @@ public class MainFrame extends JFrame implements OnUpdateLanguage{
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
-				if(LoginPanel.getInstance().rememberSession()) {
-					saveSession();
-					if(TwitchPlayer.getInstance().isConnected())
-						TwitchPlayer.getInstance().disconnect();
-				}
+				if(TwitchLoginPanel.getInstance().rememberSession())
+					saveTwitchSession();
+				if(YoutubeLoginPanel.getInstance().rememberSession())
+					saveYouTubeSession();
+				if(TwitchPlayer.getInstance().isConnected())
+					TwitchPlayer.getInstance().disconnect();
+				
+				if(YouTubePlayer.getInstance().isConnected())
+					YouTubePlayer.getInstance().disconnect();
 			}
 		});
 	}
 	
-	private void saveSession() {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s.saveSession()", MainFrame.class.getSimpleName()));
-		if(currentPanel!=LoginPanel.getInstance()) {
+	private void saveTwitchSession() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.saveTwitchSession()", MainFrame.class.getSimpleName()));
+		if(currentPanel!=TwitchLoginPanel.getInstance()) {
 			try {
 				ObjectMapper objectMapper = new ObjectMapper();
-				File file = new File("session.json");
+				File file = new File(Constants.SAVE_PATH,"twitchSession.json");
 				JTextField tmp = new JTextField(String.format(DataManager.getLanguage().getSavingSession(), file.getAbsolutePath()));
 				tmp.setEditable(false);
 				tmp.setBorder(null);
 				tmp.setOpaque(false);
-				//tmp.setToolTipText(Constants.CHANNEL_FIELD_TIP);
 				tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-				objectMapper.writeValue(file, DataManager.getSession());
+				objectMapper.writeValue(file, DataManager.getTwitchSession());
+				Constants.showCustomColorMessageDialog(null, 
+						tmp, 
+						"Saving Session", JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);			
+			} catch (IOException e) {
+				Constants.showExceptionDialog(e);
+			}	
+		}
+	}
+	
+	private void saveYouTubeSession() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.saveYouTubeSession()", MainFrame.class.getSimpleName()));
+		if(currentPanel!=YoutubeLoginPanel.getInstance()) {
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+				File file = new File(Constants.SAVE_PATH,"youtubeSession.json");
+				JTextField tmp = new JTextField(String.format(DataManager.getLanguage().getSavingSession(), file.getAbsolutePath()));
+				tmp.setEditable(false);
+				tmp.setBorder(null);
+				tmp.setOpaque(false);
+				tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				objectMapper.writeValue(file, DataManager.getYouTubeSession());
 				Constants.showCustomColorMessageDialog(null, 
 						tmp, 
 						"Saving Session", JOptionPane.INFORMATION_MESSAGE, null, Constants.TWITCH_COLOR);			
@@ -91,13 +118,23 @@ public class MainFrame extends JFrame implements OnUpdateLanguage{
 
 	private void onStart() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.onStart()", MainFrame.class.getSimpleName()));
-		File sessionFile = new File("session.json");
-		if(sessionFile.exists())
+		
+		File twitchSessionFile = new File(Constants.SAVE_PATH,"twitchSession.json");
+		if(twitchSessionFile.exists())
 			try {
 				ObjectMapper objectMapper = new ObjectMapper();
-				SessionData session = objectMapper.readValue(sessionFile, SessionData.class);
-				DataManager.setSession(session);
-				LoginPanel.getInstance().setSession(session);
+				TwitchSessionData session = objectMapper.readValue(twitchSessionFile, TwitchSessionData.class);
+				TwitchLoginPanel.getInstance().setSession(session);
+			} catch (IOException e) {
+				Constants.showExceptionDialog(e);
+			}
+		
+		File youtubeSessionFile = new File(Constants.SAVE_PATH,"youtubeSession.json");
+		if(youtubeSessionFile.exists())
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+				YouTubeSessionData session = objectMapper.readValue(youtubeSessionFile, YouTubeSessionData.class);
+				YoutubeLoginPanel.getInstance().setSession(session);
 			} catch (IOException e) {
 				Constants.showExceptionDialog(e);
 			}
@@ -112,7 +149,7 @@ public class MainFrame extends JFrame implements OnUpdateLanguage{
 		singleton.repaint();
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		this.setTitle(session.getTitle());	
 	}

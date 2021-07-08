@@ -14,11 +14,10 @@ import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.CommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class CommandTableModel implements OnUpdateLanguage{
+public class CommandTableModel{
 
 	private DefaultTableModel table;
 
@@ -91,7 +90,7 @@ public class CommandTableModel implements OnUpdateLanguage{
 		table.setRowCount(0);
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		for(int i=0; i<table.getRowCount(); i++) {
 			Object syntax = table.getValueAt(i, 1);

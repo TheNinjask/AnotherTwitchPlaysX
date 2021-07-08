@@ -2,7 +2,8 @@
 
 [logo]: https://fontmeme.com/permalink/210517/3e4924b31b184892fc5b77d4a4ca094c.png
 
-<span style="display:block;text-align:center">![screenshot](./demo.png)</span>
+<span style="display:block;text-align:center">![screenshot](./login.png)
+![screenshot](./main.png)</span>
 
 ### Before Using App Reminder
 
@@ -36,12 +37,12 @@ So I hope you can have fun using this application!
 
 ## Features
 
-Well as the name of the app says its another TwitchPlays app.
+Well as the name of the app says its another TwitchPlays app. (Now with YouTube support!)
 I am a bit bad at explaining in text but if you use the app I hope it is intuitive enough.
 * Set commands with control(s) assigned;
 * The commands have (minimum for now) support for variables! e.g. type in chat !test 1 2 can correspond to move mouse to (1,2)
 * Support for mods (if someone develops)
-* Display twitch chat (wow really? that so hard /s)
+* Display chat (wow really? that so hard /s)
 * and more! ("and more!" may not be included. b̴̜̀͂ư̷̡̡͝t̷̫́͜ ̵̞͐́͜i̵̧̹͛f̷̟͐͠ͅ ̴̢̳̑y̶̪̚o̶̢̜̅ù̷̖ ̶̤̃̽h̸̨͍̐o̶̫̎ḽ̵͌͠ḍ̶̠̅̔ ̴̤͇̏͝s̵̨̛͛h̴͕̠̎̈́i̶͉͕͝f̶̱̿̀͜t̸͓̰͑ ̶̰̣̓w̷̤̲͌̓h̸̛̟è̸̳̹ń̶̟̾ ̶̝̣͌p̷̼͐͝r̵̰̖̔e̶̻̘̕s̷̜̽̌s̷̬̔i̵̘͍͊͊n̷̘̒͝g̴̬̈́͌ ̸̮̀t̵̻̲̎h̷̛̺͝e̷͉̮͋̈́ ̴̟̋͜"̷̦̄̂M̸̼͌o̸̞͌̈d̸͉̭̈́"̴̯͝͝ ̵̣̙͗b̸̗̓͜ũ̷̞ţ̸́͝t̵̞͍̊ȍ̷͓̜́n̷̪̄,̶̳̼̔ ̸̟͐̉ͅI̷̛̬̕ ̷̤̈́̃c̸̟̉ȁ̷̙̲̄n̵̮̭̅̇ ̵̱͂̐ȃ̶̖̚r̶̬͇̐r̸̗̰̾̅a̸͙̜͌n̷̝̗̕g̸̮̺͐e̴̜̾͒ ̶̲̀͋ṡ̶̙̣ȍ̶̧̒m̵̲̌͒ͅè̵̪t̴̜̭́̓ĥ̷͈͙̈́ǐ̴͓͔ň̶̦g̴̩̋́)
 
 ## Modding
@@ -53,7 +54,7 @@ To make a mod for this app, you start a maven project and add the following [dep
 <dependency>
   <groupId>pt.theninjask</groupId>
   <artifactId>anothertwitchplaysx</artifactId>
-  <version>1.4.0</version>
+  <version>1.5.0</version>
 </dependency>
 ```
 and when you use mvn package, the .jar created has to be a fat .jar (but it won't require the dependency above.)
@@ -78,6 +79,11 @@ Here a plugin to help you create one that also excludes unnecessary dependencies
 						<exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
 						<exclude>com.1stleg:jnativehook</exclude>
 						<exclude>commons-cli:commons-cli</exclude>
+						<exclude>com.google.apis:google-api-services-youtube</exclude>
+						<exclude>com.google.http-client:google-http-client</exclude>
+						<exclude>com.google.api-client:google-api-client</exclude>
+						<exclude>com.google.oauth-client:google-oauth-client-jetty</exclude>
+						<exclude>net.engio:mbassador</exclude>
 					</excludes>
 				</artifactSet>
 			</configuration>
@@ -152,7 +158,7 @@ For any issues/wishes please refer to [bugs](#bugs) section (even tho it might n
 <!-- omit in toc -->
 ### Why is the UI so small?
 
-Because I actually kinda liked it but I hid behind the excuse of to make me think to use the space more carefully. For example, I ran out of space for more twitch chat options, so I made that slider to preserve the size and still be intuitive enough for users!
+Because I actually kinda liked it but I hid behind the excuse of to make me think to use the space more carefully. For example, I ran out of space for more chat options, so I made that slider to preserve the size and still be intuitive enough for users!
 <!-- omit in toc -->
 ### Why is there no support for controllers
 

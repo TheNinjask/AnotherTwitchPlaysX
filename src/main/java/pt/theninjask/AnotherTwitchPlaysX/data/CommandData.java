@@ -19,10 +19,10 @@ import java.util.logging.StreamHandler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.api.services.youtube.model.LiveChatMessage;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoLeadDefinedException;
@@ -36,14 +36,15 @@ public class CommandData implements Data {
 
 	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
 		private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+
 		@Override
 		public synchronized String format(LogRecord lr) {
-			return String.format("[%s]: %s\n", sdf.format(new Date(lr.getMillis())),lr.getMessage());
+			return String.format("[%s]: %s\n", sdf.format(new Date(lr.getMillis())), lr.getMessage());
 		}
 	};
-	
+
 	private static Logger logger = setUpLogger();
-	
+
 	private String lead;
 
 	private CommandType type;
@@ -55,31 +56,31 @@ public class CommandData implements Data {
 	private List<Pair<String, CommandVarType>> vars;
 
 	private static AtomicBoolean isSingleActive = new AtomicBoolean(false);
-	
+
 	public static void enableLogging(boolean val) {
-		if(val) {
+		if (val) {
 			logger.setLevel(Level.ALL);
-		}else {
-			logger.setLevel(Level.OFF);	
+		} else {
+			logger.setLevel(Level.OFF);
 		}
 	}
-	
+
 	private static final Logger setUpLogger() {
 		Logger logger = Logger.getLogger(CommandData.class.getName());
 		logger.setUseParentHandlers(false);
 		StreamHandler handler = new StreamHandler(System.out, LOGGER_FORMATTER) {
-			 @Override
+			@Override
 			public synchronized void publish(LogRecord record) {
-				 super.publish(record);
-		         super.flush();
+				super.publish(record);
+				super.flush();
 			}
 		};
 		logger.addHandler(handler);
-		//logger.addHandler(new ConsoleHandler());
+		// logger.addHandler(new ConsoleHandler());
 		logger.setLevel(Level.OFF);
 		return logger;
 	}
-	
+
 	public CommandData() {
 		this.lead = "";
 		this.type = CommandType.UNISON;
@@ -239,12 +240,11 @@ public class CommandData implements Data {
 		return copy;
 	}
 
-	@Handler
-	public void onMessage(ActorMessageEvent<User> event) {
+	public void onMessage(String message) {
 		// if(!event.getActor().getNick().equalsIgnoreCase("mytwitchusername69420"))
 		// return;
 		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
-		Matcher match = pattern.matcher(event.getMessage());
+		Matcher match = pattern.matcher(message);
 		Map<String, String> map = new HashMap<String, String>();
 		if (!match.matches())
 			return;
@@ -256,6 +256,16 @@ public class CommandData implements Data {
 				map.put(elem.getLeft(), value.toLowerCase());
 		}
 		execute(map);
+	}
+
+	@Handler
+	public void onMessage(ChannelMessageEvent event) {
+		onMessage(event.getMessage());
+	}
+	
+	@Handler
+	public void onMessage(LiveChatMessage event) {
+		onMessage(event.getSnippet().getDisplayMessage());
 	}
 
 	public void execute() {
@@ -339,25 +349,26 @@ public class CommandData implements Data {
 		});
 		logger.info(String.format("Ended Unison %s with map", lead));
 	}
+
 	public void executeSingle() {
 		logger.info(String.format("Started Single %s with cooldown %s", lead, cooldown.inCooldown()));
 		cooldown.run(() -> {
 			ThreadPool.execute(() -> {
 				Robot robot = RobotSingleton.getInstance().getRobot();
-					if(isSingleActive.get()) {
-						return;
-					}
-					isSingleActive.set(true);
-					for (ControlData elem : controls) {
-						ThreadPool.executeSingle(() -> {
-							logger.info(String.format("Started %s of Single %s", elem.toString(), lead));
-							elem.execute(robot);
-							logger.info(String.format("Ended %s of Single %s", elem.toString(), lead));
-						});
-						if (elem.getAftermathDelay() != null)
-							robot.delay(elem.getAftermathDelay());
-					}
-					isSingleActive.set(false);
+				if (isSingleActive.get()) {
+					return;
+				}
+				isSingleActive.set(true);
+				for (ControlData elem : controls) {
+					ThreadPool.executeSingle(() -> {
+						logger.info(String.format("Started %s of Single %s", elem.toString(), lead));
+						elem.execute(robot);
+						logger.info(String.format("Ended %s of Single %s", elem.toString(), lead));
+					});
+					if (elem.getAftermathDelay() != null)
+						robot.delay(elem.getAftermathDelay());
+				}
+				isSingleActive.set(false);
 			});
 		});
 		logger.info(String.format("Ended Single %s", lead));
@@ -368,20 +379,20 @@ public class CommandData implements Data {
 		cooldown.run(() -> {
 			ThreadPool.execute(() -> {
 				Robot robot = RobotSingleton.getInstance().getRobot();
-					if(isSingleActive.get()) {
-						return;
-					}
-					isSingleActive.set(true);
-					for (ControlData elem : controls) {
-						ThreadPool.executeSingle(() -> {
-							logger.info(String.format("Started %s of Single %s with map", elem.toString(), lead));
-							elem.execute(robot, map);
-							logger.info(String.format("Ended %s of Single %s with map", elem.toString(), lead));
-						});
-						if (elem.getAftermathDelay() != null)
-							robot.delay(elem.getAftermathDelay());
-					}
-					isSingleActive.set(false);
+				if (isSingleActive.get()) {
+					return;
+				}
+				isSingleActive.set(true);
+				for (ControlData elem : controls) {
+					ThreadPool.executeSingle(() -> {
+						logger.info(String.format("Started %s of Single %s with map", elem.toString(), lead));
+						elem.execute(robot, map);
+						logger.info(String.format("Ended %s of Single %s with map", elem.toString(), lead));
+					});
+					if (elem.getAftermathDelay() != null)
+						robot.delay(elem.getAftermathDelay());
+				}
+				isSingleActive.set(false);
 			});
 		});
 		logger.info(String.format("Ended Single %s with map", lead));

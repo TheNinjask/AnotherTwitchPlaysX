@@ -39,14 +39,13 @@ import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.ControlDataPanel.Type;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
-public class CommandPanel extends JPanel implements OnUpdateLanguage{
+public class CommandPanel extends JPanel{
 
 	/**
 	 * 
@@ -758,7 +757,7 @@ public class CommandPanel extends JPanel implements OnUpdateLanguage{
 		return add;
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
 		varAdd = session.getCommand().getVarAdd();
 		leadLabel.setText(session.getCommand().getLead());

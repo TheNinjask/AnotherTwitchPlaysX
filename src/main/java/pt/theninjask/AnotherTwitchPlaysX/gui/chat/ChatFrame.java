@@ -26,26 +26,26 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 
-import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.helper.ActorMessageEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
+
+import com.google.api.services.youtube.model.LiveChatMessage;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.util.ComponentResizer;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager.OnUpdateLanguage;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
-import pt.theninjask.AnotherTwitchPlaysX.util.mock.ChannelMessageEventMock;
 
-public class TwitchChatFrame extends JFrame implements OnUpdateLanguage{
+public class ChatFrame extends JFrame{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static TwitchChatFrame singleton = new TwitchChatFrame();
+	private static ChatFrame singleton = new ChatFrame();
 
 	public static int MSG_DISPLAY_MIN = 5;
 
@@ -112,8 +112,8 @@ public class TwitchChatFrame extends JFrame implements OnUpdateLanguage{
 
 	private JButton send;
 
-	private TwitchChatFrame() {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s()", TwitchChatFrame.class.getSimpleName()));
+	private ChatFrame() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s()", ChatFrame.class.getSimpleName()));
 		this.type = ChatType.MINECRAFT;
 		this.mode = ChatMode.SOLID;
 		// this.setTitle(String.format("%s's Twitch Chat",
@@ -138,14 +138,13 @@ public class TwitchChatFrame extends JFrame implements OnUpdateLanguage{
 
 		enabledDR = new AtomicBoolean(false);
 		enableDragAndResize();
-		//DataManager.registerLangEvent(this);
+		// DataManager.registerLangEvent(this);
+		this.setTitle(String.format(DataManager.getLanguage().getChat().getTitle(),
+				DataManager.getLanguage().getID()));
 	}
 
-	public static TwitchChatFrame getInstance() {
-		Constants.printVerboseMessage(Level.INFO,
-				String.format("%s.getInstance()", TwitchChatFrame.class.getSimpleName()));
-		singleton.setTitle(
-				String.format(DataManager.getLanguage().getTwitchChat().getTitle(), DataManager.getSession().getChannel().substring(1)));
+	public static ChatFrame getInstance() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", ChatFrame.class.getSimpleName()));
 		return singleton;
 	}
 
@@ -198,31 +197,36 @@ public class TwitchChatFrame extends JFrame implements OnUpdateLanguage{
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					onMessage(new ChannelMessageEventMock(DataManager.getSession().getNickname(),
-							input.getText()));
-					TwitchPlayer.getInstance().sendMessage(input.getText());
+					onMessage(DataManager.getLanguage().getChat().getUser(), input.getText());
+					if(TwitchPlayer.getInstance().isConnected()) {
+						TwitchPlayer.getInstance().sendMessage(input.getText());						
+					}
+					if(YouTubePlayer.getInstance().isConnected()) {
+						YouTubePlayer.getInstance().sendMessage(input.getText());
+					}
 					input.setText("");
 				}
 			}
 		});
 		messagePanel.add(input, BorderLayout.CENTER);
-		send = new JButton(DataManager.getLanguage().getTwitchChat().getSend());
+		send = new JButton(DataManager.getLanguage().getChat().getSend());
 		send.addActionListener(l -> {
-			onMessage(
-					new ChannelMessageEventMock(DataManager.getSession().getNickname(), input.getText()));
-			TwitchPlayer.getInstance().sendMessage(input.getText());
+			onMessage(DataManager.getLanguage().getChat().getUser(), input.getText());
+			if(TwitchPlayer.getInstance().isConnected()) {
+				TwitchPlayer.getInstance().sendMessage(input.getText());						
+			}
+			if(YouTubePlayer.getInstance().isConnected()) {
+				YouTubePlayer.getInstance().sendMessage(input.getText());
+			}
 			input.setText("");
 		});
 		messagePanel.add(send, BorderLayout.EAST);
@@ -234,14 +238,13 @@ public class TwitchChatFrame extends JFrame implements OnUpdateLanguage{
 			return;
 		chat.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				posX= e.getX() - (chat.getWidth() - scroll.getWidth());
-				posY= e.getY() - (chat.getHeight() - scroll.getHeight());
+				posX = e.getX() - (chat.getWidth() - scroll.getWidth());
+				posY = e.getY() - (chat.getHeight() - scroll.getHeight());
 			}
 		});
 		chat.addMouseMotionListener(new MouseAdapter() {
 			public void mouseDragged(MouseEvent evt) {
-				setLocation(evt.getXOnScreen() - posX, 
-						evt.getYOnScreen() - posY);
+				setLocation(evt.getXOnScreen() - posX, evt.getYOnScreen() - posY);
 
 			}
 		});
@@ -262,16 +265,25 @@ public class TwitchChatFrame extends JFrame implements OnUpdateLanguage{
 		enabledDR.set(false);
 	}
 
-	@Handler
-	public void onMessage(ActorMessageEvent<User> event) {
+	public void onMessage(String nick, String message) {
 		synchronized (scroll) {
 			synchronized (chat) {
 				updateChatSize();
-				chat.append(String.format(type.getFormat(), event.getActor().getNick(), event.getMessage()));
+				chat.append(String.format(type.getFormat(), nick, message));
 				scroll.repaint();
 				scroll.revalidate();
 			}
 		}
+	}
+
+	@Handler
+	public void onMessage(ChannelMessageEvent event) {
+		onMessage(event.getActor().getNick(), event.getMessage());
+	}
+	
+	@Handler
+	public void onMessage(LiveChatMessage message) {
+		onMessage(message.getAuthorDetails().getDisplayName(), message.getSnippet().getDisplayMessage());
 	}
 
 	public void clearChat() {
@@ -382,11 +394,10 @@ public class TwitchChatFrame extends JFrame implements OnUpdateLanguage{
 		messagePanel.setVisible(show);
 	}
 
-	@Override
+	//@Handler
 	public void updateLang(Lang session) {
-		send.setText(session.getTwitchChat().getSend());
-		singleton.setTitle(
-				String.format(session.getTwitchChat().getTitle(), DataManager.getSession().getChannel().substring(1)));
-		
+		send.setText(session.getChat().getSend());
+		this.setTitle(String.format(DataManager.getLanguage().getChat().getTitle(),
+				DataManager.getLanguage().getID()));
 	}
 }

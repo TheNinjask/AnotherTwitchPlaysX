@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
-import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -18,18 +17,15 @@ import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
-import pt.theninjask.AnotherTwitchPlaysX.twitch.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.TaskCooldown;
-import pt.theninjask.AnotherTwitchPlaysX.util.mock.ChannelMessageEventMock;
 
 @ATPXModProps(keepLoaded = false)
 public class TestCommandsMod extends ATPXMod {
 
 	private JPanel mainPanel;
-
-	private String[] users = { "TheNinjask", "Dragonboil", "Drakekax", "GoncaAC", "JoGoKa?" };
 
 	private TaskCooldown worker;
 
@@ -139,10 +135,7 @@ public class TestCommandsMod extends ATPXMod {
 				try {
 					Thread.sleep(Long.parseLong(cooldown.getText()) * 1000);
 					worker.run(() -> {
-						ChannelMessageEventMock mockMessage = new ChannelMessageEventMock(
-								users[ThreadLocalRandom.current().nextInt(users.length)],
-								selec.getItemAt(selec.getSelectedIndex()).get().getRegexExample());
-						selec.getItemAt(selec.getSelectedIndex()).get().onMessage(mockMessage);
+						selec.getItemAt(selec.getSelectedIndex()).get().onMessage(selec.getItemAt(selec.getSelectedIndex()).get().getRegexExample());
 					});
 				} catch (Exception e) {
 					Constants.showExceptionDialog(e);
@@ -153,9 +146,7 @@ public class TestCommandsMod extends ATPXMod {
 				try {
 					Thread.sleep(Long.parseLong(cooldown.getText()) * 1000);
 					for (CommandData cmd : DataManager.getCommands()) {
-						ChannelMessageEventMock mockMessage = new ChannelMessageEventMock(
-								users[ThreadLocalRandom.current().nextInt(users.length)], cmd.getRegexExample());
-						cmd.onMessage(mockMessage);
+						cmd.onMessage(cmd.getRegexExample());
 						Thread.sleep(Long.parseLong(delay.getText()) * 1000);
 					}
 				} catch (Exception e) {
