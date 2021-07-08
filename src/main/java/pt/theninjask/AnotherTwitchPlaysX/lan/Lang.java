@@ -3,7 +3,7 @@ package pt.theninjask.AnotherTwitchPlaysX.lan;
 public interface Lang {
 	
 	public default String getTitle() {
-		return "Another TwitchPlaysX";
+		return "AnotherTwitchPlaysX";
 	};
 	
 	public default String getID() {

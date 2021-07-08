@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
@@ -42,7 +43,8 @@ public class MainFrame extends JFrame{
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainFrame.class.getSimpleName()));
 		this.onStart();
 		this.getContentPane().setBackground(Constants.TWITCH_COLOR);
-		this.setTitle(DataManager.getLanguage().getTitle());
+		//this.setTitle(DataManager.getLanguage().getTitle());
+		this.setTitle(String.format("%s - v %s", DataManager.getLanguage().getID(), App.VERSION));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
@@ -151,7 +153,7 @@ public class MainFrame extends JFrame{
 
 	//@Handler
 	public void updateLang(Lang session) {
-		this.setTitle(session.getTitle());	
+		this.setTitle(String.format("%s - v %s", DataManager.getLanguage().getID(), App.VERSION));
 	}
 	
 }

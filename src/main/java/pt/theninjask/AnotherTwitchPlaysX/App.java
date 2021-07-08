@@ -47,6 +47,8 @@ public class App {
 
 	public static final String NAME = "AnotherTwitchPlaysX";
 
+	public static final String VERSION = "1.5.0";
+	
 	public static void main(String[] args) {
 
 		int amountOfRequiredTwitchSessionOptions = 0;
