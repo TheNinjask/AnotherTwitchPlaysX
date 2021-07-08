@@ -3,7 +3,7 @@
 [logo]: https://fontmeme.com/permalink/210517/3e4924b31b184892fc5b77d4a4ca094c.png
 
 ![login](./login.png)
-![menu](./main.png)
+![menu](./menu.png)
 
 ### Before Using App Reminder
 
