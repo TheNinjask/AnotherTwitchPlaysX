@@ -55,7 +55,7 @@ To make a mod for this app, you start a maven project and add the following [dep
 <dependency>
   <groupId>pt.theninjask</groupId>
   <artifactId>anothertwitchplaysx</artifactId>
-  <version>1.5.0</version>
+  <version>1.5.2</version>
 </dependency>
 ```
 and when you use `mvn package`, the .jar created has to be a fat .jar (but it won't require the dependency above.)

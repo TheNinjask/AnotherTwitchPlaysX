@@ -8,9 +8,6 @@ import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 
 public class JTableStringToKeyCode extends JTable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private StringToKeyCodeTableModel table;

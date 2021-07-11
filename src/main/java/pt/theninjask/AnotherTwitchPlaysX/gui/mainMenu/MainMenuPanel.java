@@ -273,9 +273,9 @@ public class MainMenuPanel extends JPanel {
 				try {
 					GlobalScreen.unregisterNativeHook();
 					for (CommandData elem : DataManager.getCommands()) {
-						if (TwitchPlayer.getInstance().isConnected())
+						if (TwitchPlayer.getInstance().isSetup())
 							TwitchPlayer.getInstance().unregisterEventListener(elem);
-						if (YouTubePlayer.getInstance().isConnected())
+						if (YouTubePlayer.getInstance().isSetup())
 							YouTubePlayer.getInstance().unregisterEventListener(elem);
 					}
 					gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
@@ -294,9 +294,9 @@ public class MainMenuPanel extends JPanel {
 					commandsButton.setEnabled(false);
 					connectButton.setEnabled(false);
 					for (CommandData elem : DataManager.getCommands()) {
-						if (TwitchPlayer.getInstance().isConnected())
+						if (TwitchPlayer.getInstance().isSetup())
 							TwitchPlayer.getInstance().registerEventListener(elem);
-						if (YouTubePlayer.getInstance().isConnected())
+						if (YouTubePlayer.getInstance().isSetup())
 							YouTubePlayer.getInstance().registerEventListener(elem);
 					}
 					GlobalScreen.registerNativeHook();
@@ -318,9 +318,9 @@ public class MainMenuPanel extends JPanel {
 								try {
 									GlobalScreen.unregisterNativeHook();
 									for (CommandData elem : DataManager.getCommands()) {
-										if (TwitchPlayer.getInstance().isConnected())
+										if (TwitchPlayer.getInstance().isSetup())
 											TwitchPlayer.getInstance().unregisterEventListener(elem);
-										if (YouTubePlayer.getInstance().isConnected())
+										if (YouTubePlayer.getInstance().isSetup())
 											YouTubePlayer.getInstance().unregisterEventListener(elem);
 									}
 									gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
@@ -367,16 +367,16 @@ public class MainMenuPanel extends JPanel {
 				ChatFrame.getInstance().setVisible(false);
 				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
 				ChatFrame.getInstance().clearChat();
-				if (TwitchPlayer.getInstance().isConnected())
+				if (TwitchPlayer.getInstance().isSetup())
 					TwitchPlayer.getInstance().unregisterEventListener(ChatFrame.getInstance());
-				if (YouTubePlayer.getInstance().isConnected())
+				if (YouTubePlayer.getInstance().isSetup())
 					YouTubePlayer.getInstance().unregisterEventListener(ChatFrame.getInstance());
 			} else {
 				ChatFrame.getInstance().setVisible(true);
 				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getHideTwitchChat());
-				if (TwitchPlayer.getInstance().isConnected())
+				if (TwitchPlayer.getInstance().isSetup())
 					TwitchPlayer.getInstance().registerEventListener(ChatFrame.getInstance());
-				if (YouTubePlayer.getInstance().isConnected())
+				if (YouTubePlayer.getInstance().isSetup())
 					YouTubePlayer.getInstance().registerEventListener(ChatFrame.getInstance());
 			}
 		});
@@ -385,9 +385,9 @@ public class MainMenuPanel extends JPanel {
 			public void windowClosing(WindowEvent event) {
 				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
 				ChatFrame.getInstance().clearChat();
-				if (TwitchPlayer.getInstance().isConnected())
+				if (TwitchPlayer.getInstance().isSetup())
 					TwitchPlayer.getInstance().unregisterEventListener(ChatFrame.getInstance());
-				if (YouTubePlayer.getInstance().isConnected())
+				if (YouTubePlayer.getInstance().isSetup())
 					YouTubePlayer.getInstance().unregisterEventListener(ChatFrame.getInstance());
 			}
 		});

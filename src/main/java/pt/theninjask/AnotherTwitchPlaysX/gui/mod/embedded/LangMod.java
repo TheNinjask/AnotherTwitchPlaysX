@@ -17,7 +17,6 @@ public class LangMod extends ATPXMod {
 
 	@Override
 	public JPanel getJPanelInstance() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

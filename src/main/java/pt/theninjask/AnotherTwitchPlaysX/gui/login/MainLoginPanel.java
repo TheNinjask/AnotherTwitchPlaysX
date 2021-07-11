@@ -24,9 +24,6 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class MainLoginPanel extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private static MainLoginPanel singleton = new MainLoginPanel();

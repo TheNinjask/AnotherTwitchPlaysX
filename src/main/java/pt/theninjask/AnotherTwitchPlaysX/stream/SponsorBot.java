@@ -3,9 +3,6 @@ package pt.theninjask.AnotherTwitchPlaysX.stream;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
-import org.kitteh.irc.client.library.event.connection.ClientConnectionEndedEvent;
-
-import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
@@ -44,21 +41,15 @@ public class SponsorBot implements Runnable {
 	public void start() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.start()", SponsorBot.class.getSimpleName()));
 		sponsor = new Thread(this);
-		// ??
-		// TwitchPlayer.getInstance().registerEventListener(this);
 		sponsor.start();
 	}
 
 	public void stop() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.stop()", SponsorBot.class.getSimpleName()));
 		running.set(false);
-		// ??
-		/*
-		 * try { TwitchPlayer.getInstance().unregisterEventListener(this); }catch
-		 * (NotSetupException e) { Constants.printVerboseMessage(Level.WARNING, e); }
-		 */
 		if (sponsor != null && sponsor.isAlive())
 			sponsor.interrupt();
+		sponsor = null;
 	}
 
 	public void run() {
@@ -75,15 +66,6 @@ public class SponsorBot implements Runnable {
 				return;
 			}
 		}
-	}
-	// The way the app is built this is never gonna happen
-	/*
-	 * @Handler public void onConection(ClientConnectionEstablishedEvent event) { }
-	 */
-
-	@Handler
-	public void onLeave(ClientConnectionEndedEvent event) {
-		this.stop();
 	}
 
 }

@@ -56,30 +56,23 @@ public final class Constants {
 
 	private Constants() {
 	}
-	
-	public static final String SAVE_PATH = Paths.get(System.getProperty("user.home"),".ATPX").toString();
-	
+
+	public static final String SAVE_PATH = Paths.get(System.getProperty("user.home"), ".ATPX").toString();
+
 	public static final URL ICON_PATH = Constants.class
 			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/image/favicon.png");
 
 	public static final URL TWITCH_LOGO_PATH = Constants.class
 			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/logo/twitch.png");
-	
+
 	public static final URL YOUTUBE_LOGO_PATH = Constants.class
 			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/logo/youtube.png");
-	
+
 	public static final ImageIcon ICON = new ImageIcon(Constants.ICON_PATH);
 
 	public static final String TWITCH_CHAT_OAUTH = "https://twitchapps.com/tmi/";
 
 	public static final String YOUTUBE_CHAT_SECRET = "https://console.cloud.google.com/apis/credentials";
-	
-	// TODO check
-	// public static final String DEFAULT_ERROR_TITLE = "An error has occurred!";
-
-	// TODO check
-	// public static final String BROWSER_NOT_SUPPORTED = "Browsing is not
-	// supported!";
 
 	public static final int TITLE_SCREEN_ICON_WIDTH = 25;
 
@@ -96,15 +89,6 @@ public final class Constants {
 	@Deprecated
 	public static final Color BLUE_COLOR = new Color(0x123456);
 
-	// TODO check
-	// public static final String MOD_WARN = "You are loading a mod that was not
-	// made by the creator of this app nor verified by them!\nProceed at your own
-	// risk.";
-
-	// TODO check
-	// public static final String MOD_INFO = "You are loading a third party mod that
-	// was validated by the creator of this app!";
-
 	public static int stopKey = NativeKeyEvent.VC_ESCAPE;
 
 	public static final Map<String, Pair<Integer, ControlType>> STRING_TO_KEYCODE = getStringToKeyCode();
@@ -116,7 +100,7 @@ public final class Constants {
 		public void write(int b) throws IOException {
 		}
 	});
-	
+
 	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
 		// private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
 		private static final String format = "[%1$s] %2$s %n";
@@ -228,7 +212,7 @@ public final class Constants {
 
 	public static ATPXMod loadMod(File modFile) throws Exception {
 		ATPXMod mod = null;
-		if(modFile==null)
+		if (modFile == null)
 			return null;
 		try {
 			switch (JarVerifier.getInstance().verifyJar(modFile)) {
@@ -238,8 +222,7 @@ public final class Constants {
 				JTextArea msg = new JTextArea(DataManager.getLanguage().getConstants().getModInfo());
 				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
 				msg.setOpaque(false);
-				showCustomColorMessageDialog(null, msg,
-						DataManager.getLanguage().getConstants().getModInfoTitle(),
+				showCustomColorMessageDialog(null, msg, DataManager.getLanguage().getConstants().getModInfoTitle(),
 						JOptionPane.INFORMATION_MESSAGE, null, TWITCH_COLOR);
 				break;
 			case UNKNOWN:
@@ -248,8 +231,8 @@ public final class Constants {
 				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
 				msg.setOpaque(false);
 				int resp = showCustomColorOptionDialog(null, msg,
-						DataManager.getLanguage().getConstants().getModWarnTitle(),
-						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null, TWITCH_COLOR);
+						DataManager.getLanguage().getConstants().getModWarnTitle(), JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE, null, null, null, TWITCH_COLOR);
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -405,7 +388,7 @@ public final class Constants {
 
 		JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE);
 	}
-	
+
 	public static final void showExpectedExceptionDialog(Throwable e) {
 
 		Constants.printVerboseMessage(Level.WARNING, e);
@@ -431,16 +414,13 @@ public final class Constants {
 				showExceptionDialog(e1);
 			}
 		} else {
-			JOptionPane.showMessageDialog(null,
-					DataManager.getLanguage().getConstants().getBrowserNotSupported(),
-					DataManager.getLanguage().getConstants().getDefaultErrorTitle(),
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, DataManager.getLanguage().getConstants().getBrowserNotSupported(),
+					DataManager.getLanguage().getConstants().getDefaultErrorTitle(), JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
-	
+
 	public static MBassador<Object> setupDispatcher() {
 		IBusConfiguration config = new BusConfiguration().addPublicationErrorHandler(new IPublicationErrorHandler() {
-
 			@Override
 			public void handleError(PublicationError error) {
 			}
@@ -448,5 +428,5 @@ public final class Constants {
 				.addFeature(Feature.AsynchronousMessageDispatch.Default());
 		return new MBassador<Object>(config);
 	}
-	
+
 }

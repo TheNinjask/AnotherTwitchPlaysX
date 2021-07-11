@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,11 +20,14 @@ import javax.swing.JTextField;
 
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 
+import com.google.api.services.youtube.model.LiveChatMessage;
+
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.TaskCooldown;
 
@@ -63,7 +67,7 @@ public class StringChatCommandsMod extends ATPXMod {
 			case -1:
 				break;
 			case 0:
-				if(cmd.getText().isBlank() || resp.getText().isBlank()) {
+				if (cmd.getText().isBlank() || resp.getText().isBlank()) {
 					Constants.showMessageDialog("Please insert the command and/or text", "Warning on adding");
 					break;
 				}
@@ -180,8 +184,6 @@ public class StringChatCommandsMod extends ATPXMod {
 
 	@Override
 	public void refresh() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -230,12 +232,32 @@ public class StringChatCommandsMod extends ATPXMod {
 
 		}
 
+		@Handler
+		public void onMessage(LiveChatMessage event) {
+			Pattern pattern = Pattern.compile(cmd, Pattern.CASE_INSENSITIVE);
+			Matcher match = pattern.matcher(event.getSnippet().getDisplayMessage());
+			if (!match.matches())
+				return;
+			cooldown.run(() -> {
+				YouTubePlayer.getInstance().sendMessage(response);
+			});
+
+		}
+
 		@Override
 		public void run() {
 			if (MainMenuPanel.getInstance().getIsAppStarted().get()) {
-				TwitchPlayer.getInstance().registerEventListener(this);
+				Constants.printVerboseMessage(Level.INFO, String.format("Registering cmd: %s", cmd));
+				if (TwitchPlayer.getInstance().isSetup())
+					TwitchPlayer.getInstance().registerEventListener(this);
+				if(YouTubePlayer.getInstance().isSetup())
+					YouTubePlayer.getInstance().registerEventListener(this);
 			} else {
-				TwitchPlayer.getInstance().unregisterEventListener(this);
+				Constants.printVerboseMessage(Level.INFO, String.format("Unregistering cmd: %s", cmd));
+				if (TwitchPlayer.getInstance().isSetup())
+					TwitchPlayer.getInstance().unregisterEventListener(this);
+				if(YouTubePlayer.getInstance().isSetup())
+					YouTubePlayer.getInstance().unregisterEventListener(this);
 			}
 		}
 

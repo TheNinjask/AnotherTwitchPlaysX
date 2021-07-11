@@ -16,9 +16,6 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class PopOutFrame extends JFrame{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private JFrame parent;

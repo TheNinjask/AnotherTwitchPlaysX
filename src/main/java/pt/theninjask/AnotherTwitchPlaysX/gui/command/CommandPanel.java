@@ -47,9 +47,6 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
 public class CommandPanel extends JPanel{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private static String varAdd = DataManager.getLanguage().getCommand().getVarAdd();

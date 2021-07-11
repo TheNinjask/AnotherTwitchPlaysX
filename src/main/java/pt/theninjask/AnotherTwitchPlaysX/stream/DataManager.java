@@ -53,6 +53,8 @@ public class DataManager {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.setTwitchSession()", DataManager.class.getSimpleName()));
 		singleton.twitchSession = session;
+		if (disableSession)
+			session = TWITCH_DUMMY_SESSION;
 		if(session!=null)
 			singleton.dispatcher.post(session).now();
 	}
@@ -77,6 +79,8 @@ public class DataManager {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.setYoutubeSession()", DataManager.class.getSimpleName()));
 		singleton.youtubeSession = session;
+		if (disableSession)
+			session = YOUTUBE_DUMMY_SESSION;
 		if(session!=null)
 			singleton.dispatcher.post(session).now();
 	}

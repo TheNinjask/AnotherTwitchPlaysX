@@ -2,8 +2,6 @@ package pt.theninjask.AnotherTwitchPlaysX.data;
 
 public enum ControlType {
 	
-	//MOUSE_MOV("mouse_mov"),
-	//MOUSE_CLICK("mouse_click"),
 	MOUSE("mouse"),
 	KEY("key"),
 	MOUSE_DRAG("mouse_drag"),

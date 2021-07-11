@@ -43,9 +43,6 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
 public class ControlDataPanel extends JPanel{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private ControlData data;

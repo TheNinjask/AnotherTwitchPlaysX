@@ -30,7 +30,6 @@ public class HelloWorld extends ATPXMod {
 
 	@Override
 	public void refresh() {
-		//DO NOTHING
 	}
 
 }

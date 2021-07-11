@@ -86,9 +86,11 @@ public class App {
 			}
 			if (cmd.hasOption('v')) {
 				Constants.setLoggerLevel(Level.ALL);
+				Constants.printVerboseMessage(Level.INFO, String.format("%s - version: %s", NAME, VERSION));
 				Constants.printVerboseMessage(Level.INFO, "Verbose Set to ALL");
 			} else if (cmd.hasOption('w')) {
 				Constants.setLoggerLevel(Level.WARNING);
+				Constants.printVerboseMessage(Level.WARNING, String.format("%s - version: %s", NAME, VERSION));
 				Constants.printVerboseMessage(Level.WARNING, "Verbose Set to WARN");
 			}
 			if (cmd.hasOption('d')) {
@@ -180,7 +182,7 @@ public class App {
 		try {
 			Properties p = new Properties();
 			p.load(App.class.getResourceAsStream("/META-INF/maven/pt.theninjask/anothertwitchplaysx/pom.properties"));
-			version = p.getProperty("version", "");
+			version = p.getProperty("version", version);
 		} catch (Exception e) {}
 
 		return version;
@@ -188,7 +190,7 @@ public class App {
 
 	private static void skipMainLoginPanel(String nickname, String channel, String oauth, String secret,
 			String videoId) {
-		Constants.printVerboseMessage(Level.INFO, String.format("%s.skipLoginPanel()", App.class.getSimpleName()));
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.skipMainLoginPanel()", App.class.getSimpleName()));
 		TwitchSessionData twitch = new TwitchSessionData(nickname, channel, oauth);
 		YouTubeSessionData youtube = new YouTubeSessionData(secret, videoId);
 		DataManager.setTwitchSession(twitch);

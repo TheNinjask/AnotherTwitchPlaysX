@@ -21,9 +21,6 @@ import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 
 public class EmbeddedModMenuPanel extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private static EmbeddedModMenuPanel singleton = new EmbeddedModMenuPanel();

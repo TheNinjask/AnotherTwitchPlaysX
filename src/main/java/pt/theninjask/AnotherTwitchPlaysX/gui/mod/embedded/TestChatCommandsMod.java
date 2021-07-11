@@ -25,13 +25,6 @@ import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
 @ATPXModProps(keepLoaded = false, popout = true)
 public class TestChatCommandsMod extends ATPXMod {
 
-	// private Client mockClient;
-	// private static final String NICK_MOCK = "MOCK";
-	// private static final String HOST_MOCK = "0.0.0.0";
-	// private static final int PORT_MOCK = 6697;
-	// private static final String CHANNEL_MOCK = "#MOCK";
-	// private AtomicBoolean isConnected = new AtomicBoolean(false);
-
 	private int messageCap = 5;
 	private ChatType type = ChatType.MINECRAFT;
 
@@ -55,20 +48,16 @@ public class TestChatCommandsMod extends ATPXMod {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					onMessage(users[ThreadLocalRandom.current().nextInt(users.length)],
-							input.getText());
+					onMessage(users[ThreadLocalRandom.current().nextInt(users.length)], input.getText());
 					input.setText("");
 				}
 			}
@@ -76,8 +65,7 @@ public class TestChatCommandsMod extends ATPXMod {
 		messagePanel.add(input, BorderLayout.CENTER);
 		JButton send = new JButton("Send");
 		send.addActionListener(l -> {
-			onMessage(users[ThreadLocalRandom.current().nextInt(users.length)],
-					input.getText());
+			onMessage(users[ThreadLocalRandom.current().nextInt(users.length)], input.getText());
 			input.setText("");
 		});
 		messagePanel.add(send, BorderLayout.EAST);
@@ -155,14 +143,6 @@ public class TestChatCommandsMod extends ATPXMod {
 
 	@Override
 	public void refresh() {
-		/*
-		 * if (isConnected.get()) { for (Object listener :
-		 * mockClient.getEventManager().getRegisteredEventListeners()) {
-		 * mockClient.getEventManager().unregisterEventListener(listener); }
-		 * mockClient.shutdown(); isConnected.set(false); } mockClient.connect();
-		 * isConnected.set(true); DataManager.getInstance().getCommands().forEach(cmd ->
-		 * { mockClient.getEventManager().registerEventListener(cmd); });
-		 */
 	}
 
 	@Override

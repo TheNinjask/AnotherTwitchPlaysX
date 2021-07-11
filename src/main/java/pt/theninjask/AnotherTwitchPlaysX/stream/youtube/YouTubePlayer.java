@@ -2,12 +2,10 @@ package pt.theninjask.AnotherTwitchPlaysX.stream.youtube;
 
 import java.util.logging.Level;
 
-import com.google.api.services.youtube.model.LiveChatMessage;
-
-import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.exception.AlreadyConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoSessionDataException;
+import pt.theninjask.AnotherTwitchPlaysX.exception.NotSetupException;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class YouTubePlayer {
@@ -44,6 +42,10 @@ public class YouTubePlayer {
 	public boolean isConnected() {
 		return connected;
 	}
+	
+	public boolean isSetup() {
+		return client!=null;
+	}
 
 	public void setup() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setup()", YouTubePlayer.class.getSimpleName()));
@@ -67,10 +69,14 @@ public class YouTubePlayer {
 	}
 
 	public void registerEventListener(Object listener) {
+		if(client==null)
+			throw new NotSetupException();
 		client.subscribe(listener);
 	}
 
 	public void unregisterEventListener(Object listener) {
+		if(client==null)
+			throw new NotSetupException();
 		client.unsubscribe(listener);
 	}
 
@@ -95,11 +101,6 @@ public class YouTubePlayer {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.sendMessage()", YouTubePlayer.class.getSimpleName()));
 		client.postMessage(message);
-	}
-
-	@Handler
-	public void onMessage(LiveChatMessage message) {
-		System.out.println(message.getSnippet().getDisplayMessage());
 	}
 
 }

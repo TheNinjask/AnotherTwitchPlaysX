@@ -30,9 +30,6 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class MainFrame extends JFrame{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private static MainFrame singleton = new MainFrame();

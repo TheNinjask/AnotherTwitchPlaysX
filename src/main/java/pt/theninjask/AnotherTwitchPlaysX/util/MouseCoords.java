@@ -85,20 +85,14 @@ public class MouseCoords implements NativeMouseInputListener {
 
 	@Override
 	public void nativeMouseClicked(NativeMouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void nativeMousePressed(NativeMouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void nativeMouseReleased(NativeMouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -112,7 +106,5 @@ public class MouseCoords implements NativeMouseInputListener {
 
 	@Override
 	public void nativeMouseDragged(NativeMouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 }

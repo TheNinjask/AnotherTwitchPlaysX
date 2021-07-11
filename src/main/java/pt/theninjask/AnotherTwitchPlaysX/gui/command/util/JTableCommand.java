@@ -9,9 +9,6 @@ import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 
 public class JTableCommand extends JTable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private CommandTableModel table;

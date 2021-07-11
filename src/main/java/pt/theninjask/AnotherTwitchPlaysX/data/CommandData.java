@@ -273,8 +273,8 @@ public class CommandData implements Data {
 		case SINGLE:
 			executeSingle();
 			break;
-		case UNISON:
 		default:
+		case UNISON:
 			executeUnison();
 			break;
 		}
@@ -288,8 +288,8 @@ public class CommandData implements Data {
 			else
 				executeSingle(map);
 			break;
-		case UNISON:
 		default:
+		case UNISON:
 			if (map.isEmpty())
 				executeUnison();
 			else

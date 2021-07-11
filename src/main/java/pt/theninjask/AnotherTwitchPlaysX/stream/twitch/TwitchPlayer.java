@@ -51,6 +51,10 @@ public class TwitchPlayer {
 	public boolean isConnected() {
 		return connected;
 	}
+	
+	public boolean isSetup() {
+		return client!=null;
+	}
 
 	public void setup() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setup()", TwitchPlayer.class.getSimpleName()));

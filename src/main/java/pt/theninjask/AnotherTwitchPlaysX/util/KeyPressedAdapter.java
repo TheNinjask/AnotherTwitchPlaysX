@@ -14,18 +14,18 @@ public class KeyPressedAdapter implements KeyEventDispatcher {
 	}
 
 	@Override
-		public boolean dispatchKeyEvent(KeyEvent e) {
+	public boolean dispatchKeyEvent(KeyEvent e) {
 		synchronized (this) {
-            switch (e.getID()) {
-            	case KeyEvent.KEY_PRESSED:
-            		pressedKeys.add(e.getKeyCode());
-            		break;
-            	case KeyEvent.KEY_RELEASED:
-            		pressedKeys.remove(e.getKeyCode());
-            		break;
-            }
-            return false;
-        }
+			switch (e.getID()) {
+			case KeyEvent.KEY_PRESSED:
+				pressedKeys.add(e.getKeyCode());
+				break;
+			case KeyEvent.KEY_RELEASED:
+				pressedKeys.remove(e.getKeyCode());
+				break;
+			}
+			return false;
+		}
 	}
 
 }

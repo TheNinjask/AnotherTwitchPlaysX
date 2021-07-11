@@ -16,9 +16,6 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class StringToKeyCodePanel extends JPanel{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private static StringToKeyCodePanel singleton = new StringToKeyCodePanel();
