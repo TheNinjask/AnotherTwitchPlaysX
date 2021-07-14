@@ -2,6 +2,7 @@ package pt.theninjask.AnotherTwitchPlaysX.stream.youtube;
 
 import java.util.logging.Level;
 
+import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.exception.AlreadyConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoSessionDataException;
@@ -53,7 +54,7 @@ public class YouTubePlayer {
 			throw new NoSessionDataException();
 		if (connected)
 			throw new AlreadyConnectedException();
-		client = new YouTubeChatService();
+		client = new YouTubeChatService(App.ID, App.NAME);
 	}
 
 	public void setupAndConnect() {
@@ -63,7 +64,7 @@ public class YouTubePlayer {
 			throw new NoSessionDataException();
 		if (connected)
 			throw new AlreadyConnectedException();
-		client = new YouTubeChatService();
+		client = new YouTubeChatService(App.ID, App.NAME);
 		client.start(session.getVideoId(), session.getSecret());
 		connected = true;
 	}

@@ -50,6 +50,9 @@ public class Auth {
    */
   private static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
 
+  private static final String USER_ID = "user";
+  
+  private static final String HOME_DIRECTORY = "user.home";
   /**
    * Authorizes the installed application to access user's protected data.
    *
@@ -67,14 +70,14 @@ public class Auth {
     // This creates the credentials datastore at ~/.oauth-credentials/${credentialDatastore}
     FileDataStoreFactory fileDataStoreFactory =
         new FileDataStoreFactory(new File(getCredentialsDirectory()));
-    DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
+    DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(safeName(credentialDatastore));
 
     GoogleAuthorizationCodeFlow flow =
         new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
             .setCredentialDataStore(datastore)
             .build();
     // authorize
-    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize(USER_ID);
   }
 
   public static void clearCredentials() throws IOException {
@@ -99,6 +102,10 @@ public class Auth {
   }
 
   private static String getCredentialsDirectory() {
-    return System.getProperty("user.home") + "/" + CREDENTIALS_DIRECTORY;
+    return System.getProperty(HOME_DIRECTORY) + "/" + CREDENTIALS_DIRECTORY;
+  }
+  
+  private static String safeName(String in) {
+	  return in.replaceAll(in, "[^a-zA-Z0-9\\._]+");
   }
 }
