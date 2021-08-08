@@ -37,6 +37,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.login.TwitchLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.YoutubeLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.lan.en.EnglishLang;
@@ -188,7 +189,7 @@ public class App {
 	}
 
 	private static final String getVersion() {
-		String version = "\\Dev";
+		String version = "\\?.?.?";
 		try {
 			Properties p = new Properties();
 			p.load(App.class.getResourceAsStream("/META-INF/maven/pt.theninjask/anothertwitchplaysx/pom.properties"));
@@ -255,7 +256,7 @@ public class App {
 			} else {
 				File modFolder = modFolderPath.toFile();
 				for (File modFile : modFolder.listFiles()) {
-					if(modFile.isFile()) {
+					if(modFile.isFile() && modFile.getName().endsWith(".jar")) {
 						try {
 							ATPXMod mod = Constants.loadMod(modFile);
 							if(mod==null)
@@ -266,6 +267,8 @@ public class App {
 									new PopOutFrame(mod.getJPanelInstance());
 								else
 									MainFrame.replacePanel(mod.getJPanelInstance());
+							if (mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
+								ATPXModManager.addMod(mod);
 						}catch (Exception e) {
 							Constants.showMessageDialog(String.format("Could not load mod %s", modFile.getName()), "Mod Not Loaded");
 						}

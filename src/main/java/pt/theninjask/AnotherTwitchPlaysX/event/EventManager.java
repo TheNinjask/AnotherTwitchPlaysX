@@ -54,12 +54,12 @@ public class EventManager {
 		}
 	}
 	
-	public static void registerEventListener(Object event) {
-		singleton.dispatcher.subscribe(event);
+	public static void registerEventListener(Object listener) {
+		singleton.dispatcher.subscribe(listener);
 	}
 
-	public static void unregisterEventListener(Object event) {
-		singleton.dispatcher.unsubscribe(event);
+	public static void unregisterEventListener(Object listener) {
+		singleton.dispatcher.unsubscribe(listener);
 	}
 	
 	public static void triggerEvent(Event event) {

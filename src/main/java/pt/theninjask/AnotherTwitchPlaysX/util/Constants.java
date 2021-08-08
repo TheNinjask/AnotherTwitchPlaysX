@@ -38,6 +38,8 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.bcel.classfile.ClassParser;
+import org.apache.bcel.classfile.JavaClass;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
 import net.engio.mbassy.bus.MBassador;
@@ -260,6 +262,16 @@ public final class Constants {
 				}
 
 				String className = je.getName().substring(0, je.getName().lastIndexOf("."));
+				ClassParser cp = new ClassParser(jarFile.getInputStream(je), className);
+				JavaClass jc = cp.parse();
+				int access_flags = jc.getAccessFlags();
+				final int ACC_MODULE = 0x8000;
+				final int ACC_PUBLIC = 0x0001;
+				if ((access_flags & ACC_MODULE) != 0)
+					continue;
+				if ((access_flags & ACC_PUBLIC) == 0)
+					continue;
+
 				className = className.replace('/', '.');
 				Class<?> c = cl.loadClass(className);
 				if (ATPXMod.class.isAssignableFrom(c)) {

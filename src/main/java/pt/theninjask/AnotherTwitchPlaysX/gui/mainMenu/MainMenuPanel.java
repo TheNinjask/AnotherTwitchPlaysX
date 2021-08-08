@@ -47,6 +47,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame.ChatType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.embedded.EmbeddedModMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
@@ -249,6 +250,8 @@ public class MainMenuPanel extends JPanel {
 							MainFrame.replacePanel(mod.getJPanelInstance());
 					if (!mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
 						mod = null;
+					else
+						ATPXModManager.addMod(mod);
 				} catch (Exception e) {
 					Constants.showExpectedExceptionDialog(e);
 					mod = null;

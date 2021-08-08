@@ -55,7 +55,8 @@ To make a mod for this app, you start a maven project and add the following [dep
 <dependency>
   <groupId>pt.theninjask</groupId>
   <artifactId>anothertwitchplaysx</artifactId>
-  <version>1.5.2</version>
+  <scope>provided</scope>
+  <version>1.6.1</version>
 </dependency>
 ```
 and when you use `mvn package`, the .jar created has to be a fat .jar (but it won't require the dependency above.)
@@ -63,31 +64,22 @@ and when you use `mvn package`, the .jar created has to be a fat .jar (but it wo
 Here a plugin to help you create one that also excludes unnecessary dependencies from the fat .jar file.
 ```
 <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-shade-plugin</artifactId>
-	<version>3.2.4</version>
+	<artifactId>maven-assembly-plugin</artifactId>
+	<version>3.3.0</version>
+	<configuration>
+		<finalName>HelloWorldATPXMod</finalName>
+		<descriptorRefs>
+			<descriptorRef>jar-with-dependencies</descriptorRef>
+		</descriptorRefs>
+		<appendAssemblyId>false</appendAssemblyId>
+	</configuration>
 	<executions>
 		<execution>
+			<id>make-assembly</id>
 			<phase>package</phase>
 			<goals>
-				<goal>shade</goal>
+				<goal>single</goal>
 			</goals>
-			<configuration>
-				<artifactSet>
-					<excludes>
-						<exclude>pt.theninjask:anothertwitchplaysx</exclude>
-						<exclude>org.kitteh.irc:client-lib</exclude>
-						<exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
-						<exclude>com.1stleg:jnativehook</exclude>
-						<exclude>commons-cli:commons-cli</exclude>
-						<exclude>com.google.apis:google-api-services-youtube</exclude>
-						<exclude>com.google.http-client:google-http-client</exclude>
-						<exclude>com.google.api-client:google-api-client</exclude>
-						<exclude>com.google.oauth-client:google-oauth-client-jetty</exclude>
-						<exclude>net.engio:mbassador</exclude>
-					</excludes>
-				</artifactSet>
-			</configuration>
 		</execution>
 	</executions>
 </plugin>
@@ -107,12 +99,11 @@ For any issues/wishes please refer to [bugs](#bugs) section (even tho it might n
 Example-Changing the Mod Button to say greetings to the user:
 
 ```
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
+import net.engio.mbassy.listener.Handler;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.mainMenu.ModButtonClickEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
@@ -121,13 +112,7 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 public class HelloWorld extends ATPXMod {
 
 	public HelloWorld() {
-		JButton modButton = MainMenuPanel.getInstance().getModButton();
-		for (ActionListener elem : modButton.getActionListeners()) {
-			modButton.removeActionListener(elem);
-		}
-		modButton.addActionListener(l->{
-			Constants.showMessageDialog("Greetings World!", "Title-Hello World!");
-		});
+		EventManager.registerEventListener(this);
 	}
 	
 	@Override
@@ -137,7 +122,14 @@ public class HelloWorld extends ATPXMod {
 
 	@Override
 	public void refresh() {
-		//DO NOTHING
+	}
+	
+	@Handler
+	public void newModButton(ModButtonClickEvent event) {
+		if(event.toSecretMenu())
+			return;
+		event.setCancelled(true);
+		Constants.showMessageDialog("Greetings World!", "Title-Hello World!");
 	}
 
 }
