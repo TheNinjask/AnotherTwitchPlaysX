@@ -11,7 +11,7 @@ public interface ConstantsLang {
 	}
 	
 	public default String getModInfoTitle() {
-		return "Mod Info";
+		return "%s - Mod Info";
 	}
 		
 	public default String getModInfo() {
@@ -19,7 +19,7 @@ public interface ConstantsLang {
 	}
 	
 	public default String getModWarnTitle() {
-		return "Mod Warning";
+		return "%s - Mod Warning";
 	}
 	
 	public default String getModWarn() {

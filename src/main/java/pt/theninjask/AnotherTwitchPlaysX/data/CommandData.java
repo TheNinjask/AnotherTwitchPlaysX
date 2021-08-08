@@ -25,6 +25,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.api.services.youtube.model.LiveChatMessage;
 
 import net.engio.mbassy.listener.Handler;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.data.CommandDataOnMessageEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.data.CommandDataOnTwitchMessageEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.data.CommandDataOnYouTubeMessage;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoLeadDefinedException;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 import pt.theninjask.AnotherTwitchPlaysX.util.RobotSingleton;
@@ -39,7 +43,7 @@ public class CommandData implements Data {
 
 		@Override
 		public synchronized String format(LogRecord lr) {
-			return String.format("[%s]: %s\n", sdf.format(new Date(lr.getMillis())), lr.getMessage());
+			return String.format("[%s] %s\n", sdf.format(new Date(lr.getMillis())), lr.getMessage());
 		}
 	};
 
@@ -243,6 +247,10 @@ public class CommandData implements Data {
 	public void onMessage(String message) {
 		// if(!event.getActor().getNick().equalsIgnoreCase("mytwitchusername69420"))
 		// return;
+		CommandDataOnMessageEvent event = new CommandDataOnMessageEvent(this);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
 		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
 		Matcher match = pattern.matcher(message);
 		Map<String, String> map = new HashMap<String, String>();
@@ -260,11 +268,19 @@ public class CommandData implements Data {
 
 	@Handler
 	public void onMessage(ChannelMessageEvent event) {
+		CommandDataOnTwitchMessageEvent trigger = new CommandDataOnTwitchMessageEvent(this, event);
+		EventManager.triggerEvent(trigger);
+		if(trigger.isCancelled())
+			return;
 		onMessage(event.getMessage());
 	}
 	
 	@Handler
 	public void onMessage(LiveChatMessage event) {
+		CommandDataOnYouTubeMessage trigger = new CommandDataOnYouTubeMessage(this, event);
+		EventManager.triggerEvent(trigger);
+		if(trigger.isCancelled())
+			return;
 		onMessage(event.getSnippet().getDisplayMessage());
 	}
 

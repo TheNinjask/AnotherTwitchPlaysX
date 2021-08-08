@@ -4,15 +4,14 @@ import java.util.List;
 
 import javax.swing.JTable;
 
-import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 
-public class JTableStringToKeyCode extends JTable{
+public class JTableStringToKeyCode extends JTable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private StringToKeyCodeTableModel table;
-	
-	
+
 	public JTableStringToKeyCode() {
 		this.setTableHeader(null);
 		this.setFocusable(false);
@@ -24,15 +23,15 @@ public class JTableStringToKeyCode extends JTable{
 		this.getColumn(StringToKeyCodeTableModel.REMOVE_COLUMN).setPreferredWidth(10);
 		this.addMouseListener(new JTableButtonMouseListener(this));
 	}
-	
-	public boolean isCellEditable(int row, int column){  
-        return false;  
-    }
-	
+
+	public boolean isCellEditable(int row, int column) {
+		return false;
+	}
+
 	public void addRow(String key) {
 		table.addRow(key);
 	}
-	
+
 	public void clearAndSet(List<String> keys) {
 		table.clear();
 		for (String key : keys) {
@@ -40,9 +39,10 @@ public class JTableStringToKeyCode extends JTable{
 		}
 	}
 
-	//@Handler
-	public void updateLang(Lang session) {
-		table.updateLang(session);
+	// @Handler
+	public void updateLang(LanguageUpdateEvent event) {
+		if (event.getLanguage() != null)
+			table.updateLang(event);
 	}
 
 }

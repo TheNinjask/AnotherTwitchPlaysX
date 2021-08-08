@@ -10,7 +10,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.util.ClosePopOutFrameEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.util.OpenPopOutFrameEvent;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
@@ -22,6 +25,12 @@ public class PopOutFrame extends JFrame{
 	
 	public PopOutFrame(JComponent comp) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", PopOutFrame.class.getSimpleName(),this.hashCode()));
+		
+		OpenPopOutFrameEvent event = new OpenPopOutFrameEvent(this);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
+		
 		this.parent = null;
 		this.add(comp);
 		
@@ -35,16 +44,24 @@ public class PopOutFrame extends JFrame{
 		comp.requestFocusInWindow();
 		//DataManager.registerLangEvent(this);
 		this.setVisible(true);
-		/*this.addWindowListener(new WindowAdapter() {
+		PopOutFrame tmp = this;
+		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
-				DataManager.unregisterLangEvent("this");
+				EventManager.triggerEvent(new ClosePopOutFrameEvent(tmp));
+				//EventManager.unregisterEventListener(tmp);
 			}
-		});*/
+		});
 	}
 	
 	public PopOutFrame(JComponent comp, JFrame parentInc) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s(%s)", PopOutFrame.class.getSimpleName(),this.hashCode()));
+		
+		OpenPopOutFrameEvent event = new OpenPopOutFrameEvent(this);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
+		
 		this.parent = parentInc;
 		this.parent.setEnabled(false);
 		this.add(comp);
@@ -55,9 +72,11 @@ public class PopOutFrame extends JFrame{
 		this.setIconImage(icon.getImage());
 		this.setBackground(Constants.TWITCH_COLOR);
 		//DataManager.registerLangEvent(this);
+		PopOutFrame tmp = this;
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
+				EventManager.triggerEvent(new ClosePopOutFrameEvent(tmp));
 				//DataManager.unregisterLangEvent("this");
 				parent.setEnabled(true);
 				parent.revalidate();
@@ -76,8 +95,9 @@ public class PopOutFrame extends JFrame{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
-		this.setTitle(session.getTitle());
+	public void updateLang(LanguageUpdateEvent event) {
+		if(event.getLanguage()!=null)
+			this.setTitle(event.getLanguage().getTitle());
 	}
 	
 }

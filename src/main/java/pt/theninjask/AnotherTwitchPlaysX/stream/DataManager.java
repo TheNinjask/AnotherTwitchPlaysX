@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import net.engio.mbassy.bus.MBassador;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.CommandsUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.TwitchSessionUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.YoutubeSessionUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class DataManager {
 
 	private static DataManager singleton = new DataManager();
-
-	private MBassador<Object> dispatcher = Constants.setupDispatcher();
 
 	private TwitchSessionData twitchSession;
 
@@ -52,19 +54,13 @@ public class DataManager {
 	public static void setTwitchSession(TwitchSessionData session) {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.setTwitchSession()", DataManager.class.getSimpleName()));
-		singleton.twitchSession = session;
 		if (disableSession)
 			session = TWITCH_DUMMY_SESSION;
-		if(session!=null)
-			singleton.dispatcher.post(session).now();
-	}
-
-	public static void registerDataManagerEvent(Object event) {
-		singleton.dispatcher.subscribe(event);
-	}
-
-	public static void unregisterDataManagerEvent(Object event) {
-		singleton.dispatcher.unsubscribe(event);
+		TwitchSessionUpdateEvent event = new TwitchSessionUpdateEvent(session);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
+		singleton.twitchSession = session;
 	}
 
 	public static YouTubeSessionData getYouTubeSession() {
@@ -78,11 +74,13 @@ public class DataManager {
 	public static void setYouTubeSession(YouTubeSessionData session) {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.setYoutubeSession()", DataManager.class.getSimpleName()));
-		singleton.youtubeSession = session;
 		if (disableSession)
 			session = YOUTUBE_DUMMY_SESSION;
-		if(session!=null)
-			singleton.dispatcher.post(session).now();
+		YoutubeSessionUpdateEvent event = new YoutubeSessionUpdateEvent(session);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
+		singleton.youtubeSession = session;
 	}
 
 	public static List<CommandData> getCommands() {
@@ -92,6 +90,10 @@ public class DataManager {
 
 	public static void setCommands(List<CommandData> commands) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setCommands()", DataManager.class.getSimpleName()));
+		CommandsUpdateEvent event = new CommandsUpdateEvent(commands);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
 		singleton.commands = commands;
 	}
 
@@ -103,8 +105,11 @@ public class DataManager {
 
 	public static void setLanguage(Lang language) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setLanguage()", DataManager.class.getSimpleName()));
+		LanguageUpdateEvent event = new LanguageUpdateEvent(language);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
 		singleton.language = language;
-		singleton.dispatcher.post(language).now();
 	}
 
 }

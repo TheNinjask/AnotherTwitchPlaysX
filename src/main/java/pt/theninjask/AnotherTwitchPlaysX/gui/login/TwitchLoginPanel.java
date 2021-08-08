@@ -15,6 +15,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
@@ -279,7 +280,10 @@ public class TwitchLoginPanel extends JPanel{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
+	public void updateLang(LanguageUpdateEvent event) {
+		Lang session = event.getLanguage();
+		if(session == null)
+			return;
 		nickLabel.setText(session.getLogin().getTwitchField());
 		nickLabel.setToolTipText(session.getLogin().getTwitchFieldTip());
 		channelLabel.setText(session.getLogin().getChannelField());

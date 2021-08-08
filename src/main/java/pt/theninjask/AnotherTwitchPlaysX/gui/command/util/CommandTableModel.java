@@ -11,6 +11,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.CommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
@@ -91,7 +92,11 @@ public class CommandTableModel{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
+	public void updateLang(LanguageUpdateEvent event) {
+		Lang session = event.getLanguage();
+		if(session == null)
+			return;
+		
 		for(int i=0; i<table.getRowCount(); i++) {
 			Object syntax = table.getValueAt(i, 1);
 			Object edit = table.getValueAt(i, 2);

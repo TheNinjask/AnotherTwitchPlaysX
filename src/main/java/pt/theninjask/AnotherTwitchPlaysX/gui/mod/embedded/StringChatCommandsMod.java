@@ -23,6 +23,8 @@ import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import com.google.api.services.youtube.model.LiveChatMessage;
 
 import net.engio.mbassy.listener.Handler;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.mainMenu.GameButtonClickEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
@@ -78,7 +80,7 @@ public class StringChatCommandsMod extends ATPXMod {
 				cmd.setEditable(false);
 				resp.setEditable(false);
 				action.setText("Remove");
-				MainMenuPanel.getInstance().attachEventListenerToGameButton(newCmd);
+				EventManager.registerEventListener(newCmd);
 				break;
 			default:
 				SimpleCmd toDelete = options.getItemAt(options.getSelectedIndex());
@@ -92,7 +94,7 @@ public class StringChatCommandsMod extends ATPXMod {
 				resp.setText("");
 				resp.setEditable(true);
 				action.setText("Add");
-				MainMenuPanel.getInstance().dettachEventListenerToGameButton(toDelete);
+				EventManager.unregisterEventListener(toDelete);
 				break;
 			}
 		});
@@ -101,7 +103,7 @@ public class StringChatCommandsMod extends ATPXMod {
 		removeAll.addActionListener(l -> {
 
 			cmds.forEach(cmd -> {
-				MainMenuPanel.getInstance().dettachEventListenerToGameButton(cmd);
+				EventManager.unregisterEventListener(cmd);
 			});
 
 			cmds.clear();
@@ -191,7 +193,7 @@ public class StringChatCommandsMod extends ATPXMod {
 		return mainPanel;
 	}
 
-	private class SimpleCmd implements Runnable {
+	private class SimpleCmd{
 
 		private String cmd;
 
@@ -244,8 +246,8 @@ public class StringChatCommandsMod extends ATPXMod {
 
 		}
 
-		@Override
-		public void run() {
+		@Handler
+		public void run(GameButtonClickEvent event) {
 			if (MainMenuPanel.getInstance().getIsAppStarted().get()) {
 				Constants.printVerboseMessage(Level.INFO, String.format("Registering cmd: %s", cmd));
 				if (TwitchPlayer.getInstance().isSetup())

@@ -31,6 +31,7 @@ import pt.theninjask.AnotherTwitchPlaysX.data.CommandVarType;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.data.MouseCoordsType;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
@@ -1269,7 +1270,11 @@ public class ControlDataPanel extends JPanel{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
+	public void updateLang(LanguageUpdateEvent event) {
+		Lang session = event.getLanguage();
+		if(session == null)
+			return;
+		
 		jComboBoxVarNone = session.getControlData().getVarNone();
 		inputLabel.setText(data.getType() == ControlType.KEY ? session.getControlData().getTypeKey()
 				: session.getControlData().getTypeButton());

@@ -22,6 +22,15 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelBackEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelLoadEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelNewEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelPopoutEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelSaveEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelInsertEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelKeycodesEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.util.JTableCommand;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.util.StringToKeyCodePanel;
@@ -90,6 +99,10 @@ public class AllCommandPanel extends JPanel{
 		create.setFocusable(false);
 		create.setOpaque(false);
 		create.addActionListener(l -> {
+			AllCommandPanelNewEvent event = new AllCommandPanelNewEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			replacePanel(mainCommandPanel);
 			DataManager.setCommands(new ArrayList<CommandData>());
 		});
@@ -104,6 +117,10 @@ public class AllCommandPanel extends JPanel{
 		firstLoad.setOpaque(false);
 		firstLoad.addActionListener(l -> {
 			try {
+				AllCommandPanelLoadEvent event = new AllCommandPanelLoadEvent(false);
+				EventManager.triggerEvent(event);
+				if(event.isCancelled())
+					return;
 				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
 				if (file != null) {
 					ObjectMapper mapper = new ObjectMapper();
@@ -123,6 +140,10 @@ public class AllCommandPanel extends JPanel{
 		firstBack.setFocusable(false);
 		firstBack.setOpaque(false);
 		firstBack.addActionListener(l -> {
+			AllCommandPanelBackEvent event = new AllCommandPanelBackEvent(false);
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		});
 		right.add(firstBack);
@@ -168,12 +189,24 @@ public class AllCommandPanel extends JPanel{
 		insert.setFocusable(false);
 		insert.addActionListener(l -> {
 			// table.addRow(new CommandData());
+			
+			AllCommandPanelInsertEvent event = new AllCommandPanelInsertEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
+			
 			MainFrame.replacePanel(new CommandPanel());
 		});
 		right.add(insert);
 		keycodes = new JButton(DataManager.getLanguage().getAllCommand().getCodes());
 		keycodes.setFocusable(false);
 		keycodes.addActionListener(l -> {
+			
+			AllCommandPanelKeycodesEvent event = new AllCommandPanelKeycodesEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
+			
 			MainFrame.replacePanel(StringToKeyCodePanel.getInstance());
 		});
 		right.add(keycodes);
@@ -185,6 +218,12 @@ public class AllCommandPanel extends JPanel{
 		popout = new JButton(DataManager.getLanguage().getAllCommand().getPopOut());
 		popout.setFocusable(false);
 		popout.addActionListener(l -> {
+			
+			AllCommandPanelPopoutEvent event = new AllCommandPanelPopoutEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
+			
 			new PopOutFrame(left, MainFrame.getInstance()).addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent event) {
@@ -199,6 +238,10 @@ public class AllCommandPanel extends JPanel{
 		save = new JButton(DataManager.getLanguage().getAllCommand().getSave());
 		save.setFocusable(false);
 		save.addActionListener(l -> {
+			AllCommandPanelSaveEvent event = new AllCommandPanelSaveEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			File file = Constants.showSaveFile(new File("commands.json"), new FileNameExtensionFilter("JSON", "json"),
 					this);
 			if (file != null) {
@@ -224,6 +267,10 @@ public class AllCommandPanel extends JPanel{
 		load = new JButton(DataManager.getLanguage().getAllCommand().getLoad());
 		load.setFocusable(false);
 		load.addActionListener(l -> {
+			AllCommandPanelLoadEvent event = new AllCommandPanelLoadEvent(true);
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			try {
 				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
 				if (file != null) {
@@ -242,6 +289,10 @@ public class AllCommandPanel extends JPanel{
 		back = new JButton(DataManager.getLanguage().getAllCommand().getBack());
 		back.setFocusable(false);
 		back.addActionListener(l -> {
+			AllCommandPanelBackEvent event = new AllCommandPanelBackEvent(true);
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		});
 		right.add(back);
@@ -315,7 +366,11 @@ public class AllCommandPanel extends JPanel{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
+	public void updateLang(LanguageUpdateEvent event) {
+		Lang session = event.getLanguage();
+		if(session == null)
+			return;
+		
 		create.setText(session.getAllCommand().getCreate());
 		firstLoad.setText(session.getAllCommand().getLoad());
 		firstBack.setText(session.getAllCommand().getBack());
@@ -328,7 +383,7 @@ public class AllCommandPanel extends JPanel{
 		save.setText(session.getAllCommand().getSave());
 		load.setText(session.getAllCommand().getLoad());
 		back.setText(session.getAllCommand().getBack());
-		table.updateLang(session);
+		table.updateLang(event);
 
 	}
 

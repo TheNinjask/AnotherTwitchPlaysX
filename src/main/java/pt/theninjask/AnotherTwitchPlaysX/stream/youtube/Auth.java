@@ -70,8 +70,8 @@ public class Auth {
     // This creates the credentials datastore at ~/.oauth-credentials/${credentialDatastore}
     FileDataStoreFactory fileDataStoreFactory =
         new FileDataStoreFactory(new File(getCredentialsDirectory()));
-    DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(safeName(credentialDatastore));
-
+    //DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(safeName(credentialDatastore));
+    DataStore<StoredCredential> datastore = fileDataStoreFactory.getDataStore(credentialDatastore);
     GoogleAuthorizationCodeFlow flow =
         new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
             .setCredentialDataStore(datastore)
@@ -105,7 +105,7 @@ public class Auth {
     return System.getProperty(HOME_DIRECTORY) + "/" + CREDENTIALS_DIRECTORY;
   }
   
-  private static String safeName(String in) {
+  /*private static String safeName(String in) {
 	  return in.replaceAll(in, "[^a-zA-Z0-9\\._]+");
-  }
+  }*/
 }

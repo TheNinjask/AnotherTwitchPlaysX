@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
@@ -90,9 +91,12 @@ public class StringToKeyCodePanel extends JPanel{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
+	public void updateLang(LanguageUpdateEvent event) {
+		Lang session = event.getLanguage();
+		if(session == null)
+			return;
 		back.setText(session.getStringToKeyCode().getBack());
 		reset.setText(session.getStringToKeyCode().getReset());
-		table.updateLang(session);
+		table.updateLang(event);
 	}
 }

@@ -19,10 +19,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.MainFrameReplacePanelEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.TwitchLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.YoutubeLoginPanel;
-import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
@@ -141,6 +143,12 @@ public class MainFrame extends JFrame{
 	
 	public static void replacePanel(JPanel newPanel) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.replacePanel()", MainFrame.class.getSimpleName()));
+		
+		MainFrameReplacePanelEvent event = new MainFrameReplacePanelEvent(singleton.currentPanel, newPanel);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
+		
 		singleton.remove(singleton.currentPanel);
 		singleton.currentPanel = newPanel;
 		singleton.add(newPanel);
@@ -149,8 +157,9 @@ public class MainFrame extends JFrame{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
-		this.setTitle(String.format("%s - v%s", DataManager.getLanguage().getID(), App.VERSION));
+	public void updateLang(LanguageUpdateEvent event) {
+		if(event.getLanguage()!=null)
+		this.setTitle(String.format("%s - v%s", event.getLanguage().getID(), App.VERSION));
 	}
 	
 }

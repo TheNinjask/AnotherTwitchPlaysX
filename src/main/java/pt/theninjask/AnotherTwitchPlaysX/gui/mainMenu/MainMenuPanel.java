@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
@@ -37,6 +36,10 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.mainMenu.GameButtonClickEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.mainMenu.ModButtonClickEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame.ChatMode;
@@ -108,7 +111,7 @@ public class MainMenuPanel extends JPanel {
 
 	private JPanel twitchChatTransparencyModePanel;
 
-	private List<Runnable> eventsWithStart;
+	//private List<Runnable> eventsWithStart;
 
 	private JCheckBox twitchChatInput;
 
@@ -158,7 +161,7 @@ public class MainMenuPanel extends JPanel {
 		this.add(twitchChatSlider());
 		this.add(twitchChatSliderLabel(), this.getComponentCount() - 1);
 		this.add(sponsorMeInChat());
-		eventsWithStart = new CopyOnWriteArrayList<Runnable>();
+		// eventsWithStart = new CopyOnWriteArrayList<Runnable>();
 		// DataManager.registerLangEvent(this);
 	}
 
@@ -223,7 +226,12 @@ public class MainMenuPanel extends JPanel {
 		modButton.setFocusable(false);
 		// modButton.setEnabled(false);
 		modButton.addActionListener(l -> {
-			if (KeyPressedAdapter.isKeyPressed(KeyEvent.VK_SHIFT)) {
+			boolean secretMenu = KeyPressedAdapter.isKeyPressed(KeyEvent.VK_SHIFT);
+			ModButtonClickEvent event = new ModButtonClickEvent(modButton, secretMenu);
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
+			if (secretMenu) {
 				MainFrame.replacePanel(EmbeddedModMenuPanel.getInstance());
 				return;
 			}
@@ -235,7 +243,10 @@ public class MainMenuPanel extends JPanel {
 						return;
 					mod.refresh();
 					if (mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
-						MainFrame.replacePanel(mod.getJPanelInstance());
+						if (mod.getClass().getAnnotation(ATPXModProps.class).popout())
+							new PopOutFrame(mod.getJPanelInstance());
+						else
+							MainFrame.replacePanel(mod.getJPanelInstance());
 					if (!mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
 						mod = null;
 				} catch (Exception e) {
@@ -269,6 +280,10 @@ public class MainMenuPanel extends JPanel {
 		gameButton.setFocusable(false);
 		gameButton.setEnabled(false);
 		gameButton.addActionListener(l -> {
+			GameButtonClickEvent event = new GameButtonClickEvent(gameButton, isAppStarted.get());
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			if (isAppStarted.get()) {
 				try {
 					GlobalScreen.unregisterNativeHook();
@@ -282,9 +297,6 @@ public class MainMenuPanel extends JPanel {
 					commandsButton.setEnabled(true);
 					connectButton.setEnabled(true);
 					isAppStarted.set(false);
-					eventsWithStart.forEach(a -> {
-						a.run();
-					});
 				} catch (NativeHookException nativeHookException) {
 					Constants.showExceptionDialog(nativeHookException);
 				}
@@ -336,9 +348,6 @@ public class MainMenuPanel extends JPanel {
 					});
 					MainFrame.getInstance().setState(JFrame.ICONIFIED);
 					isAppStarted.set(true);
-					eventsWithStart.forEach(a -> {
-						a.run();
-					});
 				} catch (NativeHookException e) {
 					Constants.showExceptionDialog(e);
 				}
@@ -800,23 +809,11 @@ public class MainMenuPanel extends JPanel {
 		this.mod = mod;
 	}
 
-	/**
-	 * This will ensure this is the last this ran after pressing the button
-	 */
-	public void attachEventListenerToGameButton(Runnable action) {
-		Constants.printVerboseMessage(Level.INFO,
-				String.format("%s.attachEventListenerToGameButton(Runnable)", MainMenuPanel.class.getSimpleName()));
-		eventsWithStart.add(action);
-	}
-
-	public boolean dettachEventListenerToGameButton(Runnable action) {
-		Constants.printVerboseMessage(Level.INFO,
-				String.format("%s.dettachEventListenerToGameButton(Runnable)", MainMenuPanel.class.getSimpleName()));
-		return eventsWithStart.remove(action);
-	}
-
 	// @Handler
-	public void updateLang(Lang session) {
+	public void updateLang(LanguageUpdateEvent event) {
+		Lang session = event.getLanguage();
+		if(session==null)
+			return;
 		if (inConnection.get())
 			connectButton.setText(session.getMainMenu().getDisconnect());
 		else

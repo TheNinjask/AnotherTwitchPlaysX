@@ -30,11 +30,15 @@ import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.TwitchLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.YoutubeLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.lan.en.EnglishLang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
@@ -63,6 +67,8 @@ public class App {
 		options.addOptionGroup(verbose);
 
 		options.addOption("p", "printCommand", false, "Print Commands execution");
+
+		options.addOption("e", "eventLog", false, "Print events trigger");
 
 		options.addOption("d", "debug", false, "Enables printStackTrace()");
 		options.addOption("s", "disableSession", false,
@@ -103,7 +109,11 @@ public class App {
 			}
 			if (cmd.hasOption('p')) {
 				CommandData.enableLogging(true);
-				Constants.printVerboseMessage(Level.INFO, "Enabled print commands exetution");
+				Constants.printVerboseMessage(Level.INFO, "Enabled print commands execution");
+			}
+			if (cmd.hasOption('e')) {
+				EventManager.enableLogging(true);
+				Constants.printVerboseMessage(Level.INFO, "Enabled print event trigger");
 			}
 			String nickname = null;
 			String channel = null;
@@ -183,7 +193,8 @@ public class App {
 			Properties p = new Properties();
 			p.load(App.class.getResourceAsStream("/META-INF/maven/pt.theninjask/anothertwitchplaysx/pom.properties"));
 			version = p.getProperty("version", version);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 
 		return version;
 	}
@@ -206,6 +217,7 @@ public class App {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.globalSetUp()", App.class.getSimpleName()));
 		PrintStream tmp = System.out;
 		try {
+			DataManager.setLanguage(new EnglishLang());
 			// Get the logger for "com.github.kwhat.jnativehook" and set the level to off.
 			// LogManager.getLogManager().reset();
 			Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -229,13 +241,39 @@ public class App {
 			Path path = Paths.get(Constants.SAVE_PATH);
 			if (!Files.exists(path)) {
 				Files.createDirectory(path);
-				Files.setAttribute(path, "dos:hidden", true);
+				// Files.setAttribute(path, "dos:hidden", true);
 			} else if (!Files.isDirectory(path)) {
 				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
 			}
+			
+			Path modFolderPath = Paths.get(Constants.SAVE_PATH, Constants.MOD_FOLDER);
+			if (!Files.exists(modFolderPath)) {
+				Files.createDirectory(modFolderPath);
+				// Files.setAttribute(path, "dos:hidden", true);
+			} else if (!Files.isDirectory(modFolderPath)) {
+				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
+			} else {
+				File modFolder = modFolderPath.toFile();
+				for (File modFile : modFolder.listFiles()) {
+					if(modFile.isFile()) {
+						try {
+							ATPXMod mod = Constants.loadMod(modFile);
+							if(mod==null)
+								continue;
+							mod.refresh();
+							if (mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
+								if (mod.getClass().getAnnotation(ATPXModProps.class).popout())
+									new PopOutFrame(mod.getJPanelInstance());
+								else
+									MainFrame.replacePanel(mod.getJPanelInstance());
+						}catch (Exception e) {
+							Constants.showMessageDialog(String.format("Could not load mod %s", modFile.getName()), "Mod Not Loaded");
+						}
+					}
+				}
+			}
 
 			ControlData.setTranslation(Constants.STRING_TO_KEYCODE);
-			DataManager.setLanguage(new EnglishLang());
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
 		} catch (Exception | Error e) {
 			System.setOut(tmp);

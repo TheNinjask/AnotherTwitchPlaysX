@@ -10,6 +10,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.mod.EmbeddedModLoadEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
@@ -59,6 +61,12 @@ public class EmbeddedModMenuPanel extends JPanel {
 		mods.setSelectedIndex(-1);
 		mods.addActionListener(l->{
 			ATPXMod mod = mods.getItemAt(mods.getSelectedIndex()).get();
+			
+			EmbeddedModLoadEvent event = new EmbeddedModLoadEvent(mod);
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
+			
 			mod.refresh();
 			if(mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
 				if(mod.getClass().getAnnotation(ATPXModProps.class).popout())

@@ -59,6 +59,8 @@ public final class Constants {
 
 	public static final String SAVE_PATH = Paths.get(System.getProperty("user.home"), ".ATPX").toString();
 
+	public static final String MOD_FOLDER = "mods";
+
 	public static final URL ICON_PATH = Constants.class
 			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/image/favicon.png");
 
@@ -222,7 +224,8 @@ public final class Constants {
 				JTextArea msg = new JTextArea(DataManager.getLanguage().getConstants().getModInfo());
 				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
 				msg.setOpaque(false);
-				showCustomColorMessageDialog(null, msg, DataManager.getLanguage().getConstants().getModInfoTitle(),
+				showCustomColorMessageDialog(null, msg,
+						String.format(DataManager.getLanguage().getConstants().getModInfoTitle(), modFile.getName()),
 						JOptionPane.INFORMATION_MESSAGE, null, TWITCH_COLOR);
 				break;
 			case UNKNOWN:
@@ -231,8 +234,8 @@ public final class Constants {
 				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
 				msg.setOpaque(false);
 				int resp = showCustomColorOptionDialog(null, msg,
-						DataManager.getLanguage().getConstants().getModWarnTitle(), JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, null, null, TWITCH_COLOR);
+						String.format(DataManager.getLanguage().getConstants().getModWarnTitle(), modFile.getName()),
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null, TWITCH_COLOR);
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -318,7 +321,7 @@ public final class Constants {
 		try {
 			LookAndFeel previousLF = UIManager.getLookAndFeel();
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			chooser = new JFileChooser();
+			chooser = new JFileChooser(Paths.get(SAVE_PATH, MOD_FOLDER).toFile());
 			chooser.addChoosableFileFilter(filter);
 			chooser.setFileFilter(filter);
 			UIManager.setLookAndFeel(previousLF);
@@ -326,7 +329,7 @@ public final class Constants {
 
 			Constants.printVerboseMessage(Level.WARNING, e);
 
-			chooser = new JFileChooser();
+			chooser = new JFileChooser(Paths.get(SAVE_PATH, MOD_FOLDER).toFile());
 			chooser.addChoosableFileFilter(filter);
 			chooser.setFileFilter(filter);
 		}

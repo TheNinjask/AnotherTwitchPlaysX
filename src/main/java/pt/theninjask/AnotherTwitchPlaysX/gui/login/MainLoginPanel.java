@@ -12,8 +12,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.engio.mbassy.listener.Handler;
-import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
-import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.TwitchSessionUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.YoutubeSessionUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.login.ClearTwitchClickButtonEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.login.ClearYouTubeClickButtonEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.login.ConnectTwitchClickButtonEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.login.ConnectYouTubeClickButtonEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.login.StartLoginClickButtonEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
@@ -64,10 +71,16 @@ public class MainLoginPanel extends JPanel {
 			connectYoutube.setText(DataManager.getLanguage().getMainLogin().getConnected());
 			clearYoutube.setEnabled(true);
 		}
-		DataManager.registerDataManagerEvent(this);
+		EventManager.registerEventListener(this);
 		start = new JButton(DataManager.getLanguage().getMainLogin().getStart());
 		start.setFocusable(false);
 		start.addActionListener(l -> {
+			
+			StartLoginClickButtonEvent event = new StartLoginClickButtonEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
+			
 			TwitchPlayer.getInstance().setSession(DataManager.getTwitchSession());
 			YouTubePlayer.getInstance().setSession(DataManager.getYouTubeSession());
 			if (TwitchPlayer.getInstance().hasRequired() || YouTubePlayer.getInstance().hasRequired())
@@ -108,6 +121,10 @@ public class MainLoginPanel extends JPanel {
 		connectTwitch = new JButton(DataManager.getLanguage().getMainLogin().getConnect());
 		connectTwitch.setFocusable(false);
 		connectTwitch.addActionListener(l -> {
+			ConnectTwitchClickButtonEvent event = new ConnectTwitchClickButtonEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			MainFrame.replacePanel(TwitchLoginPanel.getInstance());
 		});
 		buttons.add(connectTwitch);
@@ -116,8 +133,12 @@ public class MainLoginPanel extends JPanel {
 		clearTwitch.setEnabled(false);
 		clearTwitch.setMargin(new Insets(2, 2, 2, 2));
 		clearTwitch.addActionListener(l -> {
+			ClearTwitchClickButtonEvent event = new ClearTwitchClickButtonEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			DataManager.setTwitchSession(null);
-			onUpdateTwitch(null);
+			//onUpdateTwitch(null);
 		});
 		buttons.add(clearTwitch, BorderLayout.EAST);
 		demo.add(buttons);
@@ -142,6 +163,10 @@ public class MainLoginPanel extends JPanel {
 		connectYoutube = new JButton(DataManager.getLanguage().getMainLogin().getConnect());
 		connectYoutube.setFocusable(false);
 		connectYoutube.addActionListener(l -> {
+			ConnectYouTubeClickButtonEvent event = new ConnectYouTubeClickButtonEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			MainFrame.replacePanel(YoutubeLoginPanel.getInstance());
 		});
 		buttons.add(connectYoutube);
@@ -150,8 +175,12 @@ public class MainLoginPanel extends JPanel {
 		clearYoutube.setEnabled(false);
 		clearYoutube.setMargin(new Insets(2, 2, 2, 2));
 		clearYoutube.addActionListener(l -> {
+			ClearYouTubeClickButtonEvent event = new ClearYouTubeClickButtonEvent();
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
 			DataManager.setYouTubeSession(null);
-			onUpdateYoutube(null);
+			//onUpdateYoutube(null);
 		});
 		buttons.add(clearYoutube, BorderLayout.EAST);
 		demo.add(buttons);
@@ -160,9 +189,9 @@ public class MainLoginPanel extends JPanel {
 	}
 
 	@Handler
-	public void onUpdateTwitch(TwitchSessionData session) {
-		TwitchLoginPanel.getInstance().setSession(session);
-		if (session == null) {
+	public void onUpdateTwitch(TwitchSessionUpdateEvent event) {
+		TwitchLoginPanel.getInstance().setSession(event.getSession());
+		if (event.getSession() == null) {
 			isTwitchSet.set(false);
 			connectTwitch.setText(DataManager.getLanguage().getMainLogin().getConnect());
 			clearTwitch.setEnabled(false);
@@ -175,9 +204,9 @@ public class MainLoginPanel extends JPanel {
 	}
 
 	@Handler
-	public void onUpdateYoutube(YouTubeSessionData session) {
-		YoutubeLoginPanel.getInstance().setSession(session);
-		if (session == null) {
+	public void onUpdateYoutube(YoutubeSessionUpdateEvent event) {
+		YoutubeLoginPanel.getInstance().setSession(event.getSession());
+		if (event.getSession() == null) {
 			isYoutubeSet.set(false);
 			connectYoutube.setText(DataManager.getLanguage().getMainLogin().getConnect());
 			clearYoutube.setEnabled(false);
@@ -190,7 +219,10 @@ public class MainLoginPanel extends JPanel {
 	}
 
 	// @Handler
-	public void updateLang(Lang session) {
+	public void updateLang(LanguageUpdateEvent event) {
+		Lang session = event.getLanguage();
+		if(session == null)
+			return;
 		start.setText(session.getMainLogin().getStart());
 		if (isTwitchSet.get())
 			connectTwitch.setText(session.getMainLogin().getConnected());

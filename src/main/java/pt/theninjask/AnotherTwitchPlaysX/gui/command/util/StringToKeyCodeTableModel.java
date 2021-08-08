@@ -6,18 +6,18 @@ import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class StringToKeyCodeTableModel{
+public class StringToKeyCodeTableModel {
 
 	private DefaultTableModel table;
 
 	public static final String KEYCODE_COLUMN = "KeyCode";
-	
+
 	public static final String REMOVE_COLUMN = "Remove";
-	
+
 	public StringToKeyCodeTableModel() {
 		table = new DefaultTableModel();
 		table.addColumn(KEYCODE_COLUMN);
@@ -50,15 +50,16 @@ public class StringToKeyCodeTableModel{
 		table.setRowCount(0);
 	}
 
-	//@Handler
-	public void updateLang(Lang session) {
-		for(int i=0; i<table.getRowCount(); i++) {
-			Object remove = table.getValueAt(i, 1);
-			if(remove instanceof JButton)
-				((JButton) remove).setText(session.getStringToKeyCode().getRemove());
-			
-		}
-		
+	// @Handler
+	public void updateLang(LanguageUpdateEvent event) {
+		if (event.getLanguage() != null)
+			for (int i = 0; i < table.getRowCount(); i++) {
+				Object remove = table.getValueAt(i, 1);
+				if (remove instanceof JButton)
+					((JButton) remove).setText(event.getLanguage().getStringToKeyCode().getRemove());
+
+			}
+
 	}
 
 }

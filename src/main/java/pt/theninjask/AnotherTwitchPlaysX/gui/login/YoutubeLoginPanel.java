@@ -23,9 +23,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
-import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
@@ -268,21 +268,23 @@ public class YoutubeLoginPanel extends JPanel {
 	}
 
 	// @Handler
-	public void updateLang(Lang session) {
-		secretLabel.setText(DataManager.getLanguage().getLogin().getSecretField());
+	public void updateLang(LanguageUpdateEvent event) {
+		if(event.getLanguage()==null)
+			return;
+		secretLabel.setText(event.getLanguage().getLogin().getSecretField());
 		if(secret == null || secret.isBlank())
-			secretButton.setText(DataManager.getLanguage().getLogin().getSetSecret());
+			secretButton.setText(event.getLanguage().getLogin().getSetSecret());
 		else
-			secretButton.setText(DataManager.getLanguage().getLogin().getViewSecret());
-		clearSecret.setText(DataManager.getLanguage().getLogin().getSecretClear());
-		openSecret.setText(DataManager.getLanguage().getLogin().getSecretButton());
+			secretButton.setText(event.getLanguage().getLogin().getViewSecret());
+		clearSecret.setText(event.getLanguage().getLogin().getSecretClear());
+		openSecret.setText(event.getLanguage().getLogin().getSecretButton());
 		
-		videoLabel.setText(DataManager.getLanguage().getLogin().getVideoField());
+		videoLabel.setText(event.getLanguage().getLogin().getVideoField());
 		
-		goToMainMenu.setText(DataManager.getLanguage().getLogin().getLoginButton());
-		rememberSession.setText(DataManager.getLanguage().getLogin().getRememberSession());
+		goToMainMenu.setText(event.getLanguage().getLogin().getLoginButton());
+		rememberSession.setText(event.getLanguage().getLogin().getRememberSession());
 		
-		back.setText(DataManager.getLanguage().getLogin().getGoBack());
+		back.setText(event.getLanguage().getLogin().getGoBack());
 	}
 
 }

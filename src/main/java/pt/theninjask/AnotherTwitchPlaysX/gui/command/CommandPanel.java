@@ -36,6 +36,7 @@ import pt.theninjask.AnotherTwitchPlaysX.data.CommandType;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandVarType;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.ControlDataPanel.Type;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
@@ -755,7 +756,11 @@ public class CommandPanel extends JPanel{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
+	public void updateLang(LanguageUpdateEvent event) {
+		Lang session = event.getLanguage();
+		if(session == null)
+			return;
+		
 		varAdd = session.getCommand().getVarAdd();
 		leadLabel.setText(session.getCommand().getLead());
 		cooldownLabel.setText(session.getCommand().getCmdCooldown());
@@ -769,7 +774,7 @@ public class CommandPanel extends JPanel{
 		delete.setText(session.getCommand().getDelete());
 		add.setText(session.getCommand().getAddControl());
 		for (ControlDataPanel elem : controls) {
-			elem.updateLang(session);
+			elem.updateLang(event);
 		}
 		
 	}

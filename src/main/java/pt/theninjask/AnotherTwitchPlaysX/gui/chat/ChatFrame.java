@@ -31,8 +31,13 @@ import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import com.google.api.services.youtube.model.LiveChatMessage;
 
 import net.engio.mbassy.listener.Handler;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.chat.ChatFrameOnMessageEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.chat.ChatFrameOnTwitchMessageEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.chat.ChatFrameOnYouTubeMessageEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.chat.ChatFrameSendMessageEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.util.ComponentResizer;
-import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
@@ -203,6 +208,12 @@ public class ChatFrame extends JFrame{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					
+					ChatFrameSendMessageEvent event = new ChatFrameSendMessageEvent(DataManager.getLanguage().getChat().getUser(), input.getText());
+					EventManager.triggerEvent(event);
+					if(event.isCancelled())
+						return;
+					
 					onMessage(DataManager.getLanguage().getChat().getUser(), input.getText());
 					if(TwitchPlayer.getInstance().isConnected()) {
 						TwitchPlayer.getInstance().sendMessage(input.getText());						
@@ -217,6 +228,12 @@ public class ChatFrame extends JFrame{
 		messagePanel.add(input, BorderLayout.CENTER);
 		send = new JButton(DataManager.getLanguage().getChat().getSend());
 		send.addActionListener(l -> {
+			
+			ChatFrameSendMessageEvent event = new ChatFrameSendMessageEvent(DataManager.getLanguage().getChat().getUser(), input.getText());
+			EventManager.triggerEvent(event);
+			if(event.isCancelled())
+				return;
+			
 			onMessage(DataManager.getLanguage().getChat().getUser(), input.getText());
 			if(TwitchPlayer.getInstance().isConnected()) {
 				TwitchPlayer.getInstance().sendMessage(input.getText());						
@@ -263,6 +280,10 @@ public class ChatFrame extends JFrame{
 	}
 
 	public void onMessage(String nick, String message) {
+		ChatFrameOnMessageEvent event = new ChatFrameOnMessageEvent(this, nick, message);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
 		synchronized (scroll) {
 			synchronized (chat) {
 				updateChatSize();
@@ -275,12 +296,20 @@ public class ChatFrame extends JFrame{
 
 	@Handler
 	public void onMessage(ChannelMessageEvent event) {
+		ChatFrameOnTwitchMessageEvent trigger = new ChatFrameOnTwitchMessageEvent(this, event);
+		EventManager.triggerEvent(trigger);
+		if(trigger.isCancelled())
+			return;
 		onMessage(event.getActor().getNick(), event.getMessage());
 	}
 	
 	@Handler
-	public void onMessage(LiveChatMessage message) {
-		onMessage(message.getAuthorDetails().getDisplayName(), message.getSnippet().getDisplayMessage());
+	public void onMessage(LiveChatMessage event) {
+		ChatFrameOnYouTubeMessageEvent trigger = new ChatFrameOnYouTubeMessageEvent(this, event);
+		EventManager.triggerEvent(trigger);
+		if(trigger.isCancelled())
+			return;
+		onMessage(event.getAuthorDetails().getDisplayName(), event.getSnippet().getDisplayMessage());
 	}
 
 	public void clearChat() {
@@ -392,9 +421,11 @@ public class ChatFrame extends JFrame{
 	}
 
 	//@Handler
-	public void updateLang(Lang session) {
-		send.setText(session.getChat().getSend());
-		this.setTitle(String.format(DataManager.getLanguage().getChat().getTitle(),
-				DataManager.getLanguage().getID()));
+	public void updateLang(LanguageUpdateEvent event) {
+		if(event.getLanguage()==null)
+			return;
+		send.setText(event.getLanguage().getChat().getSend());
+		this.setTitle(String.format(event.getLanguage().getChat().getTitle(),
+				event.getLanguage().getID()));
 	}
 }
