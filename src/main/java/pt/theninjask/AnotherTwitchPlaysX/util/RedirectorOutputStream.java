@@ -13,12 +13,22 @@ public class RedirectorOutputStream extends PrintStream {
 	};
 	private static RedirectorOutputStream singleton = new RedirectorOutputStream(VOID);
 
+	private static OutputStream defaultStream = VOID;
+
 	private RedirectorOutputStream(OutputStream out) {
 		super(out);
 	}
 
 	public static RedirectorOutputStream getInstance() {
 		return singleton;
+	}
+
+	public static void changeDefault(OutputStream newDefaultStream) {
+		defaultStream = newDefaultStream;
+	}
+
+	public static void changeRedirectToDefault() {
+		singleton.out = defaultStream;
 	}
 
 	public static void changeRedirect(OutputStream newOut) {

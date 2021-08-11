@@ -65,12 +65,15 @@ public class App {
 	public static void main(String[] args) {
 
 		RedirectorOutputStream.changeRedirect(System.out);
+		RedirectorOutputStream.changeDefault(System.out);
 		System.setOut(RedirectorOutputStream.getInstance());
 
 		RedirectorErrorOutputStream.changeRedirect(System.err);
+		RedirectorErrorOutputStream.changeDefault(System.err);
 		System.setErr(RedirectorErrorOutputStream.getInstance());
 
 		RedirectorInputStream.changeRedirect(System.in);
+		RedirectorInputStream.changeDefault(System.in);
 		System.setIn(RedirectorInputStream.getInstance());
 
 		int amountOfRequiredTwitchSessionOptions = 0;

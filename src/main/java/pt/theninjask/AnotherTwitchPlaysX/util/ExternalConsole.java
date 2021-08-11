@@ -7,6 +7,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,6 +21,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultCaret;
+
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.externalconsole.InputCommandExternalConsoleEvent;
 
 public class ExternalConsole extends JFrame {
 
@@ -53,6 +58,15 @@ public class ExternalConsole extends JFrame {
 		this.err = new ExternalConsoleErrorOutputStream();
 		this.in = new ExternalConsoleInputStream();
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent windowEvent) {
+				if(singleton.getBackground()==Color.BLACK)
+					singleton.setDay();
+				else
+					singleton.setNight();
+			}
+		});
 		this.setAlwaysOnTop(true);
 	}
 
@@ -93,12 +107,12 @@ public class ExternalConsole extends JFrame {
 		messagePanel = new JPanel(new BorderLayout());
 		input = new JTextField();
 		input.setBorder(null);
-		
+
 		input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		input.setForeground(Color.BLACK);
 		input.setCaretColor(Color.BLACK);
 		input.setBackground(Color.WHITE);
-		
+
 		input.addKeyListener(new KeyListener() {
 
 			@Override
@@ -112,6 +126,13 @@ public class ExternalConsole extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+
+					InputCommandExternalConsoleEvent event = new InputCommandExternalConsoleEvent(
+							input.getText().split(" "));
+					EventManager.triggerEvent(event);
+					if (event.isCancelled())
+						return;
+
 					console.append(input.getText());
 					console.append("\n");
 					scroll.repaint();
@@ -133,7 +154,7 @@ public class ExternalConsole extends JFrame {
 	public OutputStream getExternalConsoleErrorOutputStream() {
 		return err;
 	}
-	
+
 	public InputStream getExternalConsoleInputStream() {
 		return in;
 	}
@@ -163,7 +184,7 @@ public class ExternalConsole extends JFrame {
 	public void setDay() {
 		console.setForeground(Color.BLACK);
 		this.setBackground(Color.WHITE);
-		
+
 		input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		input.setForeground(Color.BLACK);
 		input.setCaretColor(Color.BLACK);
@@ -173,7 +194,7 @@ public class ExternalConsole extends JFrame {
 	public void setNight() {
 		console.setForeground(Color.WHITE);
 		this.setBackground(Color.BLACK);
-		
+
 		input.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
 		input.setForeground(Color.WHITE);
 		input.setCaretColor(Color.WHITE);
@@ -191,7 +212,7 @@ public class ExternalConsole extends JFrame {
 				return -1;
 			return this.contents[pointer++];
 		}
-		
+
 	}
 
 }

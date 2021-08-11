@@ -57,7 +57,11 @@ import pt.theninjask.AnotherTwitchPlaysX.stream.SponsorBot;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsole;
 import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
+import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorErrorOutputStream;
+import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorInputStream;
+import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorOutputStream;
 
 public class MainMenuPanel extends JPanel {
 
@@ -220,6 +224,23 @@ public class MainMenuPanel extends JPanel {
 		commandsButton = new JButton(DataManager.getLanguage().getMainMenu().getSetCommands());
 		commandsButton.setFocusable(false);
 		commandsButton.addActionListener(l -> {
+			boolean changeConsole = KeyPressedAdapter.isKeyPressed(KeyEvent.VK_SHIFT);
+			if(changeConsole) {
+				if(ExternalConsole.getInstance().isVisible()) {
+					RedirectorOutputStream.changeRedirectToDefault();
+					RedirectorErrorOutputStream.changeRedirectToDefault();
+					RedirectorInputStream.changeRedirectToDefault();
+					ExternalConsole.getInstance().setVisible(false);
+				}else {
+					RedirectorOutputStream.changeRedirect(ExternalConsole.getInstance().getExternalConsoleOutputStream());
+					RedirectorErrorOutputStream
+							.changeRedirect(ExternalConsole.getInstance().getExternalConsoleErrorOutputStream());
+					RedirectorInputStream.changeRedirect(ExternalConsole.getInstance().getExternalConsoleInputStream());
+					ExternalConsole.getInstance().setNight();
+					ExternalConsole.getInstance().setVisible(true);
+				}
+				return;
+			}
 			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		tmp.add(commandsButton, BorderLayout.CENTER);
