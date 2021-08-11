@@ -2,6 +2,7 @@ package pt.theninjask.AnotherTwitchPlaysX;
 
 import java.awt.KeyboardFocusManager;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,8 +25,10 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.jnativehook.GlobalScreen;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 
+import pt.theninjask.AnotherTwitchPlaysX.data.ATPXConfig;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
@@ -45,7 +48,11 @@ import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsole;
 import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
+import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorErrorOutputStream;
+import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorInputStream;
+import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorOutputStream;
 
 public class App {
 
@@ -57,10 +64,20 @@ public class App {
 
 	public static void main(String[] args) {
 
+		RedirectorOutputStream.changeRedirect(System.out);
+		System.setOut(RedirectorOutputStream.getInstance());
+
+		RedirectorErrorOutputStream.changeRedirect(System.err);
+		System.setErr(RedirectorErrorOutputStream.getInstance());
+
+		RedirectorInputStream.changeRedirect(System.in);
+		System.setIn(RedirectorInputStream.getInstance());
+
 		int amountOfRequiredTwitchSessionOptions = 0;
 		int amountOfRequiredYouTubeSessionOptions = 0;
-
 		Options options = new Options();
+
+		options.addOption("o", "outsideConsole", false, "Outside \"Console\"");
 
 		OptionGroup verbose = new OptionGroup();
 		verbose.addOption(new Option("v", "verbose", false, "Sets Verbose to ALL"));
@@ -86,56 +103,79 @@ public class App {
 		try {
 			CommandLineParser parser = new DefaultParser();
 			CommandLine cmd = parser.parse(options, args);
-			if (cmd.hasOption('h')) {
+			ATPXConfig config = loadConfigFile();
+			if (cmd.hasOption('o') || config.isOutsideConsole()) {
+				RedirectorOutputStream.changeRedirect(ExternalConsole.getInstance().getExternalConsoleOutputStream());
+				RedirectorErrorOutputStream
+						.changeRedirect(ExternalConsole.getInstance().getExternalConsoleErrorOutputStream());
+				RedirectorInputStream.changeRedirect(ExternalConsole.getInstance().getExternalConsoleInputStream());
+				ExternalConsole.getInstance().setNight();
+				ExternalConsole.getInstance().setVisible(true);
+			}
+			if (cmd.hasOption('h') || config.isHelp()) {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp("java -jar ATPXapp.jar", options, true);
 				return;
 			}
-			if (cmd.hasOption('v')) {
+			if (cmd.hasOption('v') || config.getVerbose() == ATPXConfig.Verbose.VERBOSE) {
 				Constants.setLoggerLevel(Level.ALL);
 				Constants.printVerboseMessage(Level.INFO, String.format("%s - version: %s", NAME, VERSION));
 				Constants.printVerboseMessage(Level.INFO, "Verbose Set to ALL");
-			} else if (cmd.hasOption('w')) {
+			} else if (cmd.hasOption('w') || config.getVerbose() == ATPXConfig.Verbose.WARNING) {
 				Constants.setLoggerLevel(Level.WARNING);
 				Constants.printVerboseMessage(Level.WARNING, String.format("%s - version: %s", NAME, VERSION));
 				Constants.printVerboseMessage(Level.WARNING, "Verbose Set to WARN");
 			}
-			if (cmd.hasOption('d')) {
+			if (cmd.hasOption('d') || config.isDebug()) {
 				Constants.debug = true;
 				Constants.printVerboseMessage(Level.INFO, "Debug Set to True");
 			}
-			if (cmd.hasOption('s')) {
+			if (cmd.hasOption('s') || config.isDisableSession()) {
 				DataManager.disableSession = true;
 				Constants.printVerboseMessage(Level.INFO, "DisableSession Set to True");
 			}
-			if (cmd.hasOption('p')) {
+			if (cmd.hasOption('p') || config.isPrintCommand()) {
 				CommandData.enableLogging(true);
 				Constants.printVerboseMessage(Level.INFO, "Enabled print commands execution");
 			}
-			if (cmd.hasOption('e')) {
+			if (cmd.hasOption('e') || config.isEventLog()) {
 				EventManager.enableLogging(true);
 				Constants.printVerboseMessage(Level.INFO, "Enabled print event trigger");
 			}
 			String nickname = null;
 			String channel = null;
 			String oauth = null;
-			if (cmd.hasOption('n')) {
+			if (cmd.hasOption('n') || config.getTwitchNickname() != null) {
 				amountOfRequiredTwitchSessionOptions++;
-				nickname = cmd.getOptionValue('n');
+				if (cmd.hasOption('n'))
+					nickname = cmd.getOptionValue('n');
+				else
+					nickname = config.getTwitchNickname();
 			}
-			if (cmd.hasOption('c')) {
+			if (cmd.hasOption('c') || config.getTwitchChannel() != null) {
 				// amountOfRequiredTwitchSessionOptions++;
 				channel = cmd.getOptionValue('c');
+				if (cmd.hasOption('c'))
+					channel = cmd.getOptionValue('c');
+				else
+					channel = config.getTwitchChannel();
 			}
-			if (cmd.hasOption('t')) {
+			if (cmd.hasOption('t') || config.getTwitchToken() != null) {
 				amountOfRequiredTwitchSessionOptions++;
-				oauth = cmd.getOptionValue('t');
+				if (cmd.hasOption('t'))
+					oauth = cmd.getOptionValue('t');
+				else
+					oauth = config.getTwitchToken();
 			}
 
 			String secret = null;
 			String videoId = null;
-			if (cmd.hasOption('y')) {
-				String path = cmd.getOptionValue('y');
+			if (cmd.hasOption('y') || config.getYoutubeToken() != null) {
+				String path;
+				if (cmd.hasOption('y'))
+					path = cmd.getOptionValue('y');
+				else
+					path = config.getYoutubeToken();
 				try {
 					File file = new File(path);
 					secret = Files.readString(file.toPath());
@@ -144,8 +184,11 @@ public class App {
 				} catch (Exception e) {
 				}
 			}
-			if (cmd.hasOption('i')) {
-				videoId = cmd.getOptionValue('i');
+			if (cmd.hasOption('i') || config.getYoutubeVideoId() != null) {
+				if (cmd.hasOption('i'))
+					videoId = cmd.getOptionValue('i');
+				else
+					videoId = config.getYoutubeVideoId();
 			}
 
 			globalSetUp();
@@ -214,6 +257,19 @@ public class App {
 		MainFrame.replacePanel(MainMenuPanel.getInstance());
 	}
 
+	private static ATPXConfig loadConfigFile() {
+		File configFile = new File(Constants.SAVE_PATH, Constants.CONFIG_FILE);
+		if (configFile.exists())
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+				ATPXConfig config = objectMapper.readValue(configFile, ATPXConfig.class);
+				return config;
+			} catch (IOException e) {
+				Constants.showExceptionDialog(e);
+			}
+		return new ATPXConfig();
+	}
+
 	private static void globalSetUp() throws Exception {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.globalSetUp()", App.class.getSimpleName()));
 		PrintStream tmp = System.out;
@@ -246,7 +302,7 @@ public class App {
 			} else if (!Files.isDirectory(path)) {
 				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
 			}
-			
+
 			Path modFolderPath = Paths.get(Constants.SAVE_PATH, Constants.MOD_FOLDER);
 			if (!Files.exists(modFolderPath)) {
 				Files.createDirectory(modFolderPath);
@@ -256,10 +312,10 @@ public class App {
 			} else {
 				File modFolder = modFolderPath.toFile();
 				for (File modFile : modFolder.listFiles()) {
-					if(modFile.isFile() && modFile.getName().endsWith(".jar")) {
+					if (modFile.isFile() && modFile.getName().endsWith(".jar")) {
 						try {
 							ATPXMod mod = Constants.loadMod(modFile);
-							if(mod==null)
+							if (mod == null)
 								continue;
 							mod.refresh();
 							if (mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
@@ -269,8 +325,9 @@ public class App {
 									MainFrame.replacePanel(mod.getJPanelInstance());
 							if (mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
 								ATPXModManager.addMod(mod);
-						}catch (Exception e) {
-							Constants.showMessageDialog(String.format("Could not load mod %s", modFile.getName()), "Mod Not Loaded");
+						} catch (Exception e) {
+							Constants.showMessageDialog(String.format("Could not load mod %s", modFile.getName()),
+									"Mod Not Loaded");
 						}
 					}
 				}

@@ -63,6 +63,12 @@ public final class Constants {
 
 	public static final String MOD_FOLDER = "mods";
 
+	public static final String CONFIG_FILE = "config.json";
+	
+	public static final String TWITCH_FILE = "twitchSession.json";
+	
+	public static final String YOUTUBE_FILE = "youtubeSession.json";
+	
 	public static final URL ICON_PATH = Constants.class
 			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/image/favicon.png");
 
