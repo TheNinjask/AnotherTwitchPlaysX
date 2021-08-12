@@ -11,7 +11,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -109,17 +108,17 @@ public class App {
 			CommandLine cmd = parser.parse(options, args);
 			ATPXConfig config = loadConfigFile();
 			if (cmd.hasOption('o') || config.isOutsideConsole()) {
-				RedirectorOutputStream.changeRedirect(ExternalConsole.getInstance().getExternalConsoleOutputStream());
+				RedirectorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleOutputStream());
 				RedirectorErrorOutputStream
-						.changeRedirect(ExternalConsole.getInstance().getExternalConsoleErrorOutputStream());
-				RedirectorInputStream.changeRedirect(ExternalConsole.getInstance().getExternalConsoleInputStream());
-				ExternalConsole.getInstance().setNight();
-				ExternalConsole.getInstance().setVisible(true);
+						.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());
+				RedirectorInputStream.changeRedirect(ExternalConsole.getExternalConsoleInputStream());
+				ExternalConsole.setNight();
+				ExternalConsole.setViewable(true);
 			}
 			if (cmd.hasOption('h') || config.isHelp()) {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp("java -jar ATPXapp.jar", options, true);
-				ExternalConsole.getInstance().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				ExternalConsole.setClosable(true);
 				return;
 			}
 			if (cmd.hasOption('v') || config.getVerbose() == ATPXConfig.Verbose.VERBOSE) {

@@ -227,18 +227,18 @@ public class MainMenuPanel extends JPanel {
 		commandsButton.addActionListener(l -> {
 			boolean changeConsole = KeyPressedAdapter.isKeyPressed(KeyEvent.VK_SHIFT);
 			if(changeConsole) {
-				if(ExternalConsole.getInstance().isVisible()) {
+				if(ExternalConsole.isViewable()) {
 					RedirectorOutputStream.changeRedirectToDefault();
 					RedirectorErrorOutputStream.changeRedirectToDefault();
 					RedirectorInputStream.changeRedirectToDefault();
-					ExternalConsole.getInstance().setVisible(false);
+					ExternalConsole.setViewable(false);
 				}else {
-					RedirectorOutputStream.changeRedirect(ExternalConsole.getInstance().getExternalConsoleOutputStream());
+					RedirectorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleOutputStream());
 					RedirectorErrorOutputStream
-							.changeRedirect(ExternalConsole.getInstance().getExternalConsoleErrorOutputStream());
-					RedirectorInputStream.changeRedirect(ExternalConsole.getInstance().getExternalConsoleInputStream());
-					ExternalConsole.getInstance().setNight();
-					ExternalConsole.getInstance().setVisible(true);
+							.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());
+					RedirectorInputStream.changeRedirect(ExternalConsole.getExternalConsoleInputStream());
+					ExternalConsole.setNight();
+					ExternalConsole.setViewable(true);
 				}
 				return;
 			}

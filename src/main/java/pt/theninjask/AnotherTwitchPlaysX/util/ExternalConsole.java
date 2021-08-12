@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -45,8 +47,6 @@ public class ExternalConsole extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static ExternalConsole singleton = new ExternalConsole();
-
 	private JScrollPane scroll;
 	private JTextArea console;
 	private ExternalConsoleOutputStream out;
@@ -59,6 +59,249 @@ public class ExternalConsole extends JFrame {
 
 	private boolean autoScroll;
 
+	private Map<String, ExternalConsoleCommand> cmds;
+
+	private static ExternalConsoleCommand help = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "help";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			println("Available Commands:");
+			for (String cmd : singleton.cmds.keySet()) {
+				println(String.format("\t%s", cmd));
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand autoscroll = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "autoscroll";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup scroll = new OptionGroup();
+			// scroll.setRequired(true);
+			scroll.addOption(new Option("a", "auto", false, "Sets Scroll to Auto"));
+			scroll.addOption(new Option("m", "manual", false, "Sets Scroll to Manual"));
+			options.addOptionGroup(scroll);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				// CommandLine cmd = parser.parse(options, args);
+				parser.parse(options, args);
+				switch (String.valueOf(scroll.getSelected())) {
+				case "a":
+					singleton.autoScroll = true;
+					break;
+				case "m":
+					singleton.autoScroll = false;
+					break;
+				default:
+					println(String.format("autoscroll is set as: %s", singleton.autoScroll));
+					println("Options: -a, -m");
+					break;
+				}
+
+			} catch (ParseException e) {
+				Constants.showExpectedExceptionDialog(e);
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand verbose = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "verbose";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup verbose = new OptionGroup();
+			// verbose.setRequired(true);
+			verbose.addOption(new Option("n", "none", false, "Sets Verbose to OFF"));
+			verbose.addOption(new Option("v", "verbose", false, "Sets Verbose to ALL"));
+			verbose.addOption(new Option("w", "warning", false, "Sets Verbose to WARN"));
+			options.addOptionGroup(verbose);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(verbose.getSelected())) {
+				case "n":
+					Constants.setLoggerLevel(Level.OFF);
+					break;
+				case "v":
+					Constants.setLoggerLevel(Level.ALL);
+					break;
+				case "w":
+					Constants.setLoggerLevel(Level.WARNING);
+					break;
+				default:
+					println(String.format("verbose is set as: %s", Constants.getLoggerLevel()));
+					println("Options: -n, -v, -w");
+					break;
+				}
+			} catch (ParseException e) {
+				Constants.showExpectedExceptionDialog(e);
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand printcommand = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "printcommand";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup print = new OptionGroup();
+			// print.setRequired(true);
+			print.addOption(new Option("t", "true", false, "Enabled print commands execution"));
+			print.addOption(new Option("f", "false", false, "Disabled print commands execution"));
+			options.addOptionGroup(print);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(print.getSelected())) {
+				case "t":
+					CommandData.enableLogging(true);
+					break;
+				case "f":
+					CommandData.enableLogging(false);
+					break;
+				default:
+					println(String.format("Print Commands Execution is set as: %s", CommandData.isEnableLogging()));
+					println("Options: -t, -f");
+					break;
+				}
+			} catch (ParseException e) {
+				Constants.showExpectedExceptionDialog(e);
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand eventlog = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "eventlog";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup event = new OptionGroup();
+			// event.setRequired(true);
+			event.addOption(new Option("t", "true", false, "Enabled print event trigger"));
+			event.addOption(new Option("f", "false", false, "Disabled print event trigger"));
+			options.addOptionGroup(event);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(event.getSelected())) {
+				case "t":
+					EventManager.enableLogging(true);
+					break;
+				case "f":
+					EventManager.enableLogging(false);
+					break;
+				default:
+					println(String.format("Print Event Trigger is set as: %s", EventManager.isEnableLogging()));
+					println("Options: -t, -f");
+					break;
+				}
+
+			} catch (ParseException e) {
+				Constants.showExpectedExceptionDialog(e);
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand debug = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "debug";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup debug = new OptionGroup();
+			// debug.setRequired(true);
+			debug.addOption(new Option("t", "true", false, "Debug Set to True"));
+			debug.addOption(new Option("f", "false", false, "Debug Set to False"));
+			options.addOptionGroup(debug);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(debug.getSelected())) {
+				case "t":
+					Constants.debug = true;
+					break;
+				case "f":
+					Constants.debug = false;
+					break;
+				default:
+					println(String.format("Debug is set as: %s", Constants.debug));
+					println("Options: -t, -f");
+					break;
+				}
+			} catch (ParseException e) {
+				Constants.showExpectedExceptionDialog(e);
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand disablesession = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "disablesession";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup disableSession = new OptionGroup();
+			// disableSession.setRequired(true);
+			disableSession.addOption(new Option("t", "true", false, "DisableSession Set to True"));
+			disableSession.addOption(new Option("f", "false", false, "DisableSession Set to False"));
+			options.addOptionGroup(disableSession);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(disableSession.getSelected())) {
+				case "t":
+					DataManager.disableSession = true;
+					break;
+				case "f":
+					DataManager.disableSession = false;
+					break;
+				default:
+					println(String.format("DisableSession is set as: %s", DataManager.disableSession));
+					println("Options: -t, -f");
+					break;
+				}
+			} catch (ParseException e) {
+				Constants.showExpectedExceptionDialog(e);
+			}
+		}
+	};
+
+	private static ExternalConsole singleton = new ExternalConsole();
+	
 	private ExternalConsole() {
 		this.setTitle("External Console");
 		this.setMinimumSize(new Dimension(300, 300));
@@ -77,18 +320,59 @@ public class ExternalConsole extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent windowEvent) {
 				if (singleton.getBackground() == Color.BLACK)
-					singleton.setDay();
+					setDay();
 				else
-					singleton.setNight();
+					setNight();
 			}
 		});
 		this.setAlwaysOnTop(true);
 		this.autoScroll = true;
+		this.cmds = new HashMap<>();
+
+		this.cmds.put(help.getCommand(), help);
+		this.cmds.put(autoscroll.getCommand(), autoscroll);
+		this.cmds.put(verbose.getCommand(), verbose);
+		this.cmds.put(printcommand.getCommand(), printcommand);
+		this.cmds.put(eventlog.getCommand(), eventlog);
+		this.cmds.put(debug.getCommand(), debug);
+		this.cmds.put(disablesession.getCommand(), disablesession);
+
 		EventManager.registerEventListener(this);
 	}
 
-	public static ExternalConsole getInstance() {
+	/*public static ExternalConsole getInstance() {
 		return singleton;
+	}*/
+	
+	public static boolean isViewable() {
+		return singleton.isVisible();
+	}
+	
+	public static void setViewable(boolean b) {
+		singleton.setVisible(b);
+	}
+	
+	public static boolean isClosable() {
+		return singleton.getDefaultCloseOperation() >= JFrame.DISPOSE_ON_CLOSE;
+	}
+	
+	public static void setClosable(boolean b) {
+		if(b)
+			singleton.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		else
+			singleton.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+	}
+	
+	public static void addCommand(ExternalConsoleCommand newCmd) {
+		singleton.cmds.put(newCmd.getCommand(), newCmd);
+	}
+	
+	public static void removeCommand(String cmd) {
+		singleton.cmds.remove(cmd);
+	}
+	
+	public static ExternalConsoleCommand getCommand(String cmd) {
+		return singleton.cmds.get(cmd);
 	}
 
 	private JScrollPane insertConsole() {
@@ -165,16 +449,16 @@ public class ExternalConsole extends JFrame {
 		return messagePanel;
 	}
 
-	public OutputStream getExternalConsoleOutputStream() {
-		return out;
+	public static OutputStream getExternalConsoleOutputStream() {
+		return singleton.out;
 	}
 
-	public OutputStream getExternalConsoleErrorOutputStream() {
-		return err;
+	public static OutputStream getExternalConsoleErrorOutputStream() {
+		return singleton.err;
 	}
 
-	public InputStream getExternalConsoleInputStream() {
-		return in;
+	public static InputStream getExternalConsoleInputStream() {
+		return singleton.in;
 	}
 
 	private class ExternalConsoleOutputStream extends OutputStream {
@@ -209,36 +493,36 @@ public class ExternalConsole extends JFrame {
 
 	}
 
-	public void setDay() {
-		console.setForeground(Color.BLACK);
-		this.setBackground(Color.WHITE);
+	public static void setDay() {
+		singleton.console.setForeground(Color.BLACK);
+		singleton.setBackground(Color.WHITE);
 
-		input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-		input.setForeground(Color.BLACK);
-		input.setCaretColor(Color.BLACK);
-		input.setBackground(Color.WHITE);
+		singleton.input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		singleton.input.setForeground(Color.BLACK);
+		singleton.input.setCaretColor(Color.BLACK);
+		singleton.input.setBackground(Color.WHITE);
 	}
 
-	public void setNight() {
-		console.setForeground(Color.WHITE);
-		this.setBackground(Color.BLACK);
+	public static void setNight() {
+		singleton.console.setForeground(Color.WHITE);
+		singleton.setBackground(Color.BLACK);
 
-		input.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
-		input.setForeground(Color.WHITE);
-		input.setCaretColor(Color.WHITE);
-		input.setBackground(Color.BLACK);
+		singleton.input.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+		singleton.input.setForeground(Color.WHITE);
+		singleton.input.setCaretColor(Color.WHITE);
+		singleton.input.setBackground(Color.BLACK);
 	}
 
-	public void println() {
-		console.append("\n");
-		scroll.repaint();
-		scroll.revalidate();
+	public static void println() {
+		singleton.console.append("\n");
+		singleton.scroll.repaint();
+		singleton.scroll.revalidate();
 	}
 
-	public void println(String msg) {
-		console.append(String.format("%s\n", msg));
-		scroll.repaint();
-		scroll.revalidate();
+	public static void println(String msg) {
+		singleton.console.append(String.format("%s\n", msg));
+		singleton.scroll.repaint();
+		singleton.scroll.revalidate();
 	}
 
 	private class ExternalConsoleInputStream extends InputStream {
@@ -261,212 +545,10 @@ public class ExternalConsole extends JFrame {
 			return;
 		event.addAfterEvent(() -> {
 			String[] args = Arrays.copyOfRange(event.getArgs(), 1, event.getArgs().length);
-			switch (event.getArgs()[0]) {
-			case "help":
-				onCommandHelp(args);
-				break;
-			case "autoscroll":
-				onCommandAutoscroll(args);
-				break;
-			case "verbose":
-				onCommandVerbose(args);
-				break;
-			case "printcommand":
-				onCommandPrintCommand(args);
-				break;
-			case "eventlog":
-				onCommandEventLog(args);
-				break;
-			case "debug":
-				onCommandDebug(args);
-				break;
-			case "disablesession":
-				onCommandDisableSession(args);
-				break;
-			default:
-				return;
-			}
+			ExternalConsoleCommand cmd = cmds.get(event.getArgs()[0]);
+			if (cmd != null)
+				cmd.executeCommand(args);
 		});
 
 	}
-
-	private void onCommandHelp(String[] args) {
-		println("Available Commands:");
-		println("\tautoscroll");
-		println("\tverbose");
-		println("\tprintcommand");
-		println("\teventlog");
-		println("\tdebug");
-		println("\tdisablesession");
-	}
-
-	private void onCommandAutoscroll(String[] args) {
-		Options options = new Options();
-		OptionGroup scroll = new OptionGroup();
-		// scroll.setRequired(true);
-		scroll.addOption(new Option("a", "auto", false, "Sets Scroll to Auto"));
-		scroll.addOption(new Option("m", "manual", false, "Sets Scroll to Manual"));
-		options.addOptionGroup(scroll);
-		try {
-			CommandLineParser parser = new DefaultParser();
-			// CommandLine cmd = parser.parse(options, args);
-			parser.parse(options, args);
-			switch (String.valueOf(scroll.getSelected())) {
-			case "a":
-				this.autoScroll = true;
-				break;
-			case "m":
-				this.autoScroll = false;
-				break;
-			default:
-				println(String.format("autoscroll is set as: %s", this.autoScroll));
-				println("Options: -a, -m");
-				break;
-			}
-
-		} catch (ParseException e) {
-			Constants.showExpectedExceptionDialog(e);
-		}
-	}
-
-	private void onCommandVerbose(String[] args) {
-		Options options = new Options();
-		OptionGroup verbose = new OptionGroup();
-		// verbose.setRequired(true);
-		verbose.addOption(new Option("n", "none", false, "Sets Verbose to OFF"));
-		verbose.addOption(new Option("v", "verbose", false, "Sets Verbose to ALL"));
-		verbose.addOption(new Option("w", "warning", false, "Sets Verbose to WARN"));
-		options.addOptionGroup(verbose);
-		try {
-			CommandLineParser parser = new DefaultParser();
-			parser.parse(options, args);
-			switch (String.valueOf(verbose.getSelected())) {
-			case "n":
-				Constants.setLoggerLevel(Level.OFF);
-				break;
-			case "v":
-				Constants.setLoggerLevel(Level.ALL);
-				break;
-			case "w":
-				Constants.setLoggerLevel(Level.WARNING);
-				break;
-			default:
-				println(String.format("verbose is set as: %s", Constants.getLoggerLevel()));
-				println("Options: -n, -v, -w");
-				break;
-			}
-		} catch (ParseException e) {
-			Constants.showExpectedExceptionDialog(e);
-		}
-	}
-
-	private void onCommandPrintCommand(String[] args) {
-		Options options = new Options();
-		OptionGroup print = new OptionGroup();
-		// print.setRequired(true);
-		print.addOption(new Option("t", "true", false, "Enabled print commands execution"));
-		print.addOption(new Option("f", "false", false, "Disabled print commands execution"));
-		options.addOptionGroup(print);
-		try {
-			CommandLineParser parser = new DefaultParser();
-			parser.parse(options, args);
-			switch (String.valueOf(print.getSelected())) {
-			case "t":
-				CommandData.enableLogging(true);
-				break;
-			case "f":
-				CommandData.enableLogging(false);
-				break;
-			default:
-				println(String.format("Print Commands Execution is set as: %s", CommandData.isEnableLogging()));
-				println("Options: -t, -f");
-				break;
-			}
-		} catch (ParseException e) {
-			Constants.showExpectedExceptionDialog(e);
-		}
-	}
-
-	private void onCommandEventLog(String[] args) {
-		Options options = new Options();
-		OptionGroup event = new OptionGroup();
-		// event.setRequired(true);
-		event.addOption(new Option("t", "true", false, "Enabled print event trigger"));
-		event.addOption(new Option("f", "false", false, "Disabled print event trigger"));
-		options.addOptionGroup(event);
-		try {
-			CommandLineParser parser = new DefaultParser();
-			parser.parse(options, args);
-			switch (String.valueOf(event.getSelected())) {
-			case "t":
-				EventManager.enableLogging(true);
-				break;
-			case "f":
-				EventManager.enableLogging(false);
-				break;
-			default:
-				println(String.format("Print Event Trigger is set as: %s", EventManager.isEnableLogging()));
-				println("Options: -t, -f");
-				break;
-			}
-
-		} catch (ParseException e) {
-			Constants.showExpectedExceptionDialog(e);
-		}
-	}
-
-	private void onCommandDebug(String[] args) {
-		Options options = new Options();
-		OptionGroup debug = new OptionGroup();
-		// debug.setRequired(true);
-		debug.addOption(new Option("t", "true", false, "Debug Set to True"));
-		debug.addOption(new Option("f", "false", false, "Debug Set to False"));
-		options.addOptionGroup(debug);
-		try {
-			CommandLineParser parser = new DefaultParser();
-			parser.parse(options, args);
-			switch (String.valueOf(debug.getSelected())) {
-			case "t":
-				Constants.debug = true;
-				break;
-			case "f":
-				Constants.debug = false;
-				break;
-			default:
-				println(String.format("Debug is set as: %s", Constants.debug));
-				println("Options: -t, -f");
-				break;
-			}
-		} catch (ParseException e) {
-			Constants.showExpectedExceptionDialog(e);
-		}
-	}
-
-	private void onCommandDisableSession(String[] args) {
-		Options options = new Options();
-		OptionGroup disableSession = new OptionGroup();
-		// disableSession.setRequired(true);
-		disableSession.addOption(new Option("t", "true", false, "DisableSession Set to True"));
-		disableSession.addOption(new Option("f", "false", false, "DisableSession Set to False"));
-		options.addOptionGroup(disableSession);
-		try {
-			CommandLineParser parser = new DefaultParser();
-			parser.parse(options, args);
-			switch (String.valueOf(disableSession.getSelected())) {
-			case "t":
-				DataManager.disableSession = true;
-				break;
-			case "f":
-				DataManager.disableSession = false;
-				break;
-			default:
-				println(String.format("DisableSession is set as: %s", DataManager.disableSession));
-				println("Options: -t, -f");
-				break;
-			}
-		} catch (ParseException e) {
-			Constants.showExpectedExceptionDialog(e);
-		}
-	}
-
 }
