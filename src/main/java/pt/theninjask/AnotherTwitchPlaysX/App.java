@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -118,6 +119,7 @@ public class App {
 			if (cmd.hasOption('h') || config.isHelp()) {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp("java -jar ATPXapp.jar", options, true);
+				ExternalConsole.getInstance().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				return;
 			}
 			if (cmd.hasOption('v') || config.getVerbose() == ATPXConfig.Verbose.VERBOSE) {
@@ -305,7 +307,15 @@ public class App {
 			} else if (!Files.isDirectory(path)) {
 				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
 			}
-
+			
+			Path cmdsFolderPath = Paths.get(Constants.SAVE_PATH, Constants.CMD_FOLDER);
+			if (!Files.exists(cmdsFolderPath)) {
+				Files.createDirectory(cmdsFolderPath);
+				// Files.setAttribute(path, "dos:hidden", true);
+			} else if (!Files.isDirectory(cmdsFolderPath)) {
+				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
+			}
+			
 			Path modFolderPath = Paths.get(Constants.SAVE_PATH, Constants.MOD_FOLDER);
 			if (!Files.exists(modFolderPath)) {
 				Files.createDirectory(modFolderPath);

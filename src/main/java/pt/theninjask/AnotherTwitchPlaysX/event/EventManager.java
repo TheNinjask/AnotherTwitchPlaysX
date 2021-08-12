@@ -54,6 +54,13 @@ public class EventManager {
 		}
 	}
 	
+	public static boolean isEnableLogging() {
+		if(logger.getLevel().equals(Level.ALL))
+			return true;
+		else
+			return false;
+	}
+	
 	public static void registerEventListener(Object listener) {
 		singleton.dispatcher.subscribe(listener);
 	}

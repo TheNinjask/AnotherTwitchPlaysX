@@ -63,12 +63,14 @@ public final class Constants {
 
 	public static final String MOD_FOLDER = "mods";
 
+	public static final String CMD_FOLDER = "cmds";
+
 	public static final String CONFIG_FILE = "config.json";
-	
+
 	public static final String TWITCH_FILE = "twitchSession.json";
-	
+
 	public static final String YOUTUBE_FILE = "youtubeSession.json";
-	
+
 	public static final URL ICON_PATH = Constants.class
 			.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/image/favicon.png");
 
@@ -156,6 +158,10 @@ public final class Constants {
 
 	public static void setLoggerLevel(Level level) {
 		LOGGER.setLevel(level);
+	}
+	
+	public static Level getLoggerLevel() {
+		return LOGGER.getLevel();
 	}
 
 	public static void printVerboseMessage(Level level, Throwable message) {
@@ -333,13 +339,14 @@ public final class Constants {
 		}
 	}
 
-	public static File showOpenFile(FileNameExtensionFilter filter, Component comp) {
+	public static File showSaveFile(File defaultFile, FileNameExtensionFilter filter, Component comp, File path) {
 		JFileChooser chooser = null;
 		int resp = JFileChooser.ERROR_OPTION;
 		try {
 			LookAndFeel previousLF = UIManager.getLookAndFeel();
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			chooser = new JFileChooser(Paths.get(SAVE_PATH, MOD_FOLDER).toFile());
+			chooser = new JFileChooser(path);
+			chooser.setSelectedFile(defaultFile);
 			chooser.addChoosableFileFilter(filter);
 			chooser.setFileFilter(filter);
 			UIManager.setLookAndFeel(previousLF);
@@ -347,7 +354,66 @@ public final class Constants {
 
 			Constants.printVerboseMessage(Level.WARNING, e);
 
-			chooser = new JFileChooser(Paths.get(SAVE_PATH, MOD_FOLDER).toFile());
+			chooser = new JFileChooser(path);
+			chooser.setSelectedFile(defaultFile);
+			chooser.addChoosableFileFilter(filter);
+			chooser.setFileFilter(filter);
+		}
+		resp = chooser.showSaveDialog(comp);
+		switch (resp) {
+		case JFileChooser.APPROVE_OPTION:
+			return chooser.getSelectedFile();
+		case JFileChooser.CANCEL_OPTION:
+		case JFileChooser.ERROR_OPTION:
+		default:
+			return null;
+		}
+	}
+
+	public static File showOpenFile(FileNameExtensionFilter filter, Component comp) {
+		JFileChooser chooser = null;
+		int resp = JFileChooser.ERROR_OPTION;
+		try {
+			LookAndFeel previousLF = UIManager.getLookAndFeel();
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			chooser = new JFileChooser();
+			chooser.addChoosableFileFilter(filter);
+			chooser.setFileFilter(filter);
+			UIManager.setLookAndFeel(previousLF);
+		} catch (Exception e) {
+
+			Constants.printVerboseMessage(Level.WARNING, e);
+
+			chooser = new JFileChooser();
+			chooser.addChoosableFileFilter(filter);
+			chooser.setFileFilter(filter);
+		}
+		resp = chooser.showOpenDialog(comp);
+		switch (resp) {
+		case JFileChooser.APPROVE_OPTION:
+			return chooser.getSelectedFile();
+		case JFileChooser.CANCEL_OPTION:
+		case JFileChooser.ERROR_OPTION:
+		default:
+			return null;
+		}
+	}
+
+	public static File showOpenFile(FileNameExtensionFilter filter, Component comp, File path) {
+		JFileChooser chooser = null;
+		int resp = JFileChooser.ERROR_OPTION;
+		try {
+			LookAndFeel previousLF = UIManager.getLookAndFeel();
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			chooser = new JFileChooser(path);
+			chooser.addChoosableFileFilter(filter);
+			chooser.setFileFilter(filter);
+			UIManager.setLookAndFeel(previousLF);
+		} catch (Exception e) {
+
+			Constants.printVerboseMessage(Level.WARNING, e);
+
+			chooser = new JFileChooser(path);
 			chooser.addChoosableFileFilter(filter);
 			chooser.setFileFilter(filter);
 		}

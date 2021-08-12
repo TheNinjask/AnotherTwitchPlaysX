@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -259,7 +260,7 @@ public class MainMenuPanel extends JPanel {
 			}
 			if (mod == null) {
 				try {
-					File file = Constants.showOpenFile(new FileNameExtensionFilter("JAR", "jar"), this);
+					File file = Constants.showOpenFile(new FileNameExtensionFilter("JAR", "jar"), this, Paths.get(Constants.SAVE_PATH, Constants.MOD_FOLDER).toFile());
 					mod = Constants.loadMod(file);
 					if (mod == null)
 						return;

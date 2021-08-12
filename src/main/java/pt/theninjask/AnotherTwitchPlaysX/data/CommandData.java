@@ -68,6 +68,13 @@ public class CommandData implements Data {
 			logger.setLevel(Level.OFF);
 		}
 	}
+	
+	public static boolean isEnableLogging() {
+		if(logger.getLevel().equals(Level.ALL))
+			return true;
+		else
+			return false;
+	}
 
 	private static final Logger setUpLogger() {
 		Logger logger = Logger.getLogger(CommandData.class.getName());

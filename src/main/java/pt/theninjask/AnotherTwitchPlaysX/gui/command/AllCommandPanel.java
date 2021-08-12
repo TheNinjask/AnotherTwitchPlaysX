@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -121,7 +122,7 @@ public class AllCommandPanel extends JPanel{
 				EventManager.triggerEvent(event);
 				if(event.isCancelled())
 					return;
-				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
+				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this, Paths.get(Constants.SAVE_PATH, Constants.CMD_FOLDER).toFile());
 				if (file != null) {
 					ObjectMapper mapper = new ObjectMapper();
 					List<CommandData> commands = mapper.readValue(file,
@@ -243,7 +244,7 @@ public class AllCommandPanel extends JPanel{
 			if(event.isCancelled())
 				return;
 			File file = Constants.showSaveFile(new File("commands.json"), new FileNameExtensionFilter("JSON", "json"),
-					this);
+					this, Paths.get(Constants.SAVE_PATH, Constants.CMD_FOLDER).toFile());
 			if (file != null) {
 				try {
 					ObjectMapper objectMapper = new ObjectMapper();
@@ -272,7 +273,7 @@ public class AllCommandPanel extends JPanel{
 			if(event.isCancelled())
 				return;
 			try {
-				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this);
+				File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), this, Paths.get(Constants.SAVE_PATH, Constants.CMD_FOLDER).toFile());
 				if (file != null) {
 					ObjectMapper mapper = new ObjectMapper();
 					List<CommandData> tmp = mapper.readValue(file,
