@@ -2,6 +2,7 @@ package pt.theninjask.AnotherTwitchPlaysX.util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -9,11 +10,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -67,12 +71,23 @@ public class ExternalConsole extends JFrame {
 		public String getCommand() {
 			return "help";
 		}
-
+		
+		@Override
+		public String getDescription() {
+			return "Shows all commands and their descriptions";
+		}
+		
 		@Override
 		public void executeCommand(String[] args) {
 			println("Available Commands:");
-			for (String cmd : singleton.cmds.keySet()) {
-				println(String.format("\t%s", cmd));
+			List<ExternalConsoleCommand> helpSorted = singleton.cmds.values().stream().sorted(new Comparator<ExternalConsoleCommand>() {
+				@Override
+				public int compare(ExternalConsoleCommand o1, ExternalConsoleCommand o2) {
+					return o1.getCommand().compareTo(o2.getCommand());
+				}
+			}).toList();
+			for (ExternalConsoleCommand cmd : helpSorted) {
+				println(String.format("\t%s - %s", cmd.getCommand(), cmd.getDescription()));
 			}
 		}
 	};
@@ -84,6 +99,11 @@ public class ExternalConsole extends JFrame {
 			return "autoscroll";
 		}
 
+		@Override
+		public String getDescription() {
+			return "Enables/Disables autoscrolling of ExternalConsole";
+		}
+		
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -110,7 +130,8 @@ public class ExternalConsole extends JFrame {
 				}
 
 			} catch (ParseException e) {
-				Constants.showExpectedExceptionDialog(e);
+				println(e.getMessage());
+				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -121,7 +142,12 @@ public class ExternalConsole extends JFrame {
 		public String getCommand() {
 			return "verbose";
 		}
-
+		
+		@Override
+		public String getDescription() {
+			return "Enables/Disables Verbose mode of app";
+		}
+		
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -150,7 +176,8 @@ public class ExternalConsole extends JFrame {
 					break;
 				}
 			} catch (ParseException e) {
-				Constants.showExpectedExceptionDialog(e);
+				println(e.getMessage());
+				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -162,6 +189,11 @@ public class ExternalConsole extends JFrame {
 			return "printcommand";
 		}
 
+		@Override
+		public String getDescription() {
+			return "Enables/Disables printing of CommandData execution";
+		}
+		
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -186,7 +218,8 @@ public class ExternalConsole extends JFrame {
 					break;
 				}
 			} catch (ParseException e) {
-				Constants.showExpectedExceptionDialog(e);
+				println(e.getMessage());
+				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -198,6 +231,11 @@ public class ExternalConsole extends JFrame {
 			return "eventlog";
 		}
 
+		@Override
+		public String getDescription() {
+			return "Logs app events";
+		}
+		
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -223,7 +261,8 @@ public class ExternalConsole extends JFrame {
 				}
 
 			} catch (ParseException e) {
-				Constants.showExpectedExceptionDialog(e);
+				println(e.getMessage());
+				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -235,6 +274,11 @@ public class ExternalConsole extends JFrame {
 			return "debug";
 		}
 
+		@Override
+		public String getDescription() {
+			return "Enables/Disables printStackTrace()";
+		}
+		
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -259,7 +303,8 @@ public class ExternalConsole extends JFrame {
 					break;
 				}
 			} catch (ParseException e) {
-				Constants.showExpectedExceptionDialog(e);
+				println(e.getMessage());
+				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -271,6 +316,11 @@ public class ExternalConsole extends JFrame {
 			return "disablesession";
 		}
 
+		@Override
+		public String getDescription() {
+			return "Disables/Enables access to SessionData from DataManager (might \"brick\" app)\nMight be useful to check when a external mod gains access";
+		}
+		
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -295,13 +345,91 @@ public class ExternalConsole extends JFrame {
 					break;
 				}
 			} catch (ParseException e) {
-				Constants.showExpectedExceptionDialog(e);
+				println(e.getMessage());
+				// Constants.showExpectedExceptionDialog(e);
+			}
+		}
+	};
+	
+	private static ExternalConsoleCommand clear = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "cls";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Clears ExternalConsole";
+		}
+		
+		@Override
+		public void executeCommand(String[] args) {
+			singleton.console.setText("");
+		}
+	};
+	
+	private static ExternalConsoleCommand appfolder = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "appfolder";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Opens App Folder";
+		}
+		
+		@Override
+		public void executeCommand(String[] args) {
+			try {
+				Desktop.getDesktop().open(new File(Constants.SAVE_PATH));
+			} catch (IOException e) {
+				println(e.getMessage());
 			}
 		}
 	};
 
+	private class UsedCommand {
+
+		private UsedCommand previous;
+
+		private UsedCommand next;
+
+		private String fullCommand;
+
+		public UsedCommand(String fullCommand, UsedCommand previous, UsedCommand next) {
+			this.fullCommand = fullCommand;
+			this.previous = previous;
+			this.next = next;
+		}
+
+		public String getFullCommand() {
+			return fullCommand;
+		}
+
+		public UsedCommand getPrevious() {
+			return previous;
+		}
+
+		/*public void setPrevious(UsedCommand previous) {
+			this.previous = previous;
+		}*/
+
+		public UsedCommand getNext() {
+			return next;
+		}
+
+		public void setNext(UsedCommand next) {
+			this.next = next;
+		}
+	}
+
+	private UsedCommand last;
+
 	private static ExternalConsole singleton = new ExternalConsole();
-	
+
 	private ExternalConsole() {
 		this.setTitle("External Console");
 		this.setMinimumSize(new Dimension(300, 300));
@@ -336,41 +464,43 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(eventlog.getCommand(), eventlog);
 		this.cmds.put(debug.getCommand(), debug);
 		this.cmds.put(disablesession.getCommand(), disablesession);
-
+		this.cmds.put(clear.getCommand(), clear);
+		this.cmds.put(appfolder.getCommand(), appfolder);
+		this.last = null;
 		EventManager.registerEventListener(this);
 	}
 
-	/*public static ExternalConsole getInstance() {
-		return singleton;
-	}*/
-	
+	/*
+	 * public static ExternalConsole getInstance() { return singleton; }
+	 */
+
 	public static boolean isViewable() {
 		return singleton.isVisible();
 	}
-	
+
 	public static void setViewable(boolean b) {
 		singleton.setVisible(b);
 	}
-	
+
 	public static boolean isClosable() {
 		return singleton.getDefaultCloseOperation() >= JFrame.DISPOSE_ON_CLOSE;
 	}
-	
+
 	public static void setClosable(boolean b) {
-		if(b)
+		if (b)
 			singleton.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		else
 			singleton.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}
-	
+
 	public static void addCommand(ExternalConsoleCommand newCmd) {
 		singleton.cmds.put(newCmd.getCommand(), newCmd);
 	}
-	
+
 	public static void removeCommand(String cmd) {
 		singleton.cmds.remove(cmd);
 	}
-	
+
 	public static ExternalConsoleCommand getCommand(String cmd) {
 		return singleton.cmds.get(cmd);
 	}
@@ -426,13 +556,40 @@ public class ExternalConsole extends JFrame {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-
+				switch (e.getKeyCode()) {
+				default:
+					break;
+				case KeyEvent.VK_UP:
+				case KeyEvent.VK_KP_UP:
+					if (last != null) {
+						input.setText(last.getFullCommand());
+						if (last.getPrevious() != null)
+							last = last.getPrevious();
+					}
+					break;
+				case KeyEvent.VK_DOWN:
+				case KeyEvent.VK_KP_DOWN:
+					if (last != null)
+						if (last.getNext() != null)
+							if(last.getNext().getNext()!=null) {
+								last = last.getNext();
+								input.setText(last.getNext().getFullCommand());
+							}
+					break;
+				case KeyEvent.VK_ENTER:
 					InputCommandExternalConsoleEvent event = new InputCommandExternalConsoleEvent(
 							input.getText().split(" "));
 					EventManager.triggerEvent(event);
 					if (event.isCancelled())
 						return;
+
+					if (last != null)
+						while (last.getNext() != null)
+							last = last.getNext();
+					UsedCommand current = new UsedCommand(input.getText(), last, null);
+					if (last != null)
+						last.setNext(current);
+					last = current;
 
 					console.append(input.getText());
 					console.append("\n");
@@ -442,11 +599,13 @@ public class ExternalConsole extends JFrame {
 					in.pointer = 0;
 					input.setText("");
 					event.finishedEvent();
+					break;
 				}
 			}
 		});
 		messagePanel.add(input, BorderLayout.CENTER);
 		return messagePanel;
+
 	}
 
 	public static OutputStream getExternalConsoleOutputStream() {
