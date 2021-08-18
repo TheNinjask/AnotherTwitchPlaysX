@@ -7,7 +7,7 @@ public interface EmbeddedModMenuLang {
 	}
 	
 	public default String getWarning() {
-		return "(This stuff might not work correctly)";
+		return "(This stuff might not work)";
 	}
 	
 	public default String getGoBack() {

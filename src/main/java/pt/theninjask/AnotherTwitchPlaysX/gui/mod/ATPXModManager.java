@@ -23,4 +23,8 @@ public class ATPXModManager {
 	public static void removeAllMods() {
 		singleton.mods.clear();
 	}
+	
+	public static ArrayList<ATPXMod> getAllMods() {
+		return new ArrayList<>(singleton.mods);
+	}
 }

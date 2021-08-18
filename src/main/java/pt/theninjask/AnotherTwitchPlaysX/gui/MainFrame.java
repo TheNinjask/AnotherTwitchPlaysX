@@ -84,7 +84,7 @@ public class MainFrame extends JFrame {
 				tmp.setOpaque(false);
 				tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				objectMapper.writeValue(file, DataManager.getTwitchSession());
-				Constants.showCustomColorMessageDialog(null, tmp, "Saving Session", JOptionPane.INFORMATION_MESSAGE,
+				Constants.showCustomColorMessageDialog(null, tmp, DataManager.getLanguage().getSavingSessionTitle(), JOptionPane.INFORMATION_MESSAGE,
 						null, Constants.TWITCH_COLOR);
 			} catch (IOException e) {
 				Constants.showExceptionDialog(e);
@@ -106,7 +106,7 @@ public class MainFrame extends JFrame {
 				tmp.setOpaque(false);
 				tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
 				objectMapper.writeValue(file, DataManager.getYouTubeSession());
-				Constants.showCustomColorMessageDialog(null, tmp, "Saving Session", JOptionPane.INFORMATION_MESSAGE,
+				Constants.showCustomColorMessageDialog(null, tmp, DataManager.getLanguage().getSavingSessionTitle(), JOptionPane.INFORMATION_MESSAGE,
 						null, Constants.TWITCH_COLOR);
 			} catch (IOException e) {
 				Constants.showExceptionDialog(e);

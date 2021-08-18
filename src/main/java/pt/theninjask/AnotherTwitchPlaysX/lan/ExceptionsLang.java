@@ -30,4 +30,8 @@ public interface ExceptionsLang {
 		return "Could not verify jar!";
 	}
 	
+	public default String getNotDirectory() {
+		return "%s is not a Directory!";
+	}
+	
 }

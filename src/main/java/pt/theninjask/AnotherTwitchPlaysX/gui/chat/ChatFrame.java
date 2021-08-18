@@ -153,6 +153,7 @@ public class ChatFrame extends JFrame{
 	private JScrollPane insertChat() {
 		scroll = new JScrollPane();
 		chat = new JTextArea();
+		chat.setTabSize(4);
 		chat.setEditable(false);
 		chat.setFocusable(false);
 		chat.setLineWrap(true);
@@ -328,7 +329,7 @@ public class ChatFrame extends JFrame{
 					}
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Constants.showExceptionDialog(e);
 			}
 		}
 	}

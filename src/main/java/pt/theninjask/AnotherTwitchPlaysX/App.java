@@ -304,7 +304,7 @@ public class App {
 				Files.createDirectory(path);
 				// Files.setAttribute(path, "dos:hidden", true);
 			} else if (!Files.isDirectory(path)) {
-				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
+				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(), Constants.SAVE_PATH));
 			}
 			
 			Path cmdsFolderPath = Paths.get(Constants.SAVE_PATH, Constants.CMD_FOLDER);
@@ -312,7 +312,7 @@ public class App {
 				Files.createDirectory(cmdsFolderPath);
 				// Files.setAttribute(path, "dos:hidden", true);
 			} else if (!Files.isDirectory(cmdsFolderPath)) {
-				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
+				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(), Constants.SAVE_PATH));
 			}
 			
 			Path modFolderPath = Paths.get(Constants.SAVE_PATH, Constants.MOD_FOLDER);
@@ -320,7 +320,7 @@ public class App {
 				Files.createDirectory(modFolderPath);
 				// Files.setAttribute(path, "dos:hidden", true);
 			} else if (!Files.isDirectory(modFolderPath)) {
-				throw new RuntimeException(String.format("%s is not a Directory!", Constants.SAVE_PATH));
+				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(), Constants.SAVE_PATH));
 			} else {
 				File modFolder = modFolderPath.toFile();
 				for (File modFile : modFolder.listFiles()) {
@@ -338,8 +338,8 @@ public class App {
 							if (mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
 								ATPXModManager.addMod(mod);
 						} catch (Exception e) {
-							Constants.showMessageDialog(String.format("Could not load mod %s", modFile.getName()),
-									"Mod Not Loaded");
+							Constants.showMessageDialog(String.format(DataManager.getLanguage().getAutoLoadModFail(), modFile.getName()),
+									DataManager.getLanguage().getAutoLoadModFailTitle());
 						}
 					}
 				}

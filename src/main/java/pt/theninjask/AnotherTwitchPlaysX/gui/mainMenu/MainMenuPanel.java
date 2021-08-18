@@ -270,10 +270,12 @@ public class MainMenuPanel extends JPanel {
 							new PopOutFrame(mod.getJPanelInstance());
 						else
 							MainFrame.replacePanel(mod.getJPanelInstance());
-					if (!mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
-						mod = null;
-					else
+					if (mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded()) {
 						ATPXModManager.addMod(mod);
+						if(!mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
+							mod = null;
+					}else
+						mod = null;
 				} catch (Exception e) {
 					Constants.showExpectedExceptionDialog(e);
 					mod = null;

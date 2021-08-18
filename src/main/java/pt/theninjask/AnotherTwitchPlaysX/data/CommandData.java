@@ -26,6 +26,7 @@ import com.google.api.services.youtube.model.LiveChatMessage;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.data.CommandDataOnExecute;
 import pt.theninjask.AnotherTwitchPlaysX.event.data.CommandDataOnMessageEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.data.CommandDataOnTwitchMessageEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.data.CommandDataOnYouTubeMessage;
@@ -292,6 +293,12 @@ public class CommandData implements Data {
 	}
 
 	public void execute() {
+		
+		CommandDataOnExecute event = new CommandDataOnExecute(this);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
+		
 		switch (type) {
 		case SINGLE:
 			executeSingle();
@@ -304,6 +311,12 @@ public class CommandData implements Data {
 	}
 
 	public void execute(Map<String, String> map) {
+		
+		CommandDataOnExecute event = new CommandDataOnExecute(this, map);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
+		
 		switch (type) {
 		case SINGLE:
 			if (map.isEmpty())

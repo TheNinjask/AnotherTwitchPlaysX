@@ -15,6 +15,7 @@ import pt.theninjask.AnotherTwitchPlaysX.event.gui.mod.EmbeddedModLoadEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
@@ -29,7 +30,7 @@ public class EmbeddedModMenuPanel extends JPanel {
 	
 	private static final int ICON_WIDTH = 80;
 	
-	private ATPXMod[] mods = {new ChangeStopShortCutMod(), new TestChatCommandsMod(), new StringChatCommandsMod(), new TestCommandsMod()};
+	private ATPXMod[] mods = {new ChangeStopShortCutMod(), new TestChatCommandsMod(), new StringChatCommandsMod(), new TestCommandsMod(), new DemocracyMod()};
 	
 	private EmbeddedModMenuPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", EmbeddedModMenuPanel.class.getSimpleName()));
@@ -73,8 +74,11 @@ public class EmbeddedModMenuPanel extends JPanel {
 					new PopOutFrame(mod.getJPanelInstance());
 				else
 					MainFrame.replacePanel(mod.getJPanelInstance());
-			if(mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
-				MainMenuPanel.getInstance().setMod(mod);
+			if(mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded()) {
+				ATPXModManager.addMod(mod);
+				if(mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
+					MainMenuPanel.getInstance().setMod(mod);
+			}
 			mods.setSelectedIndex(-1);
 		});
 		dummy.add(mods);

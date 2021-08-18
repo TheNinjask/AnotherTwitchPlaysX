@@ -1,7 +1,5 @@
 package pt.theninjask.AnotherTwitchPlaysX.event;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -13,9 +11,9 @@ public abstract class BasicEvent implements Event {
 
 	private AtomicBoolean cancelled;
 
-	private boolean isFinished;
+	//private boolean isFinished;
 
-	private List<Runnable> afterEvent;
+	//private List<Runnable> afterEvent;
 
 	public BasicEvent() {
 		this(BasicEvent.class.getSimpleName());
@@ -26,8 +24,8 @@ public abstract class BasicEvent implements Event {
 		this.name = name;
 		this.cancelled = new AtomicBoolean();
 
-		this.afterEvent = new ArrayList<>();
-		this.isFinished = false;
+		//this.afterEvent = new ArrayList<>();
+		//this.isFinished = false;
 	}
 
 	public String getName() {
@@ -46,18 +44,18 @@ public abstract class BasicEvent implements Event {
 		return cancelled.get();
 	}
 
-	public synchronized void addAfterEvent(Runnable run) {
+	/*public synchronized void addAfterEvent(Runnable run) {
 		if (isFinished)
 			run.run();
 		else
 			afterEvent.add(run);
-	}
+	}*/
 
-	public synchronized void finishedEvent() {
+	/*public synchronized void finishedEvent() {
 		isFinished = true;
 		afterEvent.forEach(run -> {
 			run.run();
 		});
-	}
+	}*/
 
 }

@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,9 +30,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -42,6 +46,12 @@ import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
 import pt.theninjask.AnotherTwitchPlaysX.event.externalconsole.InputCommandExternalConsoleEvent;
+import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModManager;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 
 public class ExternalConsole extends JFrame {
@@ -71,23 +81,26 @@ public class ExternalConsole extends JFrame {
 		public String getCommand() {
 			return "help";
 		}
-		
+
 		@Override
 		public String getDescription() {
 			return "Shows all commands and their descriptions";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			println("Available Commands:");
-			List<ExternalConsoleCommand> helpSorted = singleton.cmds.values().stream().sorted(new Comparator<ExternalConsoleCommand>() {
-				@Override
-				public int compare(ExternalConsoleCommand o1, ExternalConsoleCommand o2) {
-					return o1.getCommand().compareTo(o2.getCommand());
-				}
-			}).toList();
+			List<ExternalConsoleCommand> helpSorted = singleton.cmds.values().stream()
+					.sorted(new Comparator<ExternalConsoleCommand>() {
+						@Override
+						public int compare(ExternalConsoleCommand o1, ExternalConsoleCommand o2) {
+							return o1.getCommand().compareTo(o2.getCommand());
+						}
+					}).toList();
 			for (ExternalConsoleCommand cmd : helpSorted) {
-				println(String.format("\t%s - %s", cmd.getCommand(), cmd.getDescription()));
+				int spacing = 4 + cmd.getCommand().length();
+				println(String.format("\t%s - %s", cmd.getCommand(),
+						cmd.getDescription().replaceAll("\n", "\n\t" + " ".repeat(spacing))));
 			}
 		}
 	};
@@ -103,7 +116,7 @@ public class ExternalConsole extends JFrame {
 		public String getDescription() {
 			return "Enables/Disables autoscrolling of ExternalConsole";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -142,12 +155,12 @@ public class ExternalConsole extends JFrame {
 		public String getCommand() {
 			return "verbose";
 		}
-		
+
 		@Override
 		public String getDescription() {
 			return "Enables/Disables Verbose mode of app";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -193,7 +206,7 @@ public class ExternalConsole extends JFrame {
 		public String getDescription() {
 			return "Enables/Disables printing of CommandData execution";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -235,7 +248,7 @@ public class ExternalConsole extends JFrame {
 		public String getDescription() {
 			return "Logs app events";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -278,7 +291,7 @@ public class ExternalConsole extends JFrame {
 		public String getDescription() {
 			return "Enables/Disables printStackTrace()";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -320,7 +333,7 @@ public class ExternalConsole extends JFrame {
 		public String getDescription() {
 			return "Disables/Enables access to SessionData from DataManager (might \"brick\" app)\nMight be useful to check when a external mod gains access";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			Options options = new Options();
@@ -350,7 +363,7 @@ public class ExternalConsole extends JFrame {
 			}
 		}
 	};
-	
+
 	private static ExternalConsoleCommand clear = new ExternalConsoleCommand() {
 
 		@Override
@@ -362,13 +375,13 @@ public class ExternalConsole extends JFrame {
 		public String getDescription() {
 			return "Clears ExternalConsole";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			singleton.console.setText("");
 		}
 	};
-	
+
 	private static ExternalConsoleCommand appfolder = new ExternalConsoleCommand() {
 
 		@Override
@@ -380,7 +393,7 @@ public class ExternalConsole extends JFrame {
 		public String getDescription() {
 			return "Opens App Folder";
 		}
-		
+
 		@Override
 		public void executeCommand(String[] args) {
 			try {
@@ -388,6 +401,120 @@ public class ExternalConsole extends JFrame {
 			} catch (IOException e) {
 				println(e.getMessage());
 			}
+		}
+	};
+
+	private static ExternalConsoleCommand mod = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "mod";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Operations on mods";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup mod = new OptionGroup();
+			// print.setRequired(true);
+			mod.addOption(new Option("a", "add", false, "Adds a mod"));
+			mod.addOption(new Option("r", "remove", true, "Removes a mod (their effects may linger.)"));
+			mod.addOption(new Option("c", "clear", false, "Removes all mods (their effects may linger.)"));
+			mod.addOption(new Option("l", "list", false, "Lists All Mods"));
+			options.addOptionGroup(mod);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				CommandLine cmd = parser.parse(options, args);
+				switch (String.valueOf(mod.getSelected())) {
+				case "a":
+					try {
+						File file = Constants.showOpenFile(new FileNameExtensionFilter("JAR", "jar"), null,
+								Paths.get(Constants.SAVE_PATH, Constants.MOD_FOLDER).toFile());
+						ATPXMod newMod = Constants.loadMod(file);
+						if (newMod == null)
+							return;
+						newMod.refresh();
+						if (newMod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
+							if (newMod.getClass().getAnnotation(ATPXModProps.class).popout())
+								new PopOutFrame(newMod.getJPanelInstance());
+							else
+								MainFrame.replacePanel(newMod.getJPanelInstance());
+						if (newMod.getClass().getAnnotation(ATPXModProps.class).keepLoaded()) {
+							ATPXModManager.addMod(newMod);
+							if (newMod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
+								MainMenuPanel.getInstance().setMod(newMod);
+						}
+						println(String.format("Loaded Mod %s.", newMod.getClass().getSimpleName()));
+					} catch (Exception e) {
+						println(e.getMessage());
+					}
+					break;
+				case "r":
+					String modName = cmd.getOptionValue('r');
+					/**
+					 * The weird/spaghetti code below is to avoid having a reference to the mod
+					 */
+					if (ATPXModManager.getAllMods().parallelStream().filter((m) -> {
+						if (m.getClass().getSimpleName().equals(modName)) {
+							ATPXModManager.removeMod(m);
+							if (MainMenuPanel.getInstance().getMod() == m)
+								MainMenuPanel.getInstance().setMod(null);
+							return true;
+						}
+						return false;
+					}).toList().isEmpty()) {
+						println("No mod found!");
+					} else {
+						System.gc();
+						println("Mod removed.");
+					}
+					break;
+				case "c":
+					MainMenuPanel.getInstance().setMod(null);
+					ATPXModManager.removeAllMods();
+					System.gc();
+					println("Mods cleared!");
+					break;
+				case "l":
+					ArrayList<ATPXMod> list = ATPXModManager.getAllMods();
+					if (list.isEmpty()) {
+						println("No mods loaded.");
+						break;
+					}
+					println("All mods loaded:");
+					for (ATPXMod atpxMod : list) {
+						println(String.format("\t%s", atpxMod.getClass().getSimpleName()));
+					}
+					break;
+				default:
+					println("Options: -a, -r <mod>, -c, -l");
+					break;
+				}
+			} catch (ParseException e) {
+				ExternalConsole.println(e.getMessage());
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand hide = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "hide";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Hides External Console";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			singleton.setExtendedState(JFrame.ICONIFIED);
 		}
 	};
 
@@ -413,9 +540,9 @@ public class ExternalConsole extends JFrame {
 			return previous;
 		}
 
-		/*public void setPrevious(UsedCommand previous) {
-			this.previous = previous;
-		}*/
+		/*
+		 * public void setPrevious(UsedCommand previous) { this.previous = previous; }
+		 */
 
 		public UsedCommand getNext() {
 			return next;
@@ -466,6 +593,8 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(disablesession.getCommand(), disablesession);
 		this.cmds.put(clear.getCommand(), clear);
 		this.cmds.put(appfolder.getCommand(), appfolder);
+		this.cmds.put(mod.getCommand(), mod);
+		this.cmds.put(hide.getCommand(), hide);
 		this.last = null;
 		EventManager.registerEventListener(this);
 	}
@@ -505,9 +634,18 @@ public class ExternalConsole extends JFrame {
 		return singleton.cmds.get(cmd);
 	}
 
+	public static boolean executeCommand(String cmd, String... args) {
+		ExternalConsoleCommand exe = singleton.cmds.get(cmd);
+		if (exe == null)
+			return false;
+		exe.executeCommand(args);
+		return true;
+	}
+
 	private JScrollPane insertConsole() {
 		scroll = new JScrollPane();
 		console = new JTextArea();
+		console.setTabSize(4);
 		console.setEditable(false);
 		// console.setFocusable(false);
 		console.setLineWrap(true);
@@ -571,7 +709,7 @@ public class ExternalConsole extends JFrame {
 				case KeyEvent.VK_KP_DOWN:
 					if (last != null)
 						if (last.getNext() != null)
-							if(last.getNext().getNext()!=null) {
+							if (last.getNext().getNext() != null) {
 								last = last.getNext();
 								input.setText(last.getNext().getFullCommand());
 							}
@@ -579,9 +717,9 @@ public class ExternalConsole extends JFrame {
 				case KeyEvent.VK_ENTER:
 					InputCommandExternalConsoleEvent event = new InputCommandExternalConsoleEvent(
 							input.getText().split(" "));
-					EventManager.triggerEvent(event);
-					if (event.isCancelled())
-						return;
+					/*
+					 * EventManager.triggerEvent(event); if (event.isCancelled()) return;
+					 */
 
 					if (last != null)
 						while (last.getNext() != null)
@@ -598,7 +736,8 @@ public class ExternalConsole extends JFrame {
 					in.contents = input.getText().getBytes();
 					in.pointer = 0;
 					input.setText("");
-					event.finishedEvent();
+					// event.finishedEvent();
+					EventManager.triggerEvent(event);
 					break;
 				}
 			}
@@ -702,12 +841,12 @@ public class ExternalConsole extends JFrame {
 	public void onCommand(InputCommandExternalConsoleEvent event) {
 		if (event.getArgs() == null || event.getArgs().length == 0)
 			return;
-		event.addAfterEvent(() -> {
-			String[] args = Arrays.copyOfRange(event.getArgs(), 1, event.getArgs().length);
-			ExternalConsoleCommand cmd = cmds.get(event.getArgs()[0]);
-			if (cmd != null)
-				cmd.executeCommand(args);
-		});
+		// event.addAfterEvent(() -> {
+		String[] args = Arrays.copyOfRange(event.getArgs(), 1, event.getArgs().length);
+		ExternalConsoleCommand cmd = cmds.get(event.getArgs()[0]);
+		if (cmd != null)
+			cmd.executeCommand(args);
+		// });
 
 	}
 }

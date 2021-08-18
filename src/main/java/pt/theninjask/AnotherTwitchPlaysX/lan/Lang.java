@@ -48,8 +48,20 @@ public interface Lang {
 		return "Session saved in %s!";
 	};
 	
+	public default String getSavingSessionTitle() {
+		return "Saving Session";
+	};
+	
 	public default String getLanTag() {
 		return "EN";
+	}
+	
+	public default String getAutoLoadModFail() {
+		return "Could not load mod %s";
+	}
+	
+	public default String getAutoLoadModFailTitle() {
+		return "Mod Not Loaded";
 	}
 	
 }
