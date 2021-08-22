@@ -28,11 +28,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -62,7 +65,7 @@ public class ExternalConsole extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private JScrollPane scroll;
-	private JTextArea console;
+	private JTextPane console;
 	private ExternalConsoleOutputStream out;
 	private ExternalConsoleErrorOutputStream err;
 	private ExternalConsoleInputStream in;
@@ -98,9 +101,10 @@ public class ExternalConsole extends JFrame {
 						}
 					}).toList();
 			for (ExternalConsoleCommand cmd : helpSorted) {
-				int spacing = 4 + cmd.getCommand().length();
+				// int spacing = 4 + cmd.getCommand().length();
 				println(String.format("\t%s - %s", cmd.getCommand(),
-						cmd.getDescription().replaceAll("\n", "\n\t" + " ".repeat(spacing))));
+						// cmd.getDescription().replaceAll("\n", "\n\t" + " ".repeat(spacing))));
+						cmd.getDescription().replaceAll("\n", "\n\t\t")));
 			}
 		}
 	};
@@ -144,7 +148,6 @@ public class ExternalConsole extends JFrame {
 
 			} catch (ParseException e) {
 				println(e.getMessage());
-				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -190,7 +193,6 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
-				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -232,7 +234,6 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
-				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -275,7 +276,6 @@ public class ExternalConsole extends JFrame {
 
 			} catch (ParseException e) {
 				println(e.getMessage());
-				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -317,7 +317,6 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
-				// Constants.showExpectedExceptionDialog(e);
 			}
 		}
 	};
@@ -495,7 +494,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				}
 			} catch (ParseException e) {
-				ExternalConsole.println(e.getMessage());
+				println(e.getMessage());
 			}
 		}
 	};
@@ -515,6 +514,117 @@ public class ExternalConsole extends JFrame {
 		@Override
 		public void executeCommand(String[] args) {
 			singleton.setExtendedState(JFrame.ICONIFIED);
+		}
+	};
+
+	private static ExternalConsoleCommand top = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "top";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Flag for ExternalConsole be always on top";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup top = new OptionGroup();
+			top.addOption(new Option("t", "true", false, "AlwaysOnTop Set to True"));
+			top.addOption(new Option("f", "false", false, "AlwaysOnTop Set to False"));
+			options.addOptionGroup(top);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(top.getSelected())) {
+				case "t":
+					singleton.setAlwaysOnTop(true);
+					break;
+				case "f":
+					singleton.setAlwaysOnTop(false);
+					break;
+				default:
+					println(String.format("AlwaysOnTop is set as: %s", singleton.isAlwaysOnTop()));
+					println("Options: -t, -f");
+					break;
+				}
+			} catch (ParseException e) {
+				println(e.getMessage());
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand theme = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "theme";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Changes Theme of console";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup theme = new OptionGroup();
+			theme.addOption(new Option("t", "twitch", false, "Set EC's Theme to Twitch"));
+			theme.addOption(new Option("d", "day", false, "Set EC's Theme to Day"));
+			theme.addOption(new Option("n", "night", false, "Set EC's Theme to Night"));
+			options.addOptionGroup(theme);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(theme.getSelected())) {
+				case "t":
+					setCustom(Constants.TWITCH_COLOR_COMPLEMENT, Constants.TWITCH_COLOR);
+					break;
+				case "d":
+					setDay();
+					break;
+				case "n":
+					setNight();
+					break;
+				default:
+					Color c = singleton.getBackground();
+					String current = "Unknown";
+					if (c.equals(Color.BLACK))
+						current = "Night";
+					else if (c.equals(Color.WHITE))
+						current = "Day";
+					else if (c.equals(Constants.TWITCH_COLOR))
+						current = "Twitch";
+					println(String.format("Theme is set as: %s", current));
+					println("Options: -d, -n, -t");
+					break;
+				}
+			} catch (ParseException e) {
+				println(e.getMessage());
+			}
+		}
+	};
+
+	private static ExternalConsoleCommand stop = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "stop";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Terminates ATPX App";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			singleton.dispose();
+			MainFrame.getInstance().dispatchEvent(new WindowEvent(MainFrame.getInstance(), WindowEvent.WINDOW_CLOSING));
 		}
 	};
 
@@ -595,6 +705,9 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(appfolder.getCommand(), appfolder);
 		this.cmds.put(mod.getCommand(), mod);
 		this.cmds.put(hide.getCommand(), hide);
+		this.cmds.put(top.getCommand(), top);
+		this.cmds.put(theme.getCommand(), theme);
+		this.cmds.put(stop.getCommand(), stop);
 		this.last = null;
 		EventManager.registerEventListener(this);
 	}
@@ -644,11 +757,12 @@ public class ExternalConsole extends JFrame {
 
 	private JScrollPane insertConsole() {
 		scroll = new JScrollPane();
-		console = new JTextArea();
-		console.setTabSize(4);
+		console = new JTextPane();
+		// console.setBorder(null);
+		// console.setTabSize(4);
 		console.setEditable(false);
 		// console.setFocusable(false);
-		console.setLineWrap(true);
+		// console.setLineWrap(true);
 		DefaultCaret caret = (DefaultCaret) console.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		scroll.setViewportView(console);
@@ -729,8 +843,10 @@ public class ExternalConsole extends JFrame {
 						last.setNext(current);
 					last = current;
 
-					console.append(input.getText());
-					console.append("\n");
+					// console.append(input.getText());
+					// console.append("\n");
+					println(input.getText());
+
 					scroll.repaint();
 					scroll.revalidate();
 					in.contents = input.getText().getBytes();
@@ -763,64 +879,125 @@ public class ExternalConsole extends JFrame {
 
 		@Override
 		public void write(int b) throws IOException {
-			console.append(Character.toString(b));
-			if (autoScroll)
-				try {
-					console.setCaretPosition(console.getLineStartOffset(console.getLineCount() - 1));
-				} catch (BadLocationException e) {
-				}
-			scroll.repaint();
-			scroll.revalidate();
+			try {
+				StyledDocument doc = singleton.console.getStyledDocument();
+				doc.insertString(doc.getLength(), Character.toString(b), null);
+				if (autoScroll)
+					console.setCaretPosition(doc.getLength());
+				singleton.scroll.repaint();
+				singleton.scroll.revalidate();
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// continue
+			}
+			/*
+			 * console.append(Character.toString(b)); if (autoScroll) try {
+			 * console.setCaretPosition(console.getLineStartOffset(console.getLineCount() -
+			 * 1)); } catch (BadLocationException e) { } scroll.repaint();
+			 * scroll.revalidate();
+			 */
 		}
 
 	}
 
 	private class ExternalConsoleErrorOutputStream extends OutputStream {
 
+		private SimpleAttributeSet errorSet;
+
+		public ExternalConsoleErrorOutputStream() {
+			errorSet = new SimpleAttributeSet();
+			StyleConstants.setForeground(errorSet, Color.RED);
+		}
+
 		@Override
 		public void write(int b) throws IOException {
-			console.append(Character.toString(b));
-			if (autoScroll)
-				try {
-					console.setCaretPosition(console.getLineStartOffset(console.getLineCount() - 1));
-				} catch (BadLocationException e) {
-				}
-			scroll.repaint();
-			scroll.revalidate();
+			try {
+				StyledDocument doc = singleton.console.getStyledDocument();
+				doc.insertString(doc.getLength(), Character.toString(b), null);
+				doc.setCharacterAttributes(doc.getLength() - Character.toString(b).length(),
+						Character.toString(b).length(), errorSet, false);
+				if (autoScroll)
+					console.setCaretPosition(doc.getLength());
+				singleton.scroll.repaint();
+				singleton.scroll.revalidate();
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// continue
+			}
+			/*
+			 * console.append(Character.toString(b)); if (autoScroll) try {
+			 * console.setCaretPosition(console.getLineStartOffset(console.getLineCount() -
+			 * 1)); } catch (BadLocationException e) { } scroll.repaint();
+			 * scroll.revalidate();
+			 */
 		}
 
 	}
 
-	public static void setDay() {
-		singleton.console.setForeground(Color.BLACK);
-		singleton.setBackground(Color.WHITE);
+	public static void setCustom(Color font, Color background) {
+		singleton.console.setForeground(font);
+		singleton.setBackground(background);
 
-		singleton.input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-		singleton.input.setForeground(Color.BLACK);
-		singleton.input.setCaretColor(Color.BLACK);
-		singleton.input.setBackground(Color.WHITE);
+		singleton.input.setBorder(BorderFactory.createLineBorder(font, 1));
+		singleton.input.setForeground(font);
+		singleton.input.setCaretColor(font);
+		singleton.input.setBackground(background);
+	}
+
+	public static void setDay() {
+		setCustom(Color.BLACK, Color.WHITE);
+		/*
+		 * singleton.console.setForeground(Color.BLACK);
+		 * singleton.setBackground(Color.WHITE);
+		 * 
+		 * singleton.input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		 * singleton.input.setForeground(Color.BLACK);
+		 * singleton.input.setCaretColor(Color.BLACK);
+		 * singleton.input.setBackground(Color.WHITE);
+		 */
 	}
 
 	public static void setNight() {
-		singleton.console.setForeground(Color.WHITE);
-		singleton.setBackground(Color.BLACK);
-
-		singleton.input.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
-		singleton.input.setForeground(Color.WHITE);
-		singleton.input.setCaretColor(Color.WHITE);
-		singleton.input.setBackground(Color.BLACK);
+		setCustom(Color.WHITE, Color.BLACK);
+		/*
+		 * singleton.console.setForeground(Color.WHITE);
+		 * singleton.setBackground(Color.BLACK);
+		 * 
+		 * singleton.input.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+		 * singleton.input.setForeground(Color.WHITE);
+		 * singleton.input.setCaretColor(Color.WHITE);
+		 * singleton.input.setBackground(Color.BLACK);
+		 */
 	}
 
 	public static void println() {
-		singleton.console.append("\n");
-		singleton.scroll.repaint();
-		singleton.scroll.revalidate();
+		try {
+			StyledDocument doc = singleton.console.getStyledDocument();
+			doc.insertString(doc.getLength(), "\n", null);
+			if (singleton.autoScroll)
+				singleton.console.setCaretPosition(doc.getLength());
+			// singleton.console.append("\n");
+			singleton.scroll.repaint();
+			singleton.scroll.revalidate();
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void println(String msg) {
-		singleton.console.append(String.format("%s\n", msg));
-		singleton.scroll.repaint();
-		singleton.scroll.revalidate();
+		try {
+			StyledDocument doc = singleton.console.getStyledDocument();
+			doc.insertString(doc.getLength(), String.format("%s\n", msg), null);
+			if (singleton.autoScroll)
+				singleton.console.setCaretPosition(doc.getLength());
+			// singleton.console.append(String.format("%s\n", msg));
+			singleton.scroll.repaint();
+			singleton.scroll.revalidate();
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private class ExternalConsoleInputStream extends InputStream {

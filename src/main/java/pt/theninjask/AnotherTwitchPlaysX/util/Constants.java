@@ -115,7 +115,7 @@ public final class Constants {
 
 	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
 		// private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
-		private static final String format = "[%1$s] %2$s %n";
+		private static final String format = "[%1$.4s] %2$s %n";
 
 		@Override
 		public synchronized String format(LogRecord lr) {
@@ -288,10 +288,8 @@ public final class Constants {
 				Class<?> c = cl.loadClass(className);
 				if (ATPXMod.class.isAssignableFrom(c)) {
 					ATPXModProps annotation = c.getAnnotation(ATPXModProps.class);
-					Object tmp = c.getConstructor().newInstance();
-
 					if (mod == null && annotation != null && annotation.main()) {
-						mod = (ATPXMod) tmp;
+						mod = (ATPXMod) c.getConstructor().newInstance();
 						break;
 					}
 				}

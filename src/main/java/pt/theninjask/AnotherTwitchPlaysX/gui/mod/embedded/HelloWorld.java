@@ -9,7 +9,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-@ATPXModProps(keepLoaded = false, hasPanel = false)
+@ATPXModProps(hasPanel = false)
 public class HelloWorld extends ATPXMod {
 
 	public HelloWorld() {

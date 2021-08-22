@@ -237,7 +237,6 @@ public class MainMenuPanel extends JPanel {
 					RedirectorErrorOutputStream
 							.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());
 					RedirectorInputStream.changeRedirect(ExternalConsole.getExternalConsoleInputStream());
-					ExternalConsole.setNight();
 					ExternalConsole.setViewable(true);
 				}
 				return;

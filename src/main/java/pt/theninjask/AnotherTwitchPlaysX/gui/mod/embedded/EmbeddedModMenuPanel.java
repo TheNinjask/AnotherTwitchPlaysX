@@ -30,7 +30,7 @@ public class EmbeddedModMenuPanel extends JPanel {
 	
 	private static final int ICON_WIDTH = 80;
 	
-	private ATPXMod[] mods = {new ChangeStopShortCutMod(), new TestChatCommandsMod(), new StringChatCommandsMod(), new TestCommandsMod(), new DemocracyMod()};
+	private Class<?>[] mods = {HelloWorld.class,ChangeStopShortCutMod.class, TestChatCommandsMod.class, StringChatCommandsMod.class, TestCommandsMod.class, DemocracyMod.class};
 	
 	private EmbeddedModMenuPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", EmbeddedModMenuPanel.class.getSimpleName()));
@@ -55,14 +55,24 @@ public class EmbeddedModMenuPanel extends JPanel {
 		JPanel dummy = new JPanel();
 		dummy.setOpaque(false);
 		
-		JComboBox<JComboItem<ATPXMod>> mods = new JComboBox<JComboItem<ATPXMod>>();
-		for (ATPXMod atpxMod : this.mods) {
-			mods.addItem(new JComboItem<ATPXMod>(atpxMod, atpxMod.getClass().getSimpleName()));
+		JComboBox<JComboItem<Class<?>>> mods = new JComboBox<JComboItem<Class<?>>>();
+		for (Class<?> atpxModClass : this.mods) {
+			mods.addItem(new JComboItem<Class<?>>(atpxModClass, atpxModClass.getSimpleName()));
 		}
 		mods.setSelectedIndex(-1);
 		mods.addActionListener(l->{
-			ATPXMod mod = mods.getItemAt(mods.getSelectedIndex()).get();
-			
+			Class<?> modClass = mods.getItemAt(mods.getSelectedIndex()).get();
+			if (!ATPXMod.class.isAssignableFrom(modClass))
+				return;
+			ATPXModProps annotation = modClass.getAnnotation(ATPXModProps.class);
+			if (annotation == null || !annotation.main())
+				return;
+			ATPXMod mod;
+			try {
+				mod = (ATPXMod) modClass.getConstructor().newInstance();
+			} catch (Exception e) {
+				return;
+			}
 			EmbeddedModLoadEvent event = new EmbeddedModLoadEvent(mod);
 			EventManager.triggerEvent(event);
 			if(event.isCancelled())

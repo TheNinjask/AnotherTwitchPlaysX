@@ -53,7 +53,7 @@ public class MainFrame extends JFrame {
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
 		this.setResizable(false);
 		// DataManager.registerLangEvent(this);
-		this.setVisible(true);
+		// this.setVisible(true);
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {

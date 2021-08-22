@@ -35,7 +35,6 @@ import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
-import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.TwitchLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.YoutubeLoginPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
@@ -198,12 +197,10 @@ public class App {
 			globalSetUp();
 			channel = channel == null ? null : String.format("#%s", channel);
 			if (amountOfRequiredTwitchSessionOptions >= 2 && amountOfRequiredYouTubeSessionOptions >= 1) {
-				MainLoginPanel.getInstance().setVisible(false);
-				MainFrame.getInstance();
+				// MainLoginPanel.getInstance().setVisible(false);
 				skipMainLoginPanel(nickname, channel, oauth, secret, videoId);
-				MainLoginPanel.getInstance().setVisible(true);
+				// MainLoginPanel.getInstance().setVisible(true);
 			} else {
-				MainFrame.getInstance();
 				if (amountOfRequiredTwitchSessionOptions >= 2) {
 					TwitchSessionData twitch = new TwitchSessionData(nickname, channel, oauth);
 					DataManager.setTwitchSession(twitch);
@@ -219,6 +216,7 @@ public class App {
 					YoutubeLoginPanel.getInstance().setSession(secret, videoId);
 				}
 			}
+			MainFrame.getInstance().setVisible(true);
 		} catch (MissingArgumentException | AlreadySelectedException e) {
 			System.out.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
