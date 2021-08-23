@@ -50,6 +50,7 @@ import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
 import pt.theninjask.AnotherTwitchPlaysX.event.externalconsole.InputCommandExternalConsoleEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModManager;
@@ -609,6 +610,46 @@ public class ExternalConsole extends JFrame {
 		}
 	};
 
+	private static ExternalConsoleCommand localmsg = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "localmsg";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Send a local msg to ChatFrame/ExternalConsole";
+		}
+
+		@Override
+		public void executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup local = new OptionGroup();
+			local.addOption(new Option("f", "chatframe", true, "Sends local message to ChatFrame"));
+			local.addOption(new Option("e", "externalconsole", true, "Sends local message to ExternalConsole"));
+			options.addOptionGroup(local);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				CommandLine cmd = parser.parse(options, args);
+				switch (String.valueOf(local.getSelected())) {
+				case "f":
+					ChatFrame.getInstance().onMessage(String.format("cmd.%s", getCommand()), cmd.getOptionValue('f'));
+					break;
+				case "e":
+					println(cmd.getOptionValue('e'));
+					break;
+				default:
+					println(String.format("localmsg: %s", getDescription()));
+					println("Options: -f, -e");
+					break;
+				}
+			} catch (ParseException e) {
+				println(e.getMessage());
+			}
+		}
+	};
+
 	private static ExternalConsoleCommand stop = new ExternalConsoleCommand() {
 
 		@Override
@@ -690,6 +731,7 @@ public class ExternalConsole extends JFrame {
 					setNight();
 			}
 		});
+
 		this.setAlwaysOnTop(true);
 		this.autoScroll = true;
 		this.cmds = new HashMap<>();
@@ -708,6 +750,7 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(top.getCommand(), top);
 		this.cmds.put(theme.getCommand(), theme);
 		this.cmds.put(stop.getCommand(), stop);
+		this.cmds.put(localmsg.getCommand(), localmsg);
 		this.last = null;
 		EventManager.registerEventListener(this);
 	}
@@ -758,6 +801,7 @@ public class ExternalConsole extends JFrame {
 	private JScrollPane insertConsole() {
 		scroll = new JScrollPane();
 		console = new JTextPane();
+		console.setEditorKit(new WrapEditorKit());
 		// console.setBorder(null);
 		// console.setTabSize(4);
 		console.setEditable(false);
@@ -771,6 +815,7 @@ public class ExternalConsole extends JFrame {
 		scroll.setBorder(null);
 		scroll.setWheelScrollingEnabled(true);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		// scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
@@ -914,9 +959,7 @@ public class ExternalConsole extends JFrame {
 		public void write(int b) throws IOException {
 			try {
 				StyledDocument doc = singleton.console.getStyledDocument();
-				doc.insertString(doc.getLength(), Character.toString(b), null);
-				doc.setCharacterAttributes(doc.getLength() - Character.toString(b).length(),
-						Character.toString(b).length(), errorSet, false);
+				doc.insertString(doc.getLength(), Character.toString(b), errorSet);
 				if (autoScroll)
 					console.setCaretPosition(doc.getLength());
 				singleton.scroll.repaint();

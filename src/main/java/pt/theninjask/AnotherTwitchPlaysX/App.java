@@ -196,6 +196,7 @@ public class App {
 
 			globalSetUp();
 			channel = channel == null ? null : String.format("#%s", channel);
+			MainFrame.getInstance();
 			if (amountOfRequiredTwitchSessionOptions >= 2 && amountOfRequiredYouTubeSessionOptions >= 1) {
 				// MainLoginPanel.getInstance().setVisible(false);
 				skipMainLoginPanel(nickname, channel, oauth, secret, videoId);

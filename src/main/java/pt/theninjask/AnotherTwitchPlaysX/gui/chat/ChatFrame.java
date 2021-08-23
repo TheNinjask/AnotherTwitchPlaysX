@@ -18,13 +18,17 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.Border;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.Element;
+import javax.swing.text.StyledDocument;
 
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 
@@ -42,8 +46,9 @@ import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.WrapEditorKit;
 
-public class ChatFrame extends JFrame{
+public class ChatFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
@@ -92,7 +97,7 @@ public class ChatFrame extends JFrame{
 
 	}
 
-	private JTextArea chat;
+	private JTextPane chat;
 
 	private JScrollPane scroll;
 
@@ -141,8 +146,7 @@ public class ChatFrame extends JFrame{
 		enabledDR = new AtomicBoolean(false);
 		enableDragAndResize();
 		// DataManager.registerLangEvent(this);
-		this.setTitle(String.format(DataManager.getLanguage().getChat().getTitle(),
-				DataManager.getLanguage().getID()));
+		this.setTitle(String.format(DataManager.getLanguage().getChat().getTitle(), DataManager.getLanguage().getID()));
 	}
 
 	public static ChatFrame getInstance() {
@@ -152,11 +156,13 @@ public class ChatFrame extends JFrame{
 
 	private JScrollPane insertChat() {
 		scroll = new JScrollPane();
-		chat = new JTextArea();
-		chat.setTabSize(4);
+		chat = new JTextPane();
+		chat.setEditorKit(new WrapEditorKit());
+		// chat = new JTextArea();
+		// chat.setTabSize(4);
 		chat.setEditable(false);
 		chat.setFocusable(false);
-		chat.setLineWrap(true);
+		// chat.setLineWrap(true);
 		for (MouseListener elem : chat.getMouseListeners()) {
 			chat.removeMouseListener(elem);
 		}
@@ -209,17 +215,18 @@ public class ChatFrame extends JFrame{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					
-					ChatFrameSendMessageEvent event = new ChatFrameSendMessageEvent(DataManager.getLanguage().getChat().getUser(), input.getText());
+
+					ChatFrameSendMessageEvent event = new ChatFrameSendMessageEvent(
+							DataManager.getLanguage().getChat().getUser(), input.getText());
 					EventManager.triggerEvent(event);
-					if(event.isCancelled())
+					if (event.isCancelled())
 						return;
-					
+
 					onMessage(DataManager.getLanguage().getChat().getUser(), input.getText());
-					if(TwitchPlayer.getInstance().isConnected()) {
-						TwitchPlayer.getInstance().sendMessage(input.getText());						
+					if (TwitchPlayer.getInstance().isConnected()) {
+						TwitchPlayer.getInstance().sendMessage(input.getText());
 					}
-					if(YouTubePlayer.getInstance().isConnected()) {
+					if (YouTubePlayer.getInstance().isConnected()) {
 						YouTubePlayer.getInstance().sendMessage(input.getText());
 					}
 					input.setText("");
@@ -229,17 +236,18 @@ public class ChatFrame extends JFrame{
 		messagePanel.add(input, BorderLayout.CENTER);
 		send = new JButton(DataManager.getLanguage().getChat().getSend());
 		send.addActionListener(l -> {
-			
-			ChatFrameSendMessageEvent event = new ChatFrameSendMessageEvent(DataManager.getLanguage().getChat().getUser(), input.getText());
+
+			ChatFrameSendMessageEvent event = new ChatFrameSendMessageEvent(
+					DataManager.getLanguage().getChat().getUser(), input.getText());
 			EventManager.triggerEvent(event);
-			if(event.isCancelled())
+			if (event.isCancelled())
 				return;
-			
+
 			onMessage(DataManager.getLanguage().getChat().getUser(), input.getText());
-			if(TwitchPlayer.getInstance().isConnected()) {
-				TwitchPlayer.getInstance().sendMessage(input.getText());						
+			if (TwitchPlayer.getInstance().isConnected()) {
+				TwitchPlayer.getInstance().sendMessage(input.getText());
 			}
-			if(YouTubePlayer.getInstance().isConnected()) {
+			if (YouTubePlayer.getInstance().isConnected()) {
 				YouTubePlayer.getInstance().sendMessage(input.getText());
 			}
 			input.setText("");
@@ -253,13 +261,13 @@ public class ChatFrame extends JFrame{
 			return;
 		chat.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				posX = e.getX() - (chat.getWidth() - scroll.getWidth());
-				posY = e.getY() - (chat.getHeight() - scroll.getHeight());
+				posX = e.getX() - (chat.getWidth() - (scroll.getWidth() + singleton.getWidth()) / 2);
+				posY = e.getY() - (chat.getHeight() - (scroll.getHeight() + singleton.getHeight()) / 2);
 			}
 		});
 		chat.addMouseMotionListener(new MouseAdapter() {
-			public void mouseDragged(MouseEvent evt) {
-				setLocation(evt.getXOnScreen() - posX, evt.getYOnScreen() - posY);
+			public void mouseDragged(MouseEvent e) {
+				setLocation(e.getXOnScreen() - posX, e.getYOnScreen() - posY);
 
 			}
 		});
@@ -283,14 +291,20 @@ public class ChatFrame extends JFrame{
 	public void onMessage(String nick, String message) {
 		ChatFrameOnMessageEvent event = new ChatFrameOnMessageEvent(this, nick, message);
 		EventManager.triggerEvent(event);
-		if(event.isCancelled())
+		if (event.isCancelled())
 			return;
 		synchronized (scroll) {
 			synchronized (chat) {
-				updateChatSize();
-				chat.append(String.format(type.getFormat(), nick, message));
-				scroll.repaint();
-				scroll.revalidate();
+				try {
+					updateChatSize();
+					// chat.append(String.format(type.getFormat(), nick, message));
+					StyledDocument doc = chat.getStyledDocument();
+					doc.insertString(doc.getLength(), String.format(type.getFormat(), nick, message), null);
+					scroll.repaint();
+					scroll.revalidate();
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -299,16 +313,16 @@ public class ChatFrame extends JFrame{
 	public void onMessage(ChannelMessageEvent event) {
 		ChatFrameOnTwitchMessageEvent trigger = new ChatFrameOnTwitchMessageEvent(this, event);
 		EventManager.triggerEvent(trigger);
-		if(trigger.isCancelled())
+		if (trigger.isCancelled())
 			return;
 		onMessage(event.getActor().getNick(), event.getMessage());
 	}
-	
+
 	@Handler
 	public void onMessage(LiveChatMessage event) {
 		ChatFrameOnYouTubeMessageEvent trigger = new ChatFrameOnYouTubeMessageEvent(this, event);
 		EventManager.triggerEvent(trigger);
-		if(trigger.isCancelled())
+		if (trigger.isCancelled())
 			return;
 		onMessage(event.getAuthorDetails().getDisplayName(), event.getSnippet().getDisplayMessage());
 	}
@@ -323,9 +337,16 @@ public class ChatFrame extends JFrame{
 		synchronized (chat) {
 			try {
 				if (messageCap < MSG_DISPLAY_INFINITE) {
-					int toClear = chat.getLineCount() - messageCap - 1;
+					/*
+					 * int toClear = chat.getLineCount() - messageCap - 1; if (toClear >= 0) {
+					 * chat.replaceRange("", 0, chat.getLineEndOffset(toClear)); }
+					 */
+					Element root = chat.getDocument().getDefaultRootElement();
+					int toClear = root.getElementCount() - messageCap - 1;
 					if (toClear >= 0) {
-						chat.replaceRange("", 0, chat.getLineEndOffset(toClear));
+						Element first = root.getElement(0);
+						Element last = root.getElement(toClear);
+						chat.getDocument().remove(first.getStartOffset(), last.getEndOffset());
 					}
 				}
 			} catch (Exception e) {
@@ -405,7 +426,7 @@ public class ChatFrame extends JFrame{
 		return scroll;
 	}
 
-	public JTextArea getChat() {
+	public JEditorPane getChat() {
 		return chat;
 	}
 
@@ -421,12 +442,11 @@ public class ChatFrame extends JFrame{
 		messagePanel.setVisible(show);
 	}
 
-	//@Handler
+	// @Handler
 	public void updateLang(LanguageUpdateEvent event) {
-		if(event.getLanguage()==null)
+		if (event.getLanguage() == null)
 			return;
 		send.setText(event.getLanguage().getChat().getSend());
-		this.setTitle(String.format(event.getLanguage().getChat().getTitle(),
-				event.getLanguage().getID()));
+		this.setTitle(String.format(event.getLanguage().getChat().getTitle(), event.getLanguage().getID()));
 	}
 }
