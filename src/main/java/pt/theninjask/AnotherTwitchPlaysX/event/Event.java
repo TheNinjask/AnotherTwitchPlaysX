@@ -6,4 +6,8 @@ public interface Event {
 	
 	public String getID();
 	
+	public void setCancelled(boolean cancelled);
+
+	public boolean isCancelled();
+	
 }

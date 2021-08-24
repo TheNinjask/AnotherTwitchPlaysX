@@ -64,4 +64,23 @@ public interface Lang {
 		return "Mod Not Loaded";
 	}
 	
+	public default String getUpdateNoticeTitle() {
+		return "There is a new update available!";
+	}
+	
+	public default String getUpdateNoticeWebsiteOption() {
+		return "Go to download page";
+	}
+	
+	public default String getUpdateNoticeDownloadOption() {
+		return "Download";
+	}
+	
+	public default String getUpdateNoticeSkipOption() {
+		return "Skip";
+	}
+	
+	public default String getUpdateNoticeTitleContent() {
+		return "Update %s - %s";
+	}
 }

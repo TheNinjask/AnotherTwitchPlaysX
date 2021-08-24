@@ -45,7 +45,7 @@ public class YouTubeChatService {
 	private boolean isInitialized;
 	private String nextPageToken;
 	private Timer pollTimer;
-	
+
 	private MBassador<Object> dispatcher = new MBassador<Object>(
 			new BusConfiguration().addPublicationErrorHandler(new IPublicationErrorHandler() {
 				@Override
@@ -53,7 +53,7 @@ public class YouTubeChatService {
 				}
 			}).addFeature(Feature.SyncPubSub.Default()).addFeature(Feature.AsynchronousHandlerInvocation.Default())
 					.addFeature(Feature.AsynchronousMessageDispatch.Default()));
-	
+
 	private Logger logger = null;
 	private boolean echoMessage = false;
 	private Queue<String> localMsg = new ConcurrentLinkedQueue<String>();
@@ -91,68 +91,64 @@ public class YouTubeChatService {
 		if (isInitialized)
 			return;
 		executor = Executors.newCachedThreadPool();
-		executor.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					// Build auth scopes
-					List<String> scopes = new ArrayList<String>();
-					scopes.add(YouTubeScopes.YOUTUBE_FORCE_SSL);
-					scopes.add(YouTubeScopes.YOUTUBE);
+		executor.execute(() -> {
+			try {
+				// Build auth scopes
+				List<String> scopes = new ArrayList<String>();
+				scopes.add(YouTubeScopes.YOUTUBE_FORCE_SSL);
+				scopes.add(YouTubeScopes.YOUTUBE);
 
-					// Authorize the request
-					PrintStream tmp = System.out;
-					System.setOut(VOID_STREAM);
-					Credential credential = Auth.authorize(scopes, clientSecret, APP_ID);
-					System.setOut(tmp);
-					// This object is used to make YouTube Data API requests
-					youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, credential)
-							.setApplicationName(APP_NAME).build();
-					// Get the live chat id
-					String identity;
-					if (videoId != null && !videoId.isEmpty()) {
-						identity = "videoId " + videoId;
-						YouTube.Videos.List videoList = youtube.videos().list("liveStreamingDetails")
-								.setFields("items/liveStreamingDetails/activeLiveChatId").setId(videoId);
-						VideoListResponse response = videoList.execute();
-						for (Video v : response.getItems()) {
-							liveChatId = v.getLiveStreamingDetails().getActiveLiveChatId();
-							if (liveChatId != null && !liveChatId.isEmpty()) {
-								log("Live chat id: " + liveChatId, Level.INFO);
-								break;
-							}
-						}
-					} else {
-						identity = "current user";
-						YouTube.LiveBroadcasts.List broadcastList = youtube.liveBroadcasts().list("snippet")
-								.setFields("items/snippet/liveChatId").setBroadcastType("all")
-								.setBroadcastStatus("active");
-						LiveBroadcastListResponse broadcastListResponse = broadcastList.execute();
-						for (LiveBroadcast b : broadcastListResponse.getItems()) {
-							liveChatId = b.getSnippet().getLiveChatId();
-							if (liveChatId != null && !liveChatId.isEmpty()) {
-								log("Live chat id: " + liveChatId, Level.INFO);
-								break;
-							}
+				// Authorize the request
+				PrintStream tmp = System.out;
+				System.setOut(VOID_STREAM);
+				Credential credential = Auth.authorize(scopes, clientSecret, APP_ID);
+				System.setOut(tmp);
+				// This object is used to make YouTube Data API requests
+				youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, credential)
+						.setApplicationName(APP_NAME).build();
+				// Get the live chat id
+				String identity;
+				if (videoId != null && !videoId.isEmpty()) {
+					identity = "videoId " + videoId;
+					YouTube.Videos.List videoList = youtube.videos().list("liveStreamingDetails")
+							.setFields("items/liveStreamingDetails/activeLiveChatId").setId(videoId);
+					VideoListResponse response = videoList.execute();
+					for (Video v : response.getItems()) {
+						liveChatId = v.getLiveStreamingDetails().getActiveLiveChatId();
+						if (liveChatId != null && !liveChatId.isEmpty()) {
+							log("Live chat id: " + liveChatId, Level.INFO);
+							break;
 						}
 					}
-
-					if (liveChatId == null || liveChatId.isEmpty()) {
-						log("Could not find live chat for " + identity, Level.INFO);
-						return;
+				} else {
+					identity = "current user";
+					YouTube.LiveBroadcasts.List broadcastList = youtube.liveBroadcasts().list("snippet")
+							.setFields("items/snippet/liveChatId").setBroadcastType("all").setBroadcastStatus("active");
+					LiveBroadcastListResponse broadcastListResponse = broadcastList.execute();
+					for (LiveBroadcast b : broadcastListResponse.getItems()) {
+						liveChatId = b.getSnippet().getLiveChatId();
+						if (liveChatId != null && !liveChatId.isEmpty()) {
+							log("Live chat id: " + liveChatId, Level.INFO);
+							break;
+						}
 					}
-
-					// Initialize next page token
-					LiveChatMessageListResponse response = youtube.liveChatMessages().list(liveChatId, "snippet")
-							.setFields("nextPageToken, pollingIntervalMillis").execute();
-					nextPageToken = response.getNextPageToken();
-					isInitialized = true;
-					poll(response.getPollingIntervalMillis());
-					log("YTC Service started", Level.INFO);
-				} catch (Throwable t) {
-					log(t.getMessage(), Level.WARNING);
-					t.printStackTrace();
 				}
+
+				if (liveChatId == null || liveChatId.isEmpty()) {
+					log("Could not find live chat for " + identity, Level.INFO);
+					return;
+				}
+
+				// Initialize next page token
+				LiveChatMessageListResponse response = youtube.liveChatMessages().list(liveChatId, "snippet")
+						.setFields("nextPageToken, pollingIntervalMillis").execute();
+				nextPageToken = response.getNextPageToken();
+				isInitialized = true;
+				poll(response.getPollingIntervalMillis());
+				log("YTC Service started", Level.INFO);
+			} catch (Throwable t) {
+				log(t.getMessage(), Level.WARNING);
+				t.printStackTrace();
 			}
 		});
 	}

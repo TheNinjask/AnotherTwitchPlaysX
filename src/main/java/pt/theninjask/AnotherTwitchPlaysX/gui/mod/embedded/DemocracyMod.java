@@ -168,9 +168,14 @@ public class DemocracyMod extends ATPXMod {
 						Bundle cmd = sorted.get(0);
 						if (cmd.getAllMappings().isEmpty())
 							cmd.getCmd().execute();
-						else
-							cmd.getCmd().execute(cmd.getAllMappings()
-									.get(ThreadLocalRandom.current().nextInt(cmd.getAllMappings().size())));
+						else{
+							Map<String, String> chosen = cmd.getAllMappings()
+									.get(ThreadLocalRandom.current().nextInt(cmd.getAllMappings().size()));
+							if(chosen!=null)
+								cmd.getCmd().execute(chosen);
+							else
+								cmd.getCmd().execute();
+						}
 					}
 					tally.clear();
 				}
@@ -195,6 +200,9 @@ public class DemocracyMod extends ATPXMod {
 	public void onCommandDataExecution(CommandDataOnExecute event) {
 		if (isOn && isActive) {
 			synchronized (tally) {
+				if(event.isCancelled())
+					return;
+				event.setCancelled(true);
 				Bundle bundle = tally.get(event.getCommandData());
 				if (bundle == null)
 					bundle = new Bundle(event.getCommandData(), event.getMapping());

@@ -1,5 +1,8 @@
 package pt.theninjask.AnotherTwitchPlaysX;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +16,11 @@ import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.text.DefaultCaret;
 
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
@@ -47,11 +55,14 @@ import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubLatestJson;
 import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsole;
 import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
 import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorErrorOutputStream;
 import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorInputStream;
 import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorOutputStream;
+import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
+import pt.theninjask.AnotherTwitchPlaysX.util.WrapEditorKit;
 
 public class App {
 
@@ -108,8 +119,7 @@ public class App {
 			ATPXConfig config = loadConfigFile();
 			if (cmd.hasOption('o') || config.isOutsideConsole()) {
 				RedirectorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleOutputStream());
-				RedirectorErrorOutputStream
-						.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());
+				RedirectorErrorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());
 				RedirectorInputStream.changeRedirect(ExternalConsole.getExternalConsoleInputStream());
 				ExternalConsole.setNight();
 				ExternalConsole.setViewable(true);
@@ -219,13 +229,16 @@ public class App {
 			}
 			MainFrame.getInstance().setVisible(true);
 		} catch (MissingArgumentException | AlreadySelectedException e) {
+			ExternalConsole.setClosable(true);
 			System.out.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("java -jar ATPXapp.jar", options, true);
 		} catch (Exception e) {
+			ExternalConsole.setClosable(true);
 			Constants.showExpectedExceptionDialog(e);
 		} catch (UnsatisfiedLinkError e) {
 			// TODO change
+			ExternalConsole.setClosable(true);
 			Constants.printVerboseMessage(Level.WARNING, e);
 			JLabel exception = new JLabel(e.getMessage());
 			exception.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
@@ -234,7 +247,7 @@ public class App {
 		}
 	}
 
-	private static final String getVersion() {
+	public static final String getVersion() {
 		String version = "\\?.?.?";
 		try {
 			Properties p = new Properties();
@@ -273,11 +286,88 @@ public class App {
 		return new ATPXConfig();
 	}
 
+	private static void checkForUpdate() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.checkForUpdate()", App.class.getSimpleName()));
+		GitHubLatestJson update = Constants.getLatestRelease();
+		if (update == null)
+			return;
+		StringBuilder builder = new StringBuilder(update.tag_name.replaceAll("[^\\d]", ""));
+		builder.insert(0, 0);
+		int gitVersion = Integer.parseInt(builder.toString());
+		builder = new StringBuilder(getVersion().replaceAll("[^\\d]", ""));
+		builder.insert(0, 0);
+		int currentVersion = Integer.parseInt(builder.toString());
+		if (gitVersion <= currentVersion)
+			return;
+
+		JPanel content = new JPanel(new BorderLayout());
+		JScrollPane scroll = new JScrollPane();
+		JTextPane message = new JTextPane();
+		JTextField title = new JTextField();
+		scroll = new JScrollPane();
+		message = new JTextPane();
+		
+		title.setOpaque(false);
+		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		title.setText(String.format(DataManager.getLanguage().getUpdateNoticeTitleContent(), update.tag_name, update.update_name));
+		title.setBorder(null);
+		title.setFont(new Font(title.getFont().getFontName(), title.getFont().getStyle(), title.getFont().getSize()+7));
+		title.setEditable(false);
+		
+		message.setEditorKit(new WrapEditorKit());
+		message.setEditable(false);
+		DefaultCaret caret = (DefaultCaret) message.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		scroll.setViewportView(message);
+		scroll.setFocusable(false);
+		scroll.setEnabled(false);
+		scroll.setBorder(null);
+		scroll.setWheelScrollingEnabled(true);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.setOpaque(false);
+		scroll.getViewport().setOpaque(false);
+
+		message.setOpaque(false);
+		message.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		
+		scroll.setPreferredSize(new Dimension(151, 151));
+		content.add(scroll, BorderLayout.CENTER);
+		content.add(title, BorderLayout.NORTH);
+		content.setOpaque(false);
+		
+		message.setText(update.body);
+		
+		String[] options = { DataManager.getLanguage().getUpdateNoticeWebsiteOption(),
+				DataManager.getLanguage().getUpdateNoticeDownloadOption(),
+				DataManager.getLanguage().getUpdateNoticeSkipOption() };
+
+		int resp = Constants.showCustomColorOptionDialog(null, content,
+				DataManager.getLanguage().getUpdateNoticeTitle(), JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE, null, options, null, Constants.TWITCH_COLOR);
+		switch (resp) {
+		case JOptionPane.YES_OPTION:
+			Constants.openWebsite(update.html_url);
+			break;
+		case JOptionPane.NO_OPTION:
+			Constants.openWebsite(update.assets.get(0).browser_download_url);
+			break;
+		default:
+		case JOptionPane.CANCEL_OPTION:
+		case JOptionPane.CLOSED_OPTION:
+			break;
+		}
+	}
+
 	private static void globalSetUp() throws Exception {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.globalSetUp()", App.class.getSimpleName()));
 		PrintStream tmp = System.out;
 		try {
 			DataManager.setLanguage(new EnglishLang());
+
+			ThreadPool.execute(()->{
+				checkForUpdate();
+			});
+
 			// Get the logger for "com.github.kwhat.jnativehook" and set the level to off.
 			// LogManager.getLogManager().reset();
 			Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -303,23 +393,26 @@ public class App {
 				Files.createDirectory(path);
 				// Files.setAttribute(path, "dos:hidden", true);
 			} else if (!Files.isDirectory(path)) {
-				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(), Constants.SAVE_PATH));
+				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(),
+						Constants.SAVE_PATH));
 			}
-			
+
 			Path cmdsFolderPath = Paths.get(Constants.SAVE_PATH, Constants.CMD_FOLDER);
 			if (!Files.exists(cmdsFolderPath)) {
 				Files.createDirectory(cmdsFolderPath);
 				// Files.setAttribute(path, "dos:hidden", true);
 			} else if (!Files.isDirectory(cmdsFolderPath)) {
-				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(), Constants.SAVE_PATH));
+				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(),
+						Constants.SAVE_PATH));
 			}
-			
+
 			Path modFolderPath = Paths.get(Constants.SAVE_PATH, Constants.MOD_FOLDER);
 			if (!Files.exists(modFolderPath)) {
 				Files.createDirectory(modFolderPath);
 				// Files.setAttribute(path, "dos:hidden", true);
 			} else if (!Files.isDirectory(modFolderPath)) {
-				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(), Constants.SAVE_PATH));
+				throw new RuntimeException(String.format(DataManager.getLanguage().getExceptions().getNotDirectory(),
+						Constants.SAVE_PATH));
 			} else {
 				File modFolder = modFolderPath.toFile();
 				for (File modFile : modFolder.listFiles()) {
@@ -337,13 +430,13 @@ public class App {
 							if (mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded())
 								ATPXModManager.addMod(mod);
 						} catch (Exception e) {
-							Constants.showMessageDialog(String.format(DataManager.getLanguage().getAutoLoadModFail(), modFile.getName()),
+							Constants.showMessageDialog(
+									String.format(DataManager.getLanguage().getAutoLoadModFail(), modFile.getName()),
 									DataManager.getLanguage().getAutoLoadModFailTitle());
 						}
 					}
 				}
 			}
-
 			ControlData.setTranslation(Constants.STRING_TO_KEYCODE);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
 		} catch (Exception | Error e) {

@@ -18,6 +18,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -42,6 +43,14 @@ import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
 import net.engio.mbassy.bus.config.Feature;
@@ -113,6 +122,8 @@ public final class Constants {
 		}
 	});
 
+	public static final String LATEST_VERSION_URL = "https://api.github.com/repos/TheNinjask/AnotherTwitchPlaysX/releases/latest";
+
 	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
 		// private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
 		private static final String format = "[%1$.4s] %2$s %n";
@@ -159,7 +170,7 @@ public final class Constants {
 	public static void setLoggerLevel(Level level) {
 		LOGGER.setLevel(level);
 	}
-	
+
 	public static Level getLoggerLevel() {
 		return LOGGER.getLevel();
 	}
@@ -512,6 +523,33 @@ public final class Constants {
 		}).addFeature(Feature.SyncPubSub.Default()).addFeature(Feature.AsynchronousHandlerInvocation.Default())
 				.addFeature(Feature.AsynchronousMessageDispatch.Default());
 		return new MBassador<Object>(config);
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	@JsonInclude(Include.NON_NULL)
+	public static class GitHubLatestJson {
+		public String html_url;
+		public String tag_name;
+		@JsonProperty("name")
+		public String update_name;
+		public List<Asset> assets;
+		public String body;
+
+		@JsonIgnoreProperties(ignoreUnknown = true)
+		@JsonInclude(Include.NON_NULL)
+		public static class Asset {
+			public String browser_download_url;
+		}
+
+	}
+
+	public static GitHubLatestJson getLatestRelease() {
+		try {
+			Client client = ClientBuilder.newClient();
+			return client.target(LATEST_VERSION_URL).request(MediaType.APPLICATION_JSON).get(GitHubLatestJson.class);
+		}catch (Exception e) {
+			return null;
+		}
 	}
 
 }

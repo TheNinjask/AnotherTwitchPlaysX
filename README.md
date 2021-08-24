@@ -232,7 +232,7 @@ I also wanted to be a other way to setup the commands without relying on the UI 
 Download the sauce and use the command below in the top folder of this project.
 
 ```
-mvn -f buildPom.xml clean package
+mvn clean package
 ```
 
 ## Bugs

@@ -29,7 +29,7 @@ public class MouseCoords implements NativeMouseInputListener {
 		
 	}
 	
-	public MouseCoords() {
+	private MouseCoords() {
 		this.x = new AtomicInteger(MouseInfo.getPointerInfo().getLocation().x);
 		this.y = new AtomicInteger(MouseInfo.getPointerInfo().getLocation().y);
 		this.isRunning = new AtomicBoolean(false);
