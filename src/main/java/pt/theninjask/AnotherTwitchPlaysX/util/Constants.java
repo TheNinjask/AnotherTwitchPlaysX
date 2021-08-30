@@ -3,6 +3,7 @@ package pt.theninjask.AnotherTwitchPlaysX.util;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
@@ -32,6 +33,9 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -574,16 +578,15 @@ public final class Constants {
 			return client.target(LATEST_VERSION_URL).request(MediaType.APPLICATION_JSON).get(GitHubLatestJson.class);
 		} catch (WebApplicationException e) {
 			printVerboseMessage(Level.WARNING, e);
-			/*String response = "Unknown";
-			if (e.getResponse().hasEntity()) {
-				try {
-					response = new String(((InputStream) e.getResponse().getEntity()).readAllBytes());
-					response = new ObjectMapper().readValue(response, GitHubAPIError.class).message;
-				} catch (IOException e1) {
-					printVerboseMessage(Level.WARNING, e);
-				}
-			}*/
-			//printVerboseMessage(Level.WARNING, String.format("%s - %s", e.getResponse().getStatus(), response));
+			/*
+			 * String response = "Unknown"; if (e.getResponse().hasEntity()) { try {
+			 * response = new String(((InputStream)
+			 * e.getResponse().getEntity()).readAllBytes()); response = new
+			 * ObjectMapper().readValue(response, GitHubAPIError.class).message; } catch
+			 * (IOException e1) { printVerboseMessage(Level.WARNING, e); } }
+			 */
+			// printVerboseMessage(Level.WARNING, String.format("%s - %s",
+			// e.getResponse().getStatus(), response));
 			return null;
 		} catch (Exception e) {
 			printVerboseMessage(Level.WARNING, e);
@@ -642,26 +645,49 @@ public final class Constants {
 			readme.content = renderer.render(node);
 
 			message.setContentType(MediaType.TEXT_HTML);
-			
-			//Fixes to links
+
+			// Fixes to links
 			readme.content = readme.content.replaceAll("\"./login.png\"",
 					"\"https://raw.githubusercontent.com/TheNinjask/AnotherTwitchPlaysX/master/login.png\"");
 			readme.content = readme.content.replaceAll("\"./menu.png\"",
 					"\"https://raw.githubusercontent.com/TheNinjask/AnotherTwitchPlaysX/master/menu.png\"");
-			
+
+			Pattern pattern = Pattern.compile("<h2>(.*)<\\/h2>");
+			Matcher matcher = pattern.matcher(readme.content);
+			matcher.find();
+			for (MatchResult elem : matcher.results().toList()) {
+				readme.content = readme.content.replaceAll(Pattern.quote(elem.group()),
+						String.format("<h2 id=#%s>%s<\\/h2>",
+								elem.group(1).replaceAll("\\.", "").replaceAll(" ", "-").toLowerCase(), elem.group(1)));
+			}
+
 			message.setText(readme.content);
+			PopOutFrame readmeFrame = new PopOutFrame(content);
 
 			message.addHyperlinkListener(new HyperlinkListener() {
 				@Override
 				public void hyperlinkUpdate(HyperlinkEvent e) {
 					if (e.getEventType() == EventType.ACTIVATED)
-						if (e.getURL() != null)
+						if (e.getURL() != null) {
 							openWebsite(e.getURL().toString());
+						} /*
+							 * else { JEditorPane message = (JEditorPane) e.getInputEvent().getComponent();
+							 * Pattern pattern = Pattern.compile(String.format("id=\"%s\"",
+							 * e.getDescription())); Matcher matcher = pattern.matcher(readme.content);
+							 * System.out.println(message.getText()); if (matcher.matches()) {
+							 * message.setCaretPosition((message.getDocument().getEndPosition().getOffset()
+							 * - 1) matcher.start() / message.getText().length()); }else {
+							 * System.out.println(String.format("id=\"%s\"", e.getDescription()) ); } }
+							 */
+					if (e.getEventType() == EventType.ENTERED) {
+						readmeFrame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+					} else if (e.getEventType() == EventType.EXITED) {
+						readmeFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					}
 				}
 			});
 			content.setBackground(Constants.TWITCH_COLOR);
 
-			PopOutFrame readmeFrame = new PopOutFrame(content);
 			readmeFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			message.setCaretPosition(0);
 			readmeFrame.setVisible(true);
@@ -669,7 +695,9 @@ public final class Constants {
 			// JOptionPane.PLAIN_MESSAGE, null,
 			// Constants.TWITCH_COLOR);
 
-		} catch (WebApplicationException e) {
+		} catch (
+
+		WebApplicationException e) {
 			printVerboseMessage(Level.WARNING, e);
 			String response = "Unknown";
 			if (e.getResponse().hasEntity()) {
