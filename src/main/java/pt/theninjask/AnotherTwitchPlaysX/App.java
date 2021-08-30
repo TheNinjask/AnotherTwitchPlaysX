@@ -20,7 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.text.DefaultCaret;
 
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
@@ -121,7 +120,6 @@ public class App {
 				RedirectorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleOutputStream());
 				RedirectorErrorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());
 				RedirectorInputStream.changeRedirect(ExternalConsole.getExternalConsoleInputStream());
-				ExternalConsole.setNight();
 				ExternalConsole.setViewable(true);
 			}
 			if (cmd.hasOption('h') || config.isHelp()) {
@@ -316,14 +314,11 @@ public class App {
 		
 		message.setEditorKit(new WrapEditorKit());
 		message.setEditable(false);
-		DefaultCaret caret = (DefaultCaret) message.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		scroll.setViewportView(message);
 		scroll.setFocusable(false);
 		scroll.setEnabled(false);
 		scroll.setBorder(null);
 		scroll.setWheelScrollingEnabled(true);
-		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
 

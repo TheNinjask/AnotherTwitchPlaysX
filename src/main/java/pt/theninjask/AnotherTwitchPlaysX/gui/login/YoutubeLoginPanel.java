@@ -14,8 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,6 +28,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.WrapEditorKit;
 
 public class YoutubeLoginPanel extends JPanel {
 
@@ -121,7 +122,9 @@ public class YoutubeLoginPanel extends JPanel {
 				JsonElement je = JsonParser.parseString(secret);
 				String prettySecret = gson.toJson(je);
 				
-				JTextArea area = new JTextArea(prettySecret);
+				JTextPane area = new JTextPane();
+				area.setEditorKit(new WrapEditorKit());
+				area.setText(prettySecret);
 				area.setEditable(false);
 				
 				pane.setViewportView(area);

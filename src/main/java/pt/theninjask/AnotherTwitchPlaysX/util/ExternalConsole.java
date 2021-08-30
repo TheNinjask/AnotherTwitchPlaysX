@@ -752,6 +752,14 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(stop.getCommand(), stop);
 		this.cmds.put(localmsg.getCommand(), localmsg);
 		this.last = null;
+		
+		this.console.setForeground(Color.WHITE);
+		this.setBackground(Color.BLACK);
+
+		this.input.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+		this.input.setForeground(Color.WHITE);
+		this.input.setCaretColor(Color.WHITE);
+		this.input.setBackground(Color.BLACK);
 		EventManager.registerEventListener(this);
 	}
 
