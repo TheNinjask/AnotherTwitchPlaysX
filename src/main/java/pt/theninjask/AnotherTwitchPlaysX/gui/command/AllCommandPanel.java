@@ -224,8 +224,8 @@ public class AllCommandPanel extends JPanel{
 			EventManager.triggerEvent(event);
 			if(event.isCancelled())
 				return;
-			
-			new PopOutFrame(left, MainFrame.getInstance()).addWindowListener(new WindowAdapter() {
+			PopOutFrame tmp = new PopOutFrame(left, MainFrame.getInstance());
+			tmp.addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent event) {
 					body.add(left, BorderLayout.CENTER);
@@ -233,6 +233,7 @@ public class AllCommandPanel extends JPanel{
 					singleton.repaint();
 				}
 			});
+			tmp.setVisible(true);
 		});
 		right.add(popout);
 

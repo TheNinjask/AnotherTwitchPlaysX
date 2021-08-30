@@ -130,7 +130,7 @@ public class YoutubeLoginPanel extends JPanel {
 				pane.setViewportView(area);
 				pane.setFocusable(false);
 				pane.setEnabled(false);
-				new PopOutFrame(pane, MainFrame.getInstance());
+				new PopOutFrame(pane, MainFrame.getInstance()).setVisible(true);
 			}
 		});
 		return secretButton;

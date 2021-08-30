@@ -245,7 +245,7 @@ public class App {
 		}
 	}
 
-	public static final String getVersion() {
+	private static final String getVersion() {
 		String version = "\\?.?.?";
 		try {
 			Properties p = new Properties();
@@ -292,7 +292,7 @@ public class App {
 		StringBuilder builder = new StringBuilder(update.tag_name.replaceAll("[^\\d]", ""));
 		builder.insert(0, 0);
 		int gitVersion = Integer.parseInt(builder.toString());
-		builder = new StringBuilder(getVersion().replaceAll("[^\\d]", ""));
+		builder = new StringBuilder(VERSION.replaceAll("[^\\d]", ""));
 		builder.insert(0, 0);
 		int currentVersion = Integer.parseInt(builder.toString());
 		if (gitVersion <= currentVersion)
@@ -358,7 +358,6 @@ public class App {
 		PrintStream tmp = System.out;
 		try {
 			DataManager.setLanguage(new EnglishLang());
-
 			ThreadPool.execute(()->{
 				checkForUpdate();
 			});

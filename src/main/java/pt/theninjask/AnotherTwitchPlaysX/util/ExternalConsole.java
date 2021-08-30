@@ -46,6 +46,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import net.engio.mbassy.listener.Handler;
+import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
 import pt.theninjask.AnotherTwitchPlaysX.event.externalconsole.InputCommandExternalConsoleEvent;
@@ -57,6 +58,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
+import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubLatestJson;
 
 public class ExternalConsole extends JFrame {
 
@@ -92,7 +94,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			println("Available Commands:");
 			List<ExternalConsoleCommand> helpSorted = singleton.cmds.values().stream()
 					.sorted(new Comparator<ExternalConsoleCommand>() {
@@ -107,6 +109,7 @@ public class ExternalConsole extends JFrame {
 						// cmd.getDescription().replaceAll("\n", "\n\t" + " ".repeat(spacing))));
 						cmd.getDescription().replaceAll("\n", "\n\t\t")));
 			}
+			return true;
 		}
 	};
 
@@ -123,7 +126,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup scroll = new OptionGroup();
 			// scroll.setRequired(true);
@@ -149,7 +152,9 @@ public class ExternalConsole extends JFrame {
 
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -166,7 +171,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup verbose = new OptionGroup();
 			// verbose.setRequired(true);
@@ -194,7 +199,9 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -211,7 +218,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup print = new OptionGroup();
 			// print.setRequired(true);
@@ -235,7 +242,9 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -252,7 +261,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup event = new OptionGroup();
 			// event.setRequired(true);
@@ -277,7 +286,9 @@ public class ExternalConsole extends JFrame {
 
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -294,7 +305,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup debug = new OptionGroup();
 			// debug.setRequired(true);
@@ -318,7 +329,9 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -335,7 +348,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup disableSession = new OptionGroup();
 			// disableSession.setRequired(true);
@@ -359,8 +372,9 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
-				// Constants.showExpectedExceptionDialog(e);
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -377,8 +391,9 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			singleton.console.setText("");
+			return true;
 		}
 	};
 
@@ -395,12 +410,14 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			try {
 				Desktop.getDesktop().open(new File(Constants.SAVE_PATH));
 			} catch (IOException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -417,7 +434,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup mod = new OptionGroup();
 			// print.setRequired(true);
@@ -436,11 +453,11 @@ public class ExternalConsole extends JFrame {
 								Paths.get(Constants.SAVE_PATH, Constants.MOD_FOLDER).toFile());
 						ATPXMod newMod = Constants.loadMod(file);
 						if (newMod == null)
-							return;
+							return true;
 						newMod.refresh();
 						if (newMod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
 							if (newMod.getClass().getAnnotation(ATPXModProps.class).popout())
-								new PopOutFrame(newMod.getJPanelInstance());
+								new PopOutFrame(newMod.getJPanelInstance()).setVisible(true);
 							else
 								MainFrame.replacePanel(newMod.getJPanelInstance());
 						if (newMod.getClass().getAnnotation(ATPXModProps.class).keepLoaded()) {
@@ -451,6 +468,7 @@ public class ExternalConsole extends JFrame {
 						println(String.format("Loaded Mod %s.", newMod.getClass().getSimpleName()));
 					} catch (Exception e) {
 						println(e.getMessage());
+						return false;
 					}
 					break;
 				case "r":
@@ -496,7 +514,9 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -513,8 +533,9 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			singleton.setExtendedState(JFrame.ICONIFIED);
+			return true;
 		}
 	};
 
@@ -531,7 +552,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup top = new OptionGroup();
 			top.addOption(new Option("t", "true", false, "AlwaysOnTop Set to True"));
@@ -554,7 +575,9 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -571,7 +594,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup theme = new OptionGroup();
 			theme.addOption(new Option("t", "twitch", false, "Set EC's Theme to Twitch"));
@@ -606,7 +629,9 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -623,7 +648,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup local = new OptionGroup();
 			local.addOption(new Option("f", "chatframe", true, "Sends local message to ChatFrame"));
@@ -646,7 +671,9 @@ public class ExternalConsole extends JFrame {
 				}
 			} catch (ParseException e) {
 				println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 
@@ -663,9 +690,62 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			singleton.dispose();
 			MainFrame.getInstance().dispatchEvent(new WindowEvent(MainFrame.getInstance(), WindowEvent.WINDOW_CLOSING));
+			return true;
+		}
+	};
+
+	private static ExternalConsoleCommand readme = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "readme";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Displays README of app";
+		}
+
+		@Override
+		public boolean executeCommand(String[] args) {
+			Constants.showREADME();
+			return true;
+		}
+	};
+
+	private static ExternalConsoleCommand update = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "update";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Checks if there is an update available";
+		}
+
+		@Override
+		public boolean executeCommand(String[] args) {
+			GitHubLatestJson update = Constants.getLatestRelease();
+			if (update == null) {
+				println("Could not check update.");
+				return true;
+			}
+			StringBuilder builder = new StringBuilder(update.tag_name.replaceAll("[^\\d]", ""));
+			builder.insert(0, 0);
+			int gitVersion = Integer.parseInt(builder.toString());
+			builder = new StringBuilder(App.VERSION.replaceAll("[^\\d]", ""));
+			builder.insert(0, 0);
+			int currentVersion = Integer.parseInt(builder.toString());
+			if (gitVersion <= currentVersion)
+				println(String.format("No Update Available. (Current Version: %s)", App.VERSION));
+			else
+				println(String.format("Update Available: %s", update.tag_name));
+			return true;
 		}
 	};
 
@@ -751,8 +831,11 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(theme.getCommand(), theme);
 		this.cmds.put(stop.getCommand(), stop);
 		this.cmds.put(localmsg.getCommand(), localmsg);
-		this.last = null;
+		this.cmds.put(readme.getCommand(), readme);
+		this.cmds.put(update.getCommand(), update);
 		
+		this.last = null;
+
 		this.console.setForeground(Color.WHITE);
 		this.setBackground(Color.BLACK);
 

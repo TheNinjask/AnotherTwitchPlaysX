@@ -43,7 +43,7 @@ public class PopOutFrame extends JFrame{
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		comp.requestFocusInWindow();
 		//DataManager.registerLangEvent(this);
-		this.setVisible(true);
+		//this.setVisible(true);
 		PopOutFrame tmp = this;
 		this.addWindowListener(new WindowAdapter() {
 			@Override

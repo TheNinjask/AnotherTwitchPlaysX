@@ -1,5 +1,6 @@
 package pt.theninjask.AnotherTwitchPlaysX.util;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -8,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
@@ -16,6 +18,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -32,22 +35,36 @@ import java.util.logging.StreamHandler;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkEvent.EventType;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.MediaType;
@@ -61,6 +78,7 @@ import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.exception.ModNotLoadedException;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 
 public final class Constants {
@@ -123,6 +141,8 @@ public final class Constants {
 	});
 
 	public static final String LATEST_VERSION_URL = "https://api.github.com/repos/TheNinjask/AnotherTwitchPlaysX/releases/latest";
+
+	public static final String README_URL = "https://api.github.com/repos/TheNinjask/AnotherTwitchPlaysX/readme";
 
 	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
 		// private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
@@ -527,6 +547,12 @@ public final class Constants {
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	@JsonInclude(Include.NON_NULL)
+	public static class GitHubAPIError {
+		public String message;
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	@JsonInclude(Include.NON_NULL)
 	public static class GitHubLatestJson {
 		public String html_url;
 		public String tag_name;
@@ -547,8 +573,116 @@ public final class Constants {
 		try {
 			Client client = ClientBuilder.newClient();
 			return client.target(LATEST_VERSION_URL).request(MediaType.APPLICATION_JSON).get(GitHubLatestJson.class);
-		}catch (Exception e) {
+		} catch (WebApplicationException e) {
+			printVerboseMessage(Level.WARNING, e);
+			/*String response = "Unknown";
+			if (e.getResponse().hasEntity()) {
+				try {
+					response = new String(((InputStream) e.getResponse().getEntity()).readAllBytes());
+					response = new ObjectMapper().readValue(response, GitHubAPIError.class).message;
+				} catch (IOException e1) {
+					printVerboseMessage(Level.WARNING, e);
+				}
+			}*/
+			//printVerboseMessage(Level.WARNING, String.format("%s - %s", e.getResponse().getStatus(), response));
 			return null;
+		} catch (Exception e) {
+			printVerboseMessage(Level.WARNING, e);
+			return null;
+		}
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	@JsonInclude(Include.NON_NULL)
+	public static class GitHubLatestREADME {
+		public String html_url;
+		public String encoding;
+		public String content;
+	}
+
+	public static void showREADME() {
+		try {
+			Client client = ClientBuilder.newClient();
+			GitHubLatestREADME readme = client.target(README_URL).request(MediaType.APPLICATION_JSON)
+					.get(GitHubLatestREADME.class);
+
+			JPanel content = new JPanel(new BorderLayout());
+			JScrollPane scroll = new JScrollPane();
+			JEditorPane message = new JEditorPane();
+			scroll = new JScrollPane();
+			message = new JTextPane();
+
+			// message.setEditorKit(new WrapEditorKit());
+			message.setEditable(false);
+			scroll.setViewportView(message);
+			scroll.setFocusable(false);
+			scroll.setEnabled(false);
+			scroll.setBorder(null);
+			scroll.setWheelScrollingEnabled(true);
+			scroll.setOpaque(false);
+			scroll.getViewport().setOpaque(false);
+
+			message.setOpaque(false);
+			message.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+
+			scroll.setPreferredSize(new Dimension(151, 151));
+			content.add(scroll, BorderLayout.CENTER);
+			content.setOpaque(false);
+
+			switch (readme.encoding) {
+			case "base64":
+				readme.content = new String(Base64.getMimeDecoder().decode(readme.content));
+				break;
+			default:
+				throw new RuntimeException("No encoding option for " + readme.encoding);
+			}
+
+			Parser parser = Parser.builder().build();
+			Node node = parser.parse(readme.content);
+			HtmlRenderer renderer = HtmlRenderer.builder().build();
+			readme.content = renderer.render(node);
+
+			message.setContentType(MediaType.TEXT_HTML);
+			readme.content = readme.content.replaceAll("\"./login.png\"",
+					"\"https://raw.githubusercontent.com/TheNinjask/AnotherTwitchPlaysX/master/login.png\"");
+			readme.content = readme.content.replaceAll("\"./menu.png\"",
+					"\"https://raw.githubusercontent.com/TheNinjask/AnotherTwitchPlaysX/master/menu.png\"");
+			message.setText(readme.content);
+
+			message.addHyperlinkListener(new HyperlinkListener() {
+				@Override
+				public void hyperlinkUpdate(HyperlinkEvent e) {
+					if (e.getEventType() == EventType.ACTIVATED)
+						if (e.getURL() != null)
+							openWebsite(e.getURL().toString());
+				}
+			});
+			content.setBackground(Constants.TWITCH_COLOR);
+
+			PopOutFrame readmeFrame = new PopOutFrame(content);
+			readmeFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			//scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMinimum());
+			readmeFrame.setVisible(true);
+			// Constants.showCustomColorMessageDialog(null, content, "README",
+			// JOptionPane.PLAIN_MESSAGE, null,
+			// Constants.TWITCH_COLOR);
+
+		} catch (WebApplicationException e) {
+			printVerboseMessage(Level.WARNING, e);
+			String response = "Unknown";
+			if (e.getResponse().hasEntity()) {
+				try {
+					response = new String(((InputStream) e.getResponse().getEntity()).readAllBytes());
+					response = new ObjectMapper().readValue(response, GitHubAPIError.class).message;
+				} catch (IOException e1) {
+					printVerboseMessage(Level.WARNING, e);
+				}
+			}
+			showMessageDialog(String.format("README: %s", response),
+					String.format("README - %s", e.getResponse().getStatus()));
+		} catch (Exception e) {
+			printVerboseMessage(Level.WARNING, e);
+			showMessageDialog("README not available", "README");
 		}
 	}
 

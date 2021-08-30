@@ -101,7 +101,7 @@ public class DemocracyMod extends ATPXMod {
 		}
 
 		@Override
-		public void executeCommand(String[] args) {
+		public boolean executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup dem = new OptionGroup();
 			// print.setRequired(true);
@@ -140,7 +140,9 @@ public class DemocracyMod extends ATPXMod {
 				}
 			} catch (ParseException e) {
 				ExternalConsole.println(e.getMessage());
+				return false;
 			}
+			return true;
 		}
 	};
 

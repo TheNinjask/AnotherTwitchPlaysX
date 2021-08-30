@@ -81,7 +81,7 @@ public class EmbeddedModMenuPanel extends JPanel {
 			mod.refresh();
 			if(mod.getClass().getAnnotation(ATPXModProps.class).hasPanel())
 				if(mod.getClass().getAnnotation(ATPXModProps.class).popout())
-					new PopOutFrame(mod.getJPanelInstance());
+					new PopOutFrame(mod.getJPanelInstance()).setVisible(true);
 				else
 					MainFrame.replacePanel(mod.getJPanelInstance());
 			if(mod.getClass().getAnnotation(ATPXModProps.class).keepLoaded()) {

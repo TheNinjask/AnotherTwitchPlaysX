@@ -8,6 +8,11 @@ public interface ExternalConsoleCommand {
 		return "N/A";
 	}
 	
-	public void executeCommand(String[] args);
+	/**
+	 * 
+	 * @param args
+	 * @return true if success else false
+	 */
+	public boolean executeCommand(String[] args);
 
 }
