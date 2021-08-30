@@ -40,7 +40,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
@@ -643,10 +642,13 @@ public final class Constants {
 			readme.content = renderer.render(node);
 
 			message.setContentType(MediaType.TEXT_HTML);
+			
+			//Fixes to links
 			readme.content = readme.content.replaceAll("\"./login.png\"",
 					"\"https://raw.githubusercontent.com/TheNinjask/AnotherTwitchPlaysX/master/login.png\"");
 			readme.content = readme.content.replaceAll("\"./menu.png\"",
 					"\"https://raw.githubusercontent.com/TheNinjask/AnotherTwitchPlaysX/master/menu.png\"");
+			
 			message.setText(readme.content);
 
 			message.addHyperlinkListener(new HyperlinkListener() {
@@ -661,7 +663,7 @@ public final class Constants {
 
 			PopOutFrame readmeFrame = new PopOutFrame(content);
 			readmeFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-			//scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMinimum());
+			message.setCaretPosition(0);
 			readmeFrame.setVisible(true);
 			// Constants.showCustomColorMessageDialog(null, content, "README",
 			// JOptionPane.PLAIN_MESSAGE, null,
