@@ -17,11 +17,11 @@ import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -97,12 +97,7 @@ public class ExternalConsole extends JFrame {
 		public boolean executeCommand(String[] args) {
 			println("Available Commands:");
 			List<ExternalConsoleCommand> helpSorted = singleton.cmds.values().stream()
-					.sorted(new Comparator<ExternalConsoleCommand>() {
-						@Override
-						public int compare(ExternalConsoleCommand o1, ExternalConsoleCommand o2) {
-							return o1.getCommand().compareTo(o2.getCommand());
-						}
-					}).toList();
+					.sorted(ExternalConsoleCommand.comparator).toList();
 			for (ExternalConsoleCommand cmd : helpSorted) {
 				// int spacing = 4 + cmd.getCommand().length();
 				println(String.format("\t%s - %s", cmd.getCommand(),
@@ -156,6 +151,16 @@ public class ExternalConsole extends JFrame {
 			}
 			return true;
 		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--auto", "--manual" };
+			default:
+				return null;
+			}
+		}
 	};
 
 	private static ExternalConsoleCommand verbose = new ExternalConsoleCommand() {
@@ -203,6 +208,16 @@ public class ExternalConsole extends JFrame {
 			}
 			return true;
 		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--none", "--verbose", "--warning" };
+			default:
+				return null;
+			}
+		}
 	};
 
 	private static ExternalConsoleCommand printcommand = new ExternalConsoleCommand() {
@@ -245,6 +260,16 @@ public class ExternalConsole extends JFrame {
 				return false;
 			}
 			return true;
+		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--true", "--false" };
+			default:
+				return null;
+			}
 		}
 	};
 
@@ -290,6 +315,16 @@ public class ExternalConsole extends JFrame {
 			}
 			return true;
 		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--true", "--false" };
+			default:
+				return null;
+			}
+		}
 	};
 
 	private static ExternalConsoleCommand debug = new ExternalConsoleCommand() {
@@ -333,6 +368,16 @@ public class ExternalConsole extends JFrame {
 			}
 			return true;
 		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--true", "--false" };
+			default:
+				return null;
+			}
+		}
 	};
 
 	private static ExternalConsoleCommand disablesession = new ExternalConsoleCommand() {
@@ -375,6 +420,16 @@ public class ExternalConsole extends JFrame {
 				return false;
 			}
 			return true;
+		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--true", "--false" };
+			default:
+				return null;
+			}
 		}
 	};
 
@@ -518,6 +573,16 @@ public class ExternalConsole extends JFrame {
 			}
 			return true;
 		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--add", "--remove", "--clear", "--list" };
+			default:
+				return null;
+			}
+		}
 	};
 
 	private static ExternalConsoleCommand hide = new ExternalConsoleCommand() {
@@ -579,6 +644,16 @@ public class ExternalConsole extends JFrame {
 			}
 			return true;
 		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--true", "--false" };
+			default:
+				return null;
+			}
+		}
 	};
 
 	private static ExternalConsoleCommand theme = new ExternalConsoleCommand() {
@@ -633,6 +708,17 @@ public class ExternalConsole extends JFrame {
 			}
 			return true;
 		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--day", "--night", "--twitch" };
+			default:
+				return null;
+			}
+		}
+
 	};
 
 	private static ExternalConsoleCommand localmsg = new ExternalConsoleCommand() {
@@ -675,6 +761,17 @@ public class ExternalConsole extends JFrame {
 			}
 			return true;
 		}
+
+		@Override
+		public String[] getParamOptions(int number) {
+			switch (number) {
+			case 0:
+				return new String[] { "--chatframe", "--externalconsole" };
+			default:
+				return null;
+			}
+		}
+
 	};
 
 	private static ExternalConsoleCommand stop = new ExternalConsoleCommand() {
@@ -833,7 +930,7 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(localmsg.getCommand(), localmsg);
 		this.cmds.put(readme.getCommand(), readme);
 		this.cmds.put(update.getCommand(), update);
-		
+
 		this.last = null;
 
 		this.console.setForeground(Color.WHITE);
@@ -843,6 +940,7 @@ public class ExternalConsole extends JFrame {
 		this.input.setForeground(Color.WHITE);
 		this.input.setCaretColor(Color.WHITE);
 		this.input.setBackground(Color.BLACK);
+
 		EventManager.registerEventListener(this);
 	}
 
@@ -896,7 +994,6 @@ public class ExternalConsole extends JFrame {
 		// console.setBorder(null);
 		// console.setTabSize(4);
 		console.setEditable(false);
-		// console.setFocusable(false);
 		// console.setLineWrap(true);
 		DefaultCaret caret = (DefaultCaret) console.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -910,7 +1007,6 @@ public class ExternalConsole extends JFrame {
 
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
-
 		console.setOpaque(false);
 		console.setForeground(Color.BLACK);
 		this.addComponentListener(new ComponentAdapter() {
@@ -931,8 +1027,12 @@ public class ExternalConsole extends JFrame {
 		input.setForeground(Color.BLACK);
 		input.setCaretColor(Color.BLACK);
 		input.setBackground(Color.WHITE);
-
+		input.setFocusTraversalKeysEnabled(false);
 		input.addKeyListener(new KeyListener() {
+
+			private int tabPos = -1;
+
+			private String ref = null;
 
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -944,8 +1044,44 @@ public class ExternalConsole extends JFrame {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() != KeyEvent.VK_TAB && e.getKeyCode() != KeyEvent.VK_SHIFT) {
+					tabPos = -1;
+					ref = null;
+				}
 				switch (e.getKeyCode()) {
 				default:
+					break;
+				case KeyEvent.VK_TAB:
+					String[] args = input.getText().split(" ", -1);
+					ExternalConsoleCommand cmd = cmds.get(args[0]);
+					boolean next = !KeyPressedAdapter.isKeyPressed(KeyEvent.VK_SHIFT);
+					if (ref == null) {
+						ref = args[args.length - 1];
+					}
+					if (args.length == 0 || cmd == null || cmd.getParamOptions(args.length - 2) == null) {
+						List<ExternalConsoleCommand> options = cmds.values().stream()
+								.filter(c -> c.getCommand().startsWith(ref)).sorted(ExternalConsoleCommand.comparator)
+								.toList();
+						if (next)
+							tabPos = tabPos + 1 >= options.size() ? 0 : tabPos + 1;
+						else
+							tabPos = tabPos - 1 < 0 ? options.size() - 1 : tabPos - 1;
+						if (tabPos < 0 || tabPos >= options.size())
+							break;
+						args[args.length - 1] = options.get(tabPos).getCommand();
+						input.setText(String.join(" ", args));
+					} else {
+						String[] paramOptions = cmd.getParamOptions(args.length - 2);
+						List<String> options = Stream.of(paramOptions).filter(c -> c.startsWith(ref)).toList();
+						if (next)
+							tabPos = tabPos + 1 >= options.size() ? 0 : tabPos + 1;
+						else
+							tabPos = tabPos - 1 < 0 ? options.size() - 1 : tabPos - 1;
+						if (tabPos < 0 || tabPos >= options.size())
+							break;
+						args[args.length - 1] = options.get(tabPos);
+						input.setText(String.join(" ", args));
+					}
 					break;
 				case KeyEvent.VK_UP:
 				case KeyEvent.VK_KP_UP:
@@ -953,6 +1089,8 @@ public class ExternalConsole extends JFrame {
 						input.setText(last.getFullCommand());
 						if (last.getPrevious() != null)
 							last = last.getPrevious();
+					} else {
+						input.setText("");
 					}
 					break;
 				case KeyEvent.VK_DOWN:

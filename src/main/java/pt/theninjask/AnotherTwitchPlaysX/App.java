@@ -85,6 +85,8 @@ public class App {
 		RedirectorInputStream.changeDefault(System.in);
 		System.setIn(RedirectorInputStream.getInstance());
 
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
+		
 		int amountOfRequiredTwitchSessionOptions = 0;
 		int amountOfRequiredYouTubeSessionOptions = 0;
 		Options options = new Options();
@@ -432,7 +434,6 @@ public class App {
 				}
 			}
 			ControlData.setTranslation(Constants.STRING_TO_KEYCODE);
-			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
 		} catch (Exception | Error e) {
 			System.setOut(tmp);
 			throw e;

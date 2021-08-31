@@ -201,6 +201,7 @@ public class ChatFrame extends JFrame {
 	private JPanel inputChat() {
 		messagePanel = new JPanel(new BorderLayout());
 		input = new JTextField();
+		input.setFocusTraversalKeysEnabled(false);
 		input.setBorder(BorderFactory.createLineBorder(Constants.TWITCH_COLOR_COMPLEMENT, 1));
 		input.addKeyListener(new KeyListener() {
 

@@ -670,15 +670,18 @@ public final class Constants {
 					if (e.getEventType() == EventType.ACTIVATED)
 						if (e.getURL() != null) {
 							openWebsite(e.getURL().toString());
-						} /*
-							 * else { JEditorPane message = (JEditorPane) e.getInputEvent().getComponent();
-							 * Pattern pattern = Pattern.compile(String.format("id=\"%s\"",
-							 * e.getDescription())); Matcher matcher = pattern.matcher(readme.content);
-							 * System.out.println(message.getText()); if (matcher.matches()) {
-							 * message.setCaretPosition((message.getDocument().getEndPosition().getOffset()
-							 * - 1) matcher.start() / message.getText().length()); }else {
-							 * System.out.println(String.format("id=\"%s\"", e.getDescription()) ); } }
-							 */
+							readmeFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+						} else {
+							JEditorPane message = (JEditorPane) e.getInputEvent().getComponent();
+							Pattern pattern = Pattern.compile(String.format("id=\"%s\"", e.getDescription()));
+							Matcher matcher = pattern.matcher(message.getText());
+							if (matcher.find()) {
+								message.setCaretPosition((message.getDocument().getLength())
+										* matcher.start() / message.getText().length());
+							}
+							readmeFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+						}
+
 					if (e.getEventType() == EventType.ENTERED) {
 						readmeFrame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 					} else if (e.getEventType() == EventType.EXITED) {
