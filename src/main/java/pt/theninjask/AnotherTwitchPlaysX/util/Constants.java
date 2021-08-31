@@ -702,7 +702,7 @@ public final class Constants {
 
 		WebApplicationException e) {
 			printVerboseMessage(Level.WARNING, e);
-			String response = "Unknown";
+			String response = DataManager.getLanguage().getConstants().getREADMEUnknown();
 			if (e.getResponse().hasEntity()) {
 				try {
 					response = new String(((InputStream) e.getResponse().getEntity()).readAllBytes());
@@ -711,11 +711,11 @@ public final class Constants {
 					printVerboseMessage(Level.WARNING, e);
 				}
 			}
-			showMessageDialog(String.format("README: %s", response),
-					String.format("README - %s", e.getResponse().getStatus()));
+			showMessageDialog(String.format(DataManager.getLanguage().getConstants().getREADMENetException(), response),
+					String.format(DataManager.getLanguage().getConstants().getREADMENetExceptionTitle(), e.getResponse().getStatus()));
 		} catch (Exception e) {
 			printVerboseMessage(Level.WARNING, e);
-			showMessageDialog("README not available", "README");
+			showMessageDialog(DataManager.getLanguage().getConstants().getREADMEException(), DataManager.getLanguage().getConstants().getREADMEExceptionTitle());
 		}
 	}
 

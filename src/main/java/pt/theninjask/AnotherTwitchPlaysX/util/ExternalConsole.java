@@ -846,13 +846,21 @@ public class ExternalConsole extends JFrame {
 		}
 	};
 
-	private class UsedCommand {
+	private static class UsedCommand {
 
 		private UsedCommand previous;
 
 		private UsedCommand next;
 
 		private String fullCommand;
+
+		private static final UsedCommand NULL_UC = new UsedCommand();
+
+		private UsedCommand() {
+			this.fullCommand = null;
+			this.previous = this;
+			this.next = this;
+		}
 
 		public UsedCommand(String fullCommand, UsedCommand previous, UsedCommand next) {
 			this.fullCommand = fullCommand;
@@ -931,7 +939,7 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(readme.getCommand(), readme);
 		this.cmds.put(update.getCommand(), update);
 
-		this.last = null;
+		this.last = UsedCommand.NULL_UC;
 
 		this.console.setForeground(Color.WHITE);
 		this.setBackground(Color.BLACK);
@@ -1085,22 +1093,22 @@ public class ExternalConsole extends JFrame {
 					break;
 				case KeyEvent.VK_UP:
 				case KeyEvent.VK_KP_UP:
-					if (last != null) {
-						input.setText(last.getFullCommand());
-						if (last.getPrevious() != null)
+					if (last != UsedCommand.NULL_UC) {
+						if (last.getPrevious() != UsedCommand.NULL_UC) {
+							input.setText(last.getFullCommand());
 							last = last.getPrevious();
+						}
 					} else {
 						input.setText("");
 					}
 					break;
 				case KeyEvent.VK_DOWN:
 				case KeyEvent.VK_KP_DOWN:
-					if (last != null)
-						if (last.getNext() != null)
-							if (last.getNext().getNext() != null) {
-								last = last.getNext();
-								input.setText(last.getNext().getFullCommand());
-							}
+					if (last != UsedCommand.NULL_UC && last.getNext() != UsedCommand.NULL_UC
+							&& last.getNext().getNext() != UsedCommand.NULL_UC) {
+						last = last.getNext();
+						input.setText(last.getNext().getFullCommand());
+					}
 					break;
 				case KeyEvent.VK_ENTER:
 					InputCommandExternalConsoleEvent event = new InputCommandExternalConsoleEvent(
@@ -1109,12 +1117,12 @@ public class ExternalConsole extends JFrame {
 					 * EventManager.triggerEvent(event); if (event.isCancelled()) return;
 					 */
 
-					if (last != null)
-						while (last.getNext() != null)
-							last = last.getNext();
-					UsedCommand current = new UsedCommand(input.getText(), last, null);
-					if (last != null)
-						last.setNext(current);
+					while (last.getNext() != UsedCommand.NULL_UC)
+						last = last.getNext();
+					if (last == UsedCommand.NULL_UC)
+						last = new UsedCommand(null, UsedCommand.NULL_UC, UsedCommand.NULL_UC);
+					UsedCommand current = new UsedCommand(input.getText(), last, UsedCommand.NULL_UC);
+					last.setNext(current);
 					last = current;
 
 					// console.append(input.getText());

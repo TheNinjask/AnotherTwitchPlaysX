@@ -84,7 +84,8 @@ public class App {
 		RedirectorInputStream.changeRedirect(System.in);
 		RedirectorInputStream.changeDefault(System.in);
 		System.setIn(RedirectorInputStream.getInstance());
-
+		
+		DataManager.setLanguage(new EnglishLang());
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
 		
 		int amountOfRequiredTwitchSessionOptions = 0;
@@ -359,7 +360,6 @@ public class App {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.globalSetUp()", App.class.getSimpleName()));
 		PrintStream tmp = System.out;
 		try {
-			DataManager.setLanguage(new EnglishLang());
 			ThreadPool.execute(()->{
 				checkForUpdate();
 			});

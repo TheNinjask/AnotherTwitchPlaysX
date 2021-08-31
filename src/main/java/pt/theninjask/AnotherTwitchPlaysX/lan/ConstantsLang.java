@@ -25,4 +25,24 @@ public interface ConstantsLang {
 	public default String getModWarn() {
 		return "You are loading a mod that was not made by the creator of this app nor verified by them!\nProceed at your own risk.";
 	}
+	
+	public default String getREADMEUnknown() {
+		return "Unknown";
+	}
+	
+	public default String getREADMENetExceptionTitle() {
+		return "README - %s";
+	}
+	
+	public default String getREADMENetException() {
+		return "README: %s";
+	}
+	
+	public default String getREADMEExceptionTitle() {
+		return "README";
+	}
+	
+	public default String getREADMEException() {
+		return "README not available";
+	}
 }
