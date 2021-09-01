@@ -143,9 +143,18 @@ public final class Constants {
 		}
 	});
 
-	public static final String LATEST_VERSION_URL = "https://api.github.com/repos/TheNinjask/AnotherTwitchPlaysX/releases/latest";
+	public static final String REPO_NAME = "AnotherTwitchPlaysX";
 
-	public static final String README_URL = "https://api.github.com/repos/TheNinjask/AnotherTwitchPlaysX/readme";
+	public static final String REPO_OWNER = "TheNinjask";
+
+	public static final String LATEST_VERSION_URL = String.format("https://api.github.com/repos/%s/%s/releases/latest",
+			REPO_OWNER, REPO_NAME);
+
+	public static final String README_URL = String.format("https://api.github.com/repos/%s/%s/readme", REPO_OWNER,
+			REPO_NAME);
+
+	public static final String RAW_URL = String.format("https://raw.githubusercontent.com/%s/%s/master", REPO_OWNER,
+			REPO_NAME);
 
 	private static final SimpleFormatter LOGGER_FORMATTER = new SimpleFormatter() {
 		// private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
@@ -646,15 +655,17 @@ public final class Constants {
 
 			message.setContentType(MediaType.TEXT_HTML);
 
-			// Fixes to links
-			readme.content = readme.content.replaceAll("\"./login.png\"",
-					"\"https://raw.githubusercontent.com/TheNinjask/AnotherTwitchPlaysX/master/login.png\"");
-			readme.content = readme.content.replaceAll("\"./menu.png\"",
-					"\"https://raw.githubusercontent.com/TheNinjask/AnotherTwitchPlaysX/master/menu.png\"");
-
-			Pattern pattern = Pattern.compile("<h2>(.*)<\\/h2>");
+			// Fixes to local links
+			Pattern pattern = Pattern.compile("\"./(.*)\"");
 			Matcher matcher = pattern.matcher(readme.content);
-			matcher.find();
+			for (MatchResult elem : matcher.results().toList()) {
+				readme.content = readme.content.replaceAll(Pattern.quote(elem.group()),
+						String.format("\"%s/%s\"", RAW_URL, elem.group(1)));
+			}
+
+			// Fixes to markdown links
+			pattern = Pattern.compile("<h2>(.*)<\\/h2>");
+			matcher = pattern.matcher(readme.content);
 			for (MatchResult elem : matcher.results().toList()) {
 				readme.content = readme.content.replaceAll(Pattern.quote(elem.group()),
 						String.format("<h2 id=#%s>%s<\\/h2>",
@@ -676,8 +687,8 @@ public final class Constants {
 							Pattern pattern = Pattern.compile(String.format("id=\"%s\"", e.getDescription()));
 							Matcher matcher = pattern.matcher(message.getText());
 							if (matcher.find()) {
-								message.setCaretPosition((message.getDocument().getLength())
-										* matcher.start() / message.getText().length());
+								message.setCaretPosition((message.getDocument().getLength()) * matcher.start()
+										/ message.getText().length());
 							}
 							readmeFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
@@ -694,9 +705,6 @@ public final class Constants {
 			readmeFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			message.setCaretPosition(0);
 			readmeFrame.setVisible(true);
-			// Constants.showCustomColorMessageDialog(null, content, "README",
-			// JOptionPane.PLAIN_MESSAGE, null,
-			// Constants.TWITCH_COLOR);
 
 		} catch (
 
@@ -712,10 +720,12 @@ public final class Constants {
 				}
 			}
 			showMessageDialog(String.format(DataManager.getLanguage().getConstants().getREADMENetException(), response),
-					String.format(DataManager.getLanguage().getConstants().getREADMENetExceptionTitle(), e.getResponse().getStatus()));
+					String.format(DataManager.getLanguage().getConstants().getREADMENetExceptionTitle(),
+							e.getResponse().getStatus()));
 		} catch (Exception e) {
 			printVerboseMessage(Level.WARNING, e);
-			showMessageDialog(DataManager.getLanguage().getConstants().getREADMEException(), DataManager.getLanguage().getConstants().getREADMEExceptionTitle());
+			showMessageDialog(DataManager.getLanguage().getConstants().getREADMEException(),
+					DataManager.getLanguage().getConstants().getREADMEExceptionTitle());
 		}
 	}
 
