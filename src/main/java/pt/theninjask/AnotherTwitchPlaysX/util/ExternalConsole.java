@@ -81,6 +81,8 @@ public class ExternalConsole extends JFrame {
 
 	private Map<String, ExternalConsoleCommand> cmds;
 
+	private ColorTheme currentTheme;
+	
 	private static ExternalConsoleCommand help = new ExternalConsoleCommand() {
 
 		@Override
@@ -693,23 +695,18 @@ public class ExternalConsole extends JFrame {
 				parser.parse(options, args);
 				switch (String.valueOf(theme.getSelected())) {
 				case "t":
-					setCustom(Constants.TWITCH_COLOR_COMPLEMENT, Constants.TWITCH_COLOR);
+					setTheme(Constants.TWITCH_THEME);
 					break;
 				case "d":
-					setDay();
+					setTheme(Constants.DAY_THEME);
 					break;
 				case "n":
-					setNight();
+					setTheme(Constants.NIGHT_THEME);
 					break;
 				default:
-					Color c = singleton.getBackground();
 					String current = "Unknown";
-					if (c.equals(Color.BLACK))
-						current = "Night";
-					else if (c.equals(Color.WHITE))
-						current = "Day";
-					else if (c.equals(Constants.TWITCH_COLOR))
-						current = "Twitch";
+					if (singleton.currentTheme!=null)
+						current = singleton.currentTheme.getName();
 					println(String.format("Theme is set as: %s", current));
 					println("Options: -d, -n, -t");
 					break;
@@ -733,6 +730,66 @@ public class ExternalConsole extends JFrame {
 
 	};
 
+	private static ExternalConsoleCommand apptheme = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "apptheme";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Changes Theme of app";
+		}
+
+		@Override
+		public boolean executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup theme = new OptionGroup();
+			theme.addOption(new Option("t", "twitch", false, "Set App's Theme to Twitch"));
+			theme.addOption(new Option("d", "day", false, "Set App's Theme to Day"));
+			theme.addOption(new Option("n", "night", false, "Set App's Theme to Night"));
+			options.addOptionGroup(theme);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(theme.getSelected())) {
+				case "t":
+					DataManager.setTheme(Constants.TWITCH_THEME);
+					break;
+				case "d":
+					DataManager.setTheme(Constants.DAY_THEME);
+					break;
+				case "n":
+					DataManager.setTheme(Constants.NIGHT_THEME);
+					break;
+				default:
+					String current = "Unknown";
+					if (DataManager.getTheme()!=null)
+						current = DataManager.getTheme().getName();
+					println(String.format("App Theme is set as: %s", current));
+					println("Options: -d, -n, -t");
+					break;
+				}
+			} catch (ParseException e) {
+				println(e.getMessage());
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public String[] getParamOptions(int number, String[] currArgs) {
+			switch (number) {
+			case 0:
+				return new String[] { "--day", "--night", "--twitch" };
+			default:
+				return null;
+			}
+		}
+
+	};
+	
 	private static ExternalConsoleCommand localmsg = new ExternalConsoleCommand() {
 
 		@Override
@@ -907,6 +964,7 @@ public class ExternalConsole extends JFrame {
 
 	private ExternalConsole() {
 		this.setTitle("External Console");
+		this.currentTheme = Constants.NIGHT_THEME;
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
@@ -914,7 +972,6 @@ public class ExternalConsole extends JFrame {
 		this.add(insertConsole(), BorderLayout.CENTER);
 		this.add(inputConsole(), BorderLayout.SOUTH);
 		scroll.getParent().setBackground(null);
-		this.setBackground(Color.WHITE);
 		this.out = new ExternalConsoleOutputStream();
 		this.err = new ExternalConsoleErrorOutputStream();
 		this.in = new ExternalConsoleInputStream();
@@ -922,10 +979,10 @@ public class ExternalConsole extends JFrame {
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent windowEvent) {
-				if (singleton.getBackground() == Color.BLACK)
-					setDay();
+				if (currentTheme == Constants.NIGHT_THEME)
+					setTheme(Constants.DAY_THEME);
 				else
-					setNight();
+					setTheme(Constants.NIGHT_THEME);
 			}
 		});
 
@@ -950,16 +1007,17 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(localmsg.getCommand(), localmsg);
 		this.cmds.put(readme.getCommand(), readme);
 		this.cmds.put(update.getCommand(), update);
+		this.cmds.put(apptheme.getCommand(), apptheme);
 
 		this.last = UsedCommand.NULL_UC;
 
-		this.console.setForeground(Color.WHITE);
-		this.setBackground(Color.BLACK);
+		this.console.setForeground(currentTheme.getFont());
+		this.setBackground(currentTheme.getBackground());
 
-		this.input.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
-		this.input.setForeground(Color.WHITE);
-		this.input.setCaretColor(Color.WHITE);
-		this.input.setBackground(Color.BLACK);
+		this.input.setBorder(BorderFactory.createLineBorder(currentTheme.getFont(), 1));
+		this.input.setForeground(currentTheme.getFont());
+		this.input.setCaretColor(currentTheme.getFont());
+		this.input.setBackground(currentTheme.getBackground());
 
 		EventManager.registerEventListener(this);
 	}
@@ -1028,7 +1086,7 @@ public class ExternalConsole extends JFrame {
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
 		console.setOpaque(false);
-		console.setForeground(Color.BLACK);
+		//console.setForeground(Color.BLACK);
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent event) {
@@ -1043,10 +1101,10 @@ public class ExternalConsole extends JFrame {
 		input = new JTextField();
 		input.setBorder(null);
 		
-		input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-		input.setForeground(Color.BLACK);
-		input.setCaretColor(Color.BLACK);
-		input.setBackground(Color.WHITE);
+		//input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		//input.setForeground(Color.BLACK);
+		//input.setCaretColor(Color.BLACK);
+		//input.setBackground(Color.WHITE);
 		input.setFocusTraversalKeysEnabled(false);
 		input.addKeyListener(new KeyListener() {
 
@@ -1233,40 +1291,15 @@ public class ExternalConsole extends JFrame {
 
 	}
 
-	public static void setCustom(Color font, Color background) {
-		singleton.console.setForeground(font);
-		singleton.setBackground(background);
+	public static void setTheme(ColorTheme theme) {
+		singleton.currentTheme = theme;
+		singleton.console.setForeground(theme.getFont());
+		singleton.setBackground(theme.getBackground());
 
-		singleton.input.setBorder(BorderFactory.createLineBorder(font, 1));
-		singleton.input.setForeground(font);
-		singleton.input.setCaretColor(font);
-		singleton.input.setBackground(background);
-	}
-
-	public static void setDay() {
-		setCustom(Color.BLACK, Color.WHITE);
-		/*
-		 * singleton.console.setForeground(Color.BLACK);
-		 * singleton.setBackground(Color.WHITE);
-		 * 
-		 * singleton.input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-		 * singleton.input.setForeground(Color.BLACK);
-		 * singleton.input.setCaretColor(Color.BLACK);
-		 * singleton.input.setBackground(Color.WHITE);
-		 */
-	}
-
-	public static void setNight() {
-		setCustom(Color.WHITE, Color.BLACK);
-		/*
-		 * singleton.console.setForeground(Color.WHITE);
-		 * singleton.setBackground(Color.BLACK);
-		 * 
-		 * singleton.input.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
-		 * singleton.input.setForeground(Color.WHITE);
-		 * singleton.input.setCaretColor(Color.WHITE);
-		 * singleton.input.setBackground(Color.BLACK);
-		 */
+		singleton.input.setBorder(BorderFactory.createLineBorder(theme.getFont(), 1));
+		singleton.input.setForeground(theme.getFont());
+		singleton.input.setCaretColor(theme.getFont());
+		singleton.input.setBackground(theme.getBackground());
 	}
 
 	public static void println() {
@@ -1296,7 +1329,11 @@ public class ExternalConsole extends JFrame {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public static ColorTheme getTheme() {
+		return singleton.currentTheme;
+	}
+	
 	private class ExternalConsoleInputStream extends InputStream {
 
 		private byte[] contents;

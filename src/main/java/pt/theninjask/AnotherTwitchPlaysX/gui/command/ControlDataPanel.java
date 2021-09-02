@@ -27,10 +27,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
 
+import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandVarType;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
 import pt.theninjask.AnotherTwitchPlaysX.data.MouseCoordsType;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
@@ -42,7 +45,7 @@ import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords.MouseCoordsListener;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
-public class ControlDataPanel extends JPanel{
+public class ControlDataPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -249,7 +252,7 @@ public class ControlDataPanel extends JPanel{
 		inputLabel = new JLabel(
 				data.getType() == ControlType.KEY ? DataManager.getLanguage().getControlData().getTypeKey()
 						: DataManager.getLanguage().getControlData().getTypeButton());
-		inputLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		inputLabel.setForeground(DataManager.getTheme().getFont());
 		inputPanel.add(inputLabel, BorderLayout.WEST);
 		switch (data.getType()) {
 		case KEY:
@@ -260,11 +263,11 @@ public class ControlDataPanel extends JPanel{
 			key.setFocusable(false);
 			key.addActionListener(l -> {
 				JPanel pressPanel = new JPanel(new GridLayout(2, 1));
-				pressPanel.setBackground(Constants.TWITCH_COLOR);
+				pressPanel.setBackground(DataManager.getTheme().getBackground());
 				JLabel press = new JLabel(String.format(DataManager.getLanguage().getControlData().getKeyCurrent(),
 						data.getKey() == null ? DataManager.getLanguage().getControlData().getKeyNone()
 								: KeyEvent.getKeyText(data.getKey())));
-				press.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				press.setForeground(DataManager.getTheme().getFont());
 				press.setHorizontalAlignment(JLabel.CENTER);
 				pressPanel.add(press);
 				pressPanel.setFocusable(true);
@@ -320,7 +323,7 @@ public class ControlDataPanel extends JPanel{
 		default:
 			na = new JLabel(DataManager.getLanguage().getNA());
 			normal.add(na);
-			na.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			na.setForeground(DataManager.getTheme().getFont());
 			content.add(na);
 			break;
 		}
@@ -355,7 +358,7 @@ public class ControlDataPanel extends JPanel{
 			content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 			content.setOpaque(false);
 			durationLabel = new JLabel(DataManager.getLanguage().getControlData().getDuration());
-			durationLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			durationLabel.setForeground(DataManager.getTheme().getFont());
 			durationPanel.add(durationLabel, BorderLayout.WEST);
 			duration = new JFormattedTextField(durationFormatter);
 			normal.add(duration);
@@ -440,7 +443,7 @@ public class ControlDataPanel extends JPanel{
 		content = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		content.setOpaque(false);
 		aftermathLabel = new JLabel(DataManager.getLanguage().getControlData().getAftermath());
-		aftermathLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		aftermathLabel.setForeground(DataManager.getTheme().getFont());
 		aftermathPanel.add(aftermathLabel, BorderLayout.WEST);
 		NumberFormatter aftermathFormatter = new NumberFormatter(format);
 		aftermathFormatter.setValueClass(Integer.class);
@@ -532,7 +535,7 @@ public class ControlDataPanel extends JPanel{
 			content.setOpaque(false);
 			xLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getX(),
 					MouseCoords.getInstance().getX().get()));
-			xLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			xLabel.setForeground(DataManager.getTheme().getFont());
 			xPanel.add(xLabel, BorderLayout.WEST);
 			x = new JFormattedTextField(xFormatter);
 			normal.add(x);
@@ -642,7 +645,7 @@ public class ControlDataPanel extends JPanel{
 			content.setOpaque(false);
 			yLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getY(),
 					MouseCoords.getInstance().getY().get()));
-			yLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			yLabel.setForeground(DataManager.getTheme().getFont());
 			yPanel.add(yLabel, BorderLayout.WEST);
 			NumberFormatter yFormatter = new NumberFormatter(format);
 			yFormatter.setValueClass(Integer.class);
@@ -762,7 +765,7 @@ public class ControlDataPanel extends JPanel{
 				JPanel cyclePanel = new JPanel(new BorderLayout());
 				cyclePanel.setOpaque(false);
 				cycleLabel = new JLabel(DataManager.getLanguage().getControlData().getInitialCoords());
-				cycleLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				cycleLabel.setForeground(DataManager.getTheme().getFont());
 				cycleLabel.setHorizontalAlignment(JLabel.CENTER);
 				cyclePanel.add(cycleLabel, BorderLayout.CENTER);
 				/*
@@ -779,7 +782,7 @@ public class ControlDataPanel extends JPanel{
 				content.setOpaque(false);
 				finalXLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getFinalX(),
 						MouseCoords.getInstance().getX().get()));
-				finalXLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				finalXLabel.setForeground(DataManager.getTheme().getFont());
 				finalXPanel.add(finalXLabel, BorderLayout.WEST);
 				finalX = new JFormattedTextField(finalXFormatter);
 				normal.add(finalX);
@@ -890,7 +893,7 @@ public class ControlDataPanel extends JPanel{
 				content.setOpaque(false);
 				finalYLabel = new JLabel(String.format(DataManager.getLanguage().getControlData().getFinalY(),
 						MouseCoords.getInstance().getY().get()));
-				finalYLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				finalYLabel.setForeground(DataManager.getTheme().getFont());
 				finalYPanel.add(finalYLabel, BorderLayout.WEST);
 				NumberFormatter finalYFormatter = new NumberFormatter(format);
 				finalYFormatter.setValueClass(Integer.class);
@@ -1049,7 +1052,7 @@ public class ControlDataPanel extends JPanel{
 		// JPanel indexPanel = new JPanel();
 		// indexPanel.setOpaque(false);
 		indexLabel = new JLabel(DataManager.getLanguage().getControlData().getIndex());
-		indexLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		indexLabel.setForeground(DataManager.getTheme().getFont());
 		left.add(indexLabel);
 		index = new JComboBox<Integer>();
 		index.setFocusable(false);
@@ -1085,6 +1088,7 @@ public class ControlDataPanel extends JPanel{
 		left.add(remove);
 		// left.setPreferredSize(new Dimension(50, 151));
 		this.add(left, BorderLayout.EAST);
+		EventManager.registerEventListener(this);
 	}
 
 	public void refreshIndex() {
@@ -1269,12 +1273,12 @@ public class ControlDataPanel extends JPanel{
 		return finalYType;
 	}
 
-	//@Handler
+	// @Handler
 	public void updateLang(LanguageUpdateEvent event) {
 		Lang session = event.getLanguage();
-		if(session == null)
+		if (session == null)
 			return;
-		
+
 		jComboBoxVarNone = session.getControlData().getVarNone();
 		inputLabel.setText(data.getType() == ControlType.KEY ? session.getControlData().getTypeKey()
 				: session.getControlData().getTypeButton());
@@ -1352,5 +1356,28 @@ public class ControlDataPanel extends JPanel{
 			}
 		indexLabel.setText(session.getControlData().getIndex());
 		remove.setText(session.getControlData().getRemove());
+	}
+
+	@Handler
+	public void updateTheme(ColorThemeUpdateEvent event) {
+		if (event.getTheme() != null) {
+			inputLabel.setForeground(event.getTheme().getFont());
+			if (na != null)
+				na.setForeground(event.getTheme().getFont());
+			if (durationLabel != null)
+				durationLabel.setForeground(event.getTheme().getFont());
+			aftermathLabel.setForeground(event.getTheme().getFont());
+			if (xLabel != null)
+				xLabel.setForeground(event.getTheme().getFont());
+			if (yLabel != null)
+				yLabel.setForeground(event.getTheme().getFont());
+			if (cycleLabel != null)
+				cycleLabel.setForeground(event.getTheme().getFont());
+			if (finalXLabel != null)
+				finalXLabel.setForeground(event.getTheme().getFont());
+			if (finalYLabel != null)
+				finalYLabel.setForeground(event.getTheme().getFont());
+			indexLabel.setForeground(event.getTheme().getFont());
+		}
 	}
 }

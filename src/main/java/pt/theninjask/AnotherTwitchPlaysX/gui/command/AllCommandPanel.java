@@ -22,8 +22,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelBackEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.gui.command.AllCommandPanelLoadEvent;
@@ -77,11 +79,12 @@ public class AllCommandPanel extends JPanel{
 
 	private AllCommandPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", AllCommandPanel.class.getSimpleName()));
-		this.setBackground(Constants.TWITCH_COLOR);
+		this.setBackground(DataManager.getTheme().getBackground());
 		this.setLayout(new BorderLayout());
 		this.add(currentPanel, BorderLayout.CENTER);
 		mainCommandPanel();
 		//DataManager.registerLangEvent(this);
+		EventManager.registerEventListener(this);
 	}
 
 	public static AllCommandPanel getInstance() {
@@ -161,7 +164,7 @@ public class AllCommandPanel extends JPanel{
 		title = new JLabel(DataManager.getLanguage().getAllCommand().getListOfCmds());
 		title.setHorizontalAlignment(JLabel.CENTER);
 		title.setFont(new Font(title.getFont().getName(), title.getFont().getStyle(), 25));
-		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		title.setForeground(DataManager.getTheme().getFont());
 		title.setFocusable(false);
 		mainCommandPanel.add(title, BorderLayout.NORTH);
 
@@ -254,11 +257,11 @@ public class AllCommandPanel extends JPanel{
 					tmp.setEditable(false);
 					tmp.setBorder(null);
 					tmp.setOpaque(false);
-					tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+					tmp.setForeground(DataManager.getTheme().getFont());
 					objectMapper.writeValue(file, DataManager.getCommands());
 					Constants.showCustomColorMessageDialog(null, tmp,
 							DataManager.getLanguage().getAllCommand().getSaveTitle(), JOptionPane.INFORMATION_MESSAGE,
-							null, Constants.TWITCH_COLOR);
+							null, DataManager.getTheme().getBackground());
 				} catch (IOException e) {
 					Constants.showExceptionDialog(e);
 				}
@@ -386,7 +389,14 @@ public class AllCommandPanel extends JPanel{
 		load.setText(session.getAllCommand().getLoad());
 		back.setText(session.getAllCommand().getBack());
 		table.updateLang(event);
-
+	}
+	
+	@Handler
+	public void updateTheme(ColorThemeUpdateEvent event) {
+		if(event.getTheme()!=null) {
+			this.setBackground(event.getTheme().getBackground());
+			title.setForeground(event.getTheme().getFont());
+		}
 	}
 
 }

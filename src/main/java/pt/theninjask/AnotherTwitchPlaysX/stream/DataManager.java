@@ -8,11 +8,13 @@ import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.CommandsUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.TwitchSessionUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.YoutubeSessionUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
+import pt.theninjask.AnotherTwitchPlaysX.util.ColorTheme;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class DataManager {
@@ -23,6 +25,8 @@ public class DataManager {
 
 	private YouTubeSessionData youtubeSession;
 
+	private ColorTheme theme;
+	
 	public static boolean disableSession = false;
 
 	public static final TwitchSessionData TWITCH_DUMMY_SESSION = new TwitchSessionData("dummy", "dummy", "dummy");
@@ -38,10 +42,10 @@ public class DataManager {
 		this.commands = new ArrayList<CommandData>();
 	}
 
-	private DataManager(TwitchSessionData twitchSession, List<CommandData> commands) {
+	/*private DataManager(TwitchSessionData twitchSession, List<CommandData> commands) {
 		this.twitchSession = twitchSession;
 		this.commands = commands;
-	}
+	}*/
 
 	public static TwitchSessionData getTwitchSession() {
 		Constants.printVerboseMessage(Level.INFO,
@@ -111,5 +115,17 @@ public class DataManager {
 			return;
 		singleton.language = language;
 	}
+	
+	public static ColorTheme getTheme() {
+		return singleton.theme;
+	}
 
+	public static void setTheme(ColorTheme theme) {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.setTheme()", DataManager.class.getSimpleName()));
+		ColorThemeUpdateEvent event = new ColorThemeUpdateEvent(theme);
+		EventManager.triggerEvent(event);
+		if(event.isCancelled())
+			return;
+		singleton.theme = theme;
+	}
 }

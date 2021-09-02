@@ -36,7 +36,7 @@ public class TestCommandsMod extends ATPXMod {
 		worker = new TaskCooldown(1);
 
 		mainPanel = new JPanel(new FlowLayout());
-		mainPanel.setBackground(Constants.TWITCH_COLOR);
+		mainPanel.setBackground(Constants.TWITCH_THEME.getBackground());
 
 		NumberFormat format = NumberFormat.getInstance();
 		format.setGroupingUsed(false);
@@ -49,7 +49,7 @@ public class TestCommandsMod extends ATPXMod {
 		JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		cooldownPanel.setOpaque(false);
 		JLabel cooldownLabel = new JLabel("Start in(sec): ");
-		cooldownLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		cooldownLabel.setForeground(Constants.TWITCH_THEME.getFont());
 		cooldownPanel.add(cooldownLabel);
 		JFormattedTextField cooldown = new JFormattedTextField(cooldownFormatter);
 		cooldown.setBorder(null);
@@ -91,7 +91,7 @@ public class TestCommandsMod extends ATPXMod {
 		JPanel delayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		delayPanel.setOpaque(false);
 		JLabel delayLabel = new JLabel("Delay between Cmd(sec): ");
-		delayLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		delayLabel.setForeground(Constants.TWITCH_THEME.getFont());
 		delayPanel.add(delayLabel);
 		JFormattedTextField delay = new JFormattedTextField(delayFormatter);
 		delay.setBorder(null);
@@ -165,7 +165,7 @@ public class TestCommandsMod extends ATPXMod {
 		});
 		mainPanel.add(back);
 		JLabel selecLabel = new JLabel("Select:");
-		selecLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		selecLabel.setForeground(Constants.TWITCH_THEME.getFont());
 		mainPanel.add(selecLabel);
 		selec = new JComboBox<JComboItem<CommandData>>();
 		mainPanel.add(selec);

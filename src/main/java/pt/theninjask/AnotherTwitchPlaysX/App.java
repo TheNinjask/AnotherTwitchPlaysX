@@ -86,6 +86,8 @@ public class App {
 		System.setIn(RedirectorInputStream.getInstance());
 		
 		DataManager.setLanguage(new EnglishLang());
+		DataManager.setTheme(Constants.TWITCH_THEME);
+		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
 		
 		int amountOfRequiredTwitchSessionOptions = 0;
@@ -242,9 +244,9 @@ public class App {
 			ExternalConsole.setClosable(true);
 			Constants.printVerboseMessage(Level.WARNING, e);
 			JLabel exception = new JLabel(e.getMessage());
-			exception.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			exception.setForeground(DataManager.getTheme().getFont());
 			Constants.showCustomColorMessageDialog(null, exception, e.getClass().getName(), JOptionPane.WARNING_MESSAGE,
-					null, Constants.TWITCH_COLOR);
+					null, DataManager.getTheme().getBackground());
 		}
 	}
 
@@ -309,7 +311,7 @@ public class App {
 		message = new JTextPane();
 		
 		title.setOpaque(false);
-		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		title.setForeground(DataManager.getTheme().getFont());
 		title.setText(String.format(DataManager.getLanguage().getUpdateNoticeTitleContent(), update.tag_name, update.update_name));
 		title.setBorder(null);
 		title.setFont(new Font(title.getFont().getFontName(), title.getFont().getStyle(), title.getFont().getSize()+7));
@@ -326,7 +328,7 @@ public class App {
 		scroll.getViewport().setOpaque(false);
 
 		message.setOpaque(false);
-		message.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		message.setForeground(DataManager.getTheme().getFont());
 		
 		scroll.setPreferredSize(new Dimension(151, 151));
 		content.add(scroll, BorderLayout.CENTER);
@@ -341,7 +343,7 @@ public class App {
 
 		int resp = Constants.showCustomColorOptionDialog(null, content,
 				DataManager.getLanguage().getUpdateNoticeTitle(), JOptionPane.YES_NO_CANCEL_OPTION,
-				JOptionPane.PLAIN_MESSAGE, null, options, null, Constants.TWITCH_COLOR);
+				JOptionPane.PLAIN_MESSAGE, null, options, null, DataManager.getTheme().getBackground());
 		switch (resp) {
 		case JOptionPane.YES_OPTION:
 			Constants.openWebsite(update.html_url);

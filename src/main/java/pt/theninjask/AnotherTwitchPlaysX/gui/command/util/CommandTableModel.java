@@ -48,15 +48,15 @@ public class CommandTableModel{
 				tmp.setOpaque(false);
 				JLabel syntaxLabel = new JLabel(
 						String.format(DataManager.getLanguage().getCommand().getSyntaxFull(), data.getRegex()));
-				syntaxLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				syntaxLabel.setForeground(DataManager.getTheme().getFont());
 				tmp.add(syntaxLabel);
 				JLabel egLabel = new JLabel(
 						String.format(DataManager.getLanguage().getCommand().getSyntaxDemo(), data.getRegexExample()));
-				egLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				egLabel.setForeground(DataManager.getTheme().getFont());
 				tmp.add(egLabel);
 				Constants.showCustomColorMessageDialog(null, tmp,
 						DataManager.getLanguage().getCommand().getSyntaxTitle(), JOptionPane.PLAIN_MESSAGE, null,
-						Constants.TWITCH_COLOR);
+						DataManager.getTheme().getBackground());
 			} catch (Exception e) {
 				Constants.showExpectedExceptionDialog(e);
 			}

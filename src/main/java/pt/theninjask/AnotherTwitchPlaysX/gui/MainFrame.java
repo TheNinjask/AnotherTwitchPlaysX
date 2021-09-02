@@ -16,10 +16,12 @@ import javax.swing.JTextField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.gui.MainFrameReplacePanelEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
@@ -41,7 +43,7 @@ public class MainFrame extends JFrame {
 	private MainFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainFrame.class.getSimpleName()));
 		this.onStart();
-		this.getContentPane().setBackground(Constants.TWITCH_COLOR);
+		this.getContentPane().setBackground(DataManager.getTheme().getBackground());
 		// this.setTitle(DataManager.getLanguage().getTitle());
 		this.setTitle(String.format("%s - v%s", DataManager.getLanguage().getID(), App.VERSION));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,6 +56,7 @@ public class MainFrame extends JFrame {
 		this.setResizable(false);
 		// DataManager.registerLangEvent(this);
 		// this.setVisible(true);
+		EventManager.registerEventListener(this);
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
@@ -82,10 +85,10 @@ public class MainFrame extends JFrame {
 				tmp.setEditable(false);
 				tmp.setBorder(null);
 				tmp.setOpaque(false);
-				tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				tmp.setForeground(DataManager.getTheme().getFont());
 				objectMapper.writeValue(file, DataManager.getTwitchSession());
 				Constants.showCustomColorMessageDialog(null, tmp, DataManager.getLanguage().getSavingSessionTitle(), JOptionPane.INFORMATION_MESSAGE,
-						null, Constants.TWITCH_COLOR);
+						null, DataManager.getTheme().getBackground());
 			} catch (IOException e) {
 				Constants.showExceptionDialog(e);
 			}
@@ -104,10 +107,10 @@ public class MainFrame extends JFrame {
 				tmp.setEditable(false);
 				tmp.setBorder(null);
 				tmp.setOpaque(false);
-				tmp.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				tmp.setForeground(DataManager.getTheme().getFont());
 				objectMapper.writeValue(file, DataManager.getYouTubeSession());
 				Constants.showCustomColorMessageDialog(null, tmp, DataManager.getLanguage().getSavingSessionTitle(), JOptionPane.INFORMATION_MESSAGE,
-						null, Constants.TWITCH_COLOR);
+						null, DataManager.getTheme().getBackground());
 			} catch (IOException e) {
 				Constants.showExceptionDialog(e);
 			}
@@ -162,6 +165,13 @@ public class MainFrame extends JFrame {
 	public void updateLang(LanguageUpdateEvent event) {
 		if (event.getLanguage() != null)
 			this.setTitle(String.format("%s - v%s", event.getLanguage().getID(), App.VERSION));
+	}
+	
+	@Handler
+	public void updateTheme(ColorThemeUpdateEvent event) {
+		if(event.getTheme()!=null) {
+			this.getContentPane().setBackground(event.getTheme().getBackground());
+		}
 	}
 
 }

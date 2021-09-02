@@ -52,12 +52,12 @@ public class StringChatCommandsMod extends ATPXMod {
 		cmds = new ArrayList<SimpleCmd>();
 
 		mainPanel = new JPanel(new BorderLayout());
-		mainPanel.setBackground(Constants.TWITCH_COLOR);
+		mainPanel.setBackground(Constants.TWITCH_THEME.getBackground());
 
 		JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		titlePanel.setOpaque(false);
 		JLabel title = new JLabel("Set Cmds for Chat");
-		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		title.setForeground(Constants.TWITCH_THEME.getFont());
 		titlePanel.add(title);
 		mainPanel.add(titlePanel, BorderLayout.NORTH);
 
@@ -125,7 +125,7 @@ public class StringChatCommandsMod extends ATPXMod {
 		modContent.setOpaque(false);
 
 		JLabel selectLabel = new JLabel("Select:");
-		selectLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		selectLabel.setForeground(Constants.TWITCH_THEME.getFont());
 		modContent.add(selectLabel);
 		options = new JComboBox<SimpleCmd>();
 		options.addItem(new SimpleCmd(null, null));
@@ -158,7 +158,7 @@ public class StringChatCommandsMod extends ATPXMod {
 		modContent.add(options);
 
 		JLabel cmdLabel = new JLabel("Cmd:");
-		cmdLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		cmdLabel.setForeground(Constants.TWITCH_THEME.getFont());
 		modContent.add(cmdLabel);
 		FlowLayout tmp = new FlowLayout(FlowLayout.LEADING);
 		tmp.setHgap(0);
@@ -171,7 +171,7 @@ public class StringChatCommandsMod extends ATPXMod {
 		modContent.add(cmdPanel);
 
 		JLabel respLabel = new JLabel("Text:");
-		respLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		respLabel.setForeground(Constants.TWITCH_THEME.getFont());
 		modContent.add(respLabel);
 
 		resp = new JTextArea();

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.TwitchSessionUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.YoutubeSessionUpdateEvent;
@@ -51,9 +52,13 @@ public class MainLoginPanel extends JPanel {
 
 	private JButton clearYoutube;
 
+	private JLabel twitchTitle;
+
+	private JLabel youtubeTitle;
+
 	private MainLoginPanel() {
 		this.setLayout(new BorderLayout());
-		this.setBackground(Constants.TWITCH_COLOR);
+		this.setBackground(DataManager.getTheme().getBackground());
 
 		JPanel menu = new JPanel(new GridLayout(0, 2));
 		menu.setOpaque(false);
@@ -89,7 +94,7 @@ public class MainLoginPanel extends JPanel {
 		if (!isTwitchSet.get() && !isYoutubeSet.get())
 			start.setEnabled(false);
 		this.add(start, BorderLayout.SOUTH);
-
+		EventManager.registerEventListener(this);
 	}
 
 	private void refresh() {
@@ -107,14 +112,14 @@ public class MainLoginPanel extends JPanel {
 	private JPanel getTwitchPanel() {
 		JPanel twitch = new JPanel(new GridLayout(2, 0));
 		twitch.setOpaque(false);
-		JLabel title = new JLabel();
-		title.setHorizontalAlignment(JLabel.CENTER);
-		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		twitchTitle = new JLabel();
+		twitchTitle.setHorizontalAlignment(JLabel.CENTER);
+		twitchTitle.setForeground(DataManager.getTheme().getFont());
 		ImageIcon icon = new ImageIcon(Constants.TWITCH_LOGO_PATH);
 		icon.setImage(icon.getImage().getScaledInstance(ICON_WIDTH,
 				icon.getIconHeight() * ICON_WIDTH / icon.getIconWidth(), Image.SCALE_DEFAULT));
-		title.setIcon(icon);
-		twitch.add(title);
+		twitchTitle.setIcon(icon);
+		twitch.add(twitchTitle);
 		JPanel demo = new JPanel();
 		demo.setOpaque(false);
 		JPanel buttons = new JPanel(new BorderLayout());
@@ -149,14 +154,14 @@ public class MainLoginPanel extends JPanel {
 	private JPanel getYoutubePanel() {
 		JPanel youtube = new JPanel(new GridLayout(2, 0));
 		youtube.setOpaque(false);
-		JLabel title = new JLabel();
-		title.setHorizontalAlignment(JLabel.CENTER);
-		title.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		youtubeTitle = new JLabel();
+		youtubeTitle.setHorizontalAlignment(JLabel.CENTER);
+		youtubeTitle.setForeground(DataManager.getTheme().getFont());
 		ImageIcon icon = new ImageIcon(Constants.YOUTUBE_LOGO_PATH);
 		icon.setImage(icon.getImage().getScaledInstance(ICON_WIDTH,
 				icon.getIconHeight() * ICON_WIDTH / icon.getIconWidth(), Image.SCALE_DEFAULT));
-		title.setIcon(icon);
-		youtube.add(title);
+		youtubeTitle.setIcon(icon);
+		youtube.add(youtubeTitle);
 		JPanel demo = new JPanel();
 		demo.setOpaque(false);
 		JPanel buttons = new JPanel(new BorderLayout());
@@ -236,4 +241,13 @@ public class MainLoginPanel extends JPanel {
 		clearYoutube.setText(session.getMainLogin().getClear());
 	}
 
+	@Handler
+	public void updateTheme(ColorThemeUpdateEvent event) {
+		if(event.getTheme()!=null) {
+			this.setBackground(event.getTheme().getBackground());
+			twitchTitle.setForeground(event.getTheme().getFont());
+			youtubeTitle.setForeground(event.getTheme().getFont());
+		}
+	}
+	
 }

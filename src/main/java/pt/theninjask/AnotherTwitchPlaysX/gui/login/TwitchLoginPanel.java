@@ -14,7 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
@@ -58,13 +61,14 @@ public class TwitchLoginPanel extends JPanel{
 
 	private TwitchLoginPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", TwitchLoginPanel.class.getSimpleName()));
-		this.setBackground(Constants.TWITCH_COLOR);
+		this.setBackground(DataManager.getTheme().getBackground());
 		this.setLayout(new GridLayout(4, 1));
 		this.add(setupNickSlot());
 		this.add(setupChannelSlot());
 		this.add(setupOAuthSlot());
 		this.add(setupStartAppSlot());
 		// DataManager.registerLangEvent(this);
+		EventManager.registerEventListener(this);
 	}
 
 	public void refresh() {
@@ -88,7 +92,7 @@ public class TwitchLoginPanel extends JPanel{
 		nickLabel.setOpaque(false);
 		nickLabel.setToolTipText(DataManager.getLanguage().getLogin().getTwitchFieldTip());
 		nickLabel.setFocusable(false);
-		nickLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		nickLabel.setForeground(DataManager.getTheme().getFont());
 		return nickLabel;
 	}
 
@@ -115,7 +119,7 @@ public class TwitchLoginPanel extends JPanel{
 		channelLabel.setOpaque(false);
 		channelLabel.setFocusable(false);
 		channelLabel.setToolTipText(DataManager.getLanguage().getLogin().getChannelFieldTip());
-		channelLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		channelLabel.setForeground(DataManager.getTheme().getFont());
 		return channelLabel;
 	}
 
@@ -136,7 +140,7 @@ public class TwitchLoginPanel extends JPanel{
 		oauthCheckBox = new JCheckBox(DataManager.getLanguage().getLogin().getShowToken());
 		oauthCheckBox.setFocusable(false);
 		oauthCheckBox.setOpaque(false);
-		oauthCheckBox.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		oauthCheckBox.setForeground(DataManager.getTheme().getFont());
 		oauthCheckBox.addActionListener(l -> {
 			if (oauthCheckBox.isSelected()) {
 				oauth.setEchoChar((char) 0);
@@ -157,7 +161,7 @@ public class TwitchLoginPanel extends JPanel{
 		oauthLabel.setOpaque(false);
 		oauthLabel.setFocusable(false);
 		oauthLabel.setToolTipText(DataManager.getLanguage().getLogin().getOAuthFieldTip());
-		oauthLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		oauthLabel.setForeground(DataManager.getTheme().getFont());
 		return oauthLabel;
 	}
 
@@ -200,20 +204,20 @@ public class TwitchLoginPanel extends JPanel{
 		goToMainMenu.addActionListener(e -> {
 			if (nickname.getText().isBlank()) {
 				JLabel msg = new JLabel(DataManager.getLanguage().getLogin().getMissingUsernameMsg());
-				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				msg.setForeground(DataManager.getTheme().getFont());
 				Constants.showCustomColorMessageDialog(null, msg,
 						DataManager.getLanguage().getLogin().getMissingUsernameTitle(), JOptionPane.WARNING_MESSAGE,
-						null, Constants.TWITCH_COLOR);
+						null, DataManager.getTheme().getBackground());
 				return;
 			}
 			if (!(oauth.getPassword().length > 0)) {
 				String[] options = { DataManager.getLanguage().getOkOpt(),
 						DataManager.getLanguage().getLogin().getMissingOAuthGet() };
 				JLabel msg = new JLabel(DataManager.getLanguage().getLogin().getMissingOAuthMsg());
-				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				msg.setForeground(DataManager.getTheme().getFont());
 				switch (Constants.showCustomColorOptionDialog(null, msg,
 						DataManager.getLanguage().getLogin().getMissingOAuthTitle(), JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, null, Constants.TWITCH_COLOR)) {
+						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().getBackground())) {
 				case JOptionPane.NO_OPTION:
 					Constants.openWebsite(Constants.TWITCH_CHAT_OAUTH);
 					break;
@@ -239,7 +243,7 @@ public class TwitchLoginPanel extends JPanel{
 		rememberSession = new JCheckBox();
 		rememberSession.setOpaque(false);
 		rememberSession.setText(DataManager.getLanguage().getLogin().getRememberSession());
-		rememberSession.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		rememberSession.setForeground(DataManager.getTheme().getFont());
 		return rememberSession;
 	}
 
@@ -297,4 +301,16 @@ public class TwitchLoginPanel extends JPanel{
 		back.setText(DataManager.getLanguage().getLogin().getGoBack());
 	}
 
+	@Handler
+	public void updateTheme(ColorThemeUpdateEvent event) {
+		if(event.getTheme()!=null) {
+			this.setBackground(event.getTheme().getBackground());
+			nickLabel.setForeground(event.getTheme().getFont());
+			channelLabel.setForeground(event.getTheme().getFont());
+			oauthCheckBox.setForeground(event.getTheme().getFont());
+			oauthLabel.setForeground(event.getTheme().getFont());
+			rememberSession.setForeground(event.getTheme().getFont());
+		}
+	}
+	
 }

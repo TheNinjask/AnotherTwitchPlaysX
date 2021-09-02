@@ -31,11 +31,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
 
+import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandType;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandVarType;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlType;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.ControlDataPanel.Type;
@@ -46,12 +49,12 @@ import pt.theninjask.AnotherTwitchPlaysX.util.JComboItem;
 import pt.theninjask.AnotherTwitchPlaysX.util.MouseCoords;
 import pt.theninjask.AnotherTwitchPlaysX.util.Pair;
 
-public class CommandPanel extends JPanel{
+public class CommandPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private static String varAdd = DataManager.getLanguage().getCommand().getVarAdd();
-	
+
 	private CommandData saved;
 
 	private CommandData current;
@@ -110,15 +113,15 @@ public class CommandPanel extends JPanel{
 	public CommandPanel(CommandData data) {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s(%s)", CommandPanel.class.getSimpleName(), this.hashCode()));
-		if(data == null) {
+		if (data == null) {
 			this.current = new CommandData();
 			this.saved = null;
-		}else {
+		} else {
 			this.current = data.clone();
-			this.saved = data;			
+			this.saved = data;
 		}
 		controls = new ArrayList<ControlDataPanel>();
-		this.setBackground(Constants.TWITCH_COLOR);
+		this.setBackground(DataManager.getTheme().getBackground());
 		this.setLayout(new GridLayout(2, 1));
 		JPanel tmp = new JPanel(new BorderLayout());
 		tmp.setOpaque(false);
@@ -126,7 +129,8 @@ public class CommandPanel extends JPanel{
 		tmp.add(buttonMenu(), BorderLayout.EAST);
 		this.add(tmp);
 		this.add(controlScroll());
-		//DataManager.registerLangEvent(this);
+		// DataManager.registerLangEvent(this);
+		EventManager.registerEventListener(this);
 	}
 
 	private JPanel buildPanelString() {
@@ -144,7 +148,7 @@ public class CommandPanel extends JPanel{
 		JPanel leadPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		leadPanel.setOpaque(false);
 		leadLabel = new JLabel(DataManager.getLanguage().getCommand().getLead());
-		leadLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		leadLabel.setForeground(DataManager.getTheme().getFont());
 		leadPanel.add(leadLabel);
 		lead = new JTextField("");
 		if (current.getLead() != null)
@@ -168,7 +172,7 @@ public class CommandPanel extends JPanel{
 		JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		cooldownPanel.setOpaque(false);
 		cooldownLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdCooldown());
-		cooldownLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		cooldownLabel.setForeground(DataManager.getTheme().getFont());
 		cooldownPanel.add(cooldownLabel);
 		cooldown = new JFormattedTextField(cooldownFormatter);
 		if (current.getCooldown() != null)
@@ -233,7 +237,7 @@ public class CommandPanel extends JPanel{
 		JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		typePanel.setOpaque(false);
 		typeLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdType());
-		typeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		typeLabel.setForeground(DataManager.getTheme().getFont());
 		typePanel.add(typeLabel);
 		type = new JComboBox<CommandType>(CommandType.getAll());
 		type.setSelectedItem(current.getType());
@@ -247,7 +251,7 @@ public class CommandPanel extends JPanel{
 		JPanel varsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		varsPanel.setOpaque(false);
 		varsLabel = new JLabel(DataManager.getLanguage().getCommand().getVars());
-		varsLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		varsLabel.setForeground(DataManager.getTheme().getFont());
 		varsPanel.add(varsLabel);
 
 		// TODO?
@@ -269,7 +273,7 @@ public class CommandPanel extends JPanel{
 		varsRemove.setFocusable(false);
 		AtomicBoolean disableVars = new AtomicBoolean(false);
 		varsRemove.addActionListener(l -> {
-			if(varAdd.equals(vars.getItemAt(vars.getSelectedIndex()).toString()))
+			if (varAdd.equals(vars.getItemAt(vars.getSelectedIndex()).toString()))
 				return;
 			disableVars.set(true);
 			varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getLeft());
@@ -282,23 +286,17 @@ public class CommandPanel extends JPanel{
 			vars.removeItemAt(vars.getSelectedIndex());
 			vars.setSelectedItem(null);
 			disableVars.set(false);
-			/*switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
-			default:
-				disableVars.set(true);
-				varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getLeft());
-				current.getVars().remove(vars.getItemAt(vars.getSelectedIndex()).get());
-				varsRemove.setVisible(false);
-				varsRemove.setEnabled(false);
-				controls.forEach(c -> {
-					c.removeVar(vars.getItemAt(vars.getSelectedIndex()).get());
-				});
-				vars.removeItemAt(vars.getSelectedIndex());
-				vars.setSelectedItem(null);
-				disableVars.set(false);
-				break;
-			case "ADD":
-				break;
-			}*/
+			/*
+			 * switch (vars.getItemAt(vars.getSelectedIndex()).toString()) { default:
+			 * disableVars.set(true);
+			 * varsBag.add(vars.getItemAt(vars.getSelectedIndex()).get().getLeft());
+			 * current.getVars().remove(vars.getItemAt(vars.getSelectedIndex()).get());
+			 * varsRemove.setVisible(false); varsRemove.setEnabled(false);
+			 * controls.forEach(c -> {
+			 * c.removeVar(vars.getItemAt(vars.getSelectedIndex()).get()); });
+			 * vars.removeItemAt(vars.getSelectedIndex()); vars.setSelectedItem(null);
+			 * disableVars.set(false); break; case "ADD": break; }
+			 */
 		});
 
 		vars.addActionListener(l -> {
@@ -306,14 +304,14 @@ public class CommandPanel extends JPanel{
 				return;
 			if (disableVars.get())
 				return;
-			if(varAdd.equals(vars.getItemAt(vars.getSelectedIndex()).toString())) {
+			if (varAdd.equals(vars.getItemAt(vars.getSelectedIndex()).toString())) {
 				Optional<String> var = varsBag.stream().findAny();
 				if (!var.isPresent()) {
 					JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarAddWarnMsg());
-					msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+					msg.setForeground(DataManager.getTheme().getFont());
 					Constants.showCustomColorMessageDialog(null, msg,
 							DataManager.getLanguage().getCommand().getVarAddWarnTitle(), JOptionPane.WARNING_MESSAGE,
-							null, Constants.TWITCH_COLOR);
+							null, DataManager.getTheme().getBackground());
 					vars.setSelectedItem(null);
 					varsRemove.setVisible(false);
 					varsRemove.setEnabled(false);
@@ -321,12 +319,12 @@ public class CommandPanel extends JPanel{
 				}
 
 				JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarType());
-				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				msg.setForeground(DataManager.getTheme().getFont());
 				String[] opt = { DataManager.getLanguage().getCommand().getVarDigit(),
 						DataManager.getLanguage().getCommand().getVarString() };
 				int resp = Constants.showCustomColorOptionDialog(null, msg,
 						DataManager.getLanguage().getCommand().getVarTitle(), JOptionPane.YES_NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE, null, opt, null, Constants.TWITCH_COLOR);
+						JOptionPane.QUESTION_MESSAGE, null, opt, null, DataManager.getTheme().getBackground());
 				CommandVarType type;
 				switch (resp) {
 				case JOptionPane.YES_OPTION:
@@ -353,56 +351,36 @@ public class CommandPanel extends JPanel{
 			}
 			varsRemove.setVisible(true);
 			varsRemove.setEnabled(true);
-			/*switch (vars.getItemAt(vars.getSelectedIndex()).toString()) {
-			case "ADD":
-				Optional<String> var = varsBag.stream().findAny();
-				if (!var.isPresent()) {
-					JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarAddWarnMsg());
-					msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-					Constants.showCustomColorMessageDialog(null, msg,
-							DataManager.getLanguage().getCommand().getVarAddWarnTitle(), JOptionPane.WARNING_MESSAGE,
-							null, Constants.TWITCH_COLOR);
-					vars.setSelectedItem(null);
-					varsRemove.setVisible(false);
-					varsRemove.setEnabled(false);
-					break;
-				}
-
-				JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarType());
-				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
-				String[] opt = { DataManager.getLanguage().getCommand().getVarDigit(),
-						DataManager.getLanguage().getCommand().getVarString() };
-				int resp = Constants.showCustomColorOptionDialog(null, msg,
-						DataManager.getLanguage().getCommand().getVarTitle(), JOptionPane.YES_NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE, null, opt, null, Constants.TWITCH_COLOR);
-				CommandVarType type;
-				switch (resp) {
-				case JOptionPane.YES_OPTION:
-					type = CommandVarType.DIGIT;
-					break;
-				case JOptionPane.NO_OPTION:
-					type = CommandVarType.STRING;
-					break;
-				case JOptionPane.CLOSED_OPTION:
-				default:
-					return;
-				}
-				Pair<String, CommandVarType> tmp = new Pair<String, CommandVarType>(var.get(), type);
-				vars.addItem(new JComboItem<Pair<String, CommandVarType>>(tmp, tmp.getLeft()));
-				vars.setSelectedIndex(vars.getItemCount() - 1);
-				varsBag.remove(var.get());
-				current.getVars().add(tmp);
-				controls.forEach(c -> {
-					c.addVar(tmp);
-				});
-				varsRemove.setVisible(true);
-				varsRemove.setEnabled(true);
-				break;
-			default:
-				varsRemove.setVisible(true);
-				varsRemove.setEnabled(true);
-				break;
-			}*/
+			/*
+			 * switch (vars.getItemAt(vars.getSelectedIndex()).toString()) { case "ADD":
+			 * Optional<String> var = varsBag.stream().findAny(); if (!var.isPresent()) {
+			 * JLabel msg = new
+			 * JLabel(DataManager.getLanguage().getCommand().getVarAddWarnMsg());
+			 * msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			 * Constants.showCustomColorMessageDialog(null, msg,
+			 * DataManager.getLanguage().getCommand().getVarAddWarnTitle(),
+			 * JOptionPane.WARNING_MESSAGE, null, Constants.TWITCH_COLOR);
+			 * vars.setSelectedItem(null); varsRemove.setVisible(false);
+			 * varsRemove.setEnabled(false); break; }
+			 * 
+			 * JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarType());
+			 * msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT); String[] opt = {
+			 * DataManager.getLanguage().getCommand().getVarDigit(),
+			 * DataManager.getLanguage().getCommand().getVarString() }; int resp =
+			 * Constants.showCustomColorOptionDialog(null, msg,
+			 * DataManager.getLanguage().getCommand().getVarTitle(),
+			 * JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, opt, null,
+			 * Constants.TWITCH_COLOR); CommandVarType type; switch (resp) { case
+			 * JOptionPane.YES_OPTION: type = CommandVarType.DIGIT; break; case
+			 * JOptionPane.NO_OPTION: type = CommandVarType.STRING; break; case
+			 * JOptionPane.CLOSED_OPTION: default: return; } Pair<String, CommandVarType>
+			 * tmp = new Pair<String, CommandVarType>(var.get(), type); vars.addItem(new
+			 * JComboItem<Pair<String, CommandVarType>>(tmp, tmp.getLeft()));
+			 * vars.setSelectedIndex(vars.getItemCount() - 1); varsBag.remove(var.get());
+			 * current.getVars().add(tmp); controls.forEach(c -> { c.addVar(tmp); });
+			 * varsRemove.setVisible(true); varsRemove.setEnabled(true); break; default:
+			 * varsRemove.setVisible(true); varsRemove.setEnabled(true); break; }
+			 */
 		});
 		// vars.setEnabled(false);
 		varsPanel.add(vars);
@@ -412,7 +390,7 @@ public class CommandPanel extends JPanel{
 		JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		modePanel.setOpaque(false);
 		modeLabel = new JLabel(DataManager.getLanguage().getCommand().getViewMode());
-		modeLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		modeLabel.setForeground(DataManager.getTheme().getFont());
 		modePanel.add(modeLabel);
 		mode = new JButton("Normal");
 		mode.setMargin(new Insets(0, 0, 0, 0));
@@ -451,14 +429,13 @@ public class CommandPanel extends JPanel{
 			if (saved == null || !saved.equals(current)) {
 				JTextArea msg = new JTextArea();
 				msg.setText(DataManager.getLanguage().getCommand().getNotSavedMsg());
-				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				msg.setForeground(DataManager.getTheme().getFont());
 				msg.setFocusable(false);
 				msg.setOpaque(false);
-				String[] options = { DataManager.getLanguage().getOkOpt(),
-						DataManager.getLanguage().getGoBackOpt() };
+				String[] options = { DataManager.getLanguage().getOkOpt(), DataManager.getLanguage().getGoBackOpt() };
 				int resp = Constants.showCustomColorOptionDialog(null, msg,
 						DataManager.getLanguage().getCommand().getNotSavedTitle(), JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, null, Constants.TWITCH_COLOR);
+						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().getBackground());
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -469,7 +446,7 @@ public class CommandPanel extends JPanel{
 				}
 			}
 			MouseCoords.getInstance().clearListeners();
-			//DataManager.unregisterLangEvent(this);
+			// DataManager.unregisterLangEvent(this);
 			MainFrame.replacePanel(AllCommandPanel.getInstance());
 		});
 		bMenu.add(back);
@@ -483,15 +460,15 @@ public class CommandPanel extends JPanel{
 				tmp.setOpaque(false);
 				JLabel syntaxLabel = new JLabel(
 						String.format(DataManager.getLanguage().getCommand().getSyntaxFull(), current.getRegex()));
-				syntaxLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				syntaxLabel.setForeground(DataManager.getTheme().getFont());
 				tmp.add(syntaxLabel);
 				JLabel egLabel = new JLabel(String.format(DataManager.getLanguage().getCommand().getSyntaxDemo(),
 						current.getRegexExample()));
-				egLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				egLabel.setForeground(DataManager.getTheme().getFont());
 				tmp.add(egLabel);
 				Constants.showCustomColorMessageDialog(null, tmp,
 						DataManager.getLanguage().getCommand().getSyntaxTitle(), JOptionPane.PLAIN_MESSAGE, null,
-						Constants.TWITCH_COLOR);
+						DataManager.getTheme().getBackground());
 			} catch (Exception e) {
 				Constants.showExpectedExceptionDialog(e);
 			}
@@ -650,14 +627,14 @@ public class CommandPanel extends JPanel{
 			msg.setText(DataManager.getLanguage().getCommand().getAddChooseControlType());
 			msg.setOpaque(false);
 			msg.setFocusable(false);
-			msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			msg.setForeground(DataManager.getTheme().getFont());
 			String[] options = { DataManager.getLanguage().getCommand().getAddKeyboard(),
 					DataManager.getLanguage().getCommand().getAddMouseClick(),
 					DataManager.getLanguage().getCommand().getAddMouseDrag() };
 			int resp = Constants.showCustomColorOptionDialog(null, msg,
 					DataManager.getLanguage().getCommand().getAddChooseControlTypeTitle(),
 					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, null,
-					Constants.TWITCH_COLOR);
+					DataManager.getTheme().getBackground());
 			ControlData cData = new ControlData();
 			switch (resp) {
 			case JOptionPane.NO_OPTION:
@@ -755,12 +732,12 @@ public class CommandPanel extends JPanel{
 		return add;
 	}
 
-	//@Handler
+	// @Handler
 	public void updateLang(LanguageUpdateEvent event) {
 		Lang session = event.getLanguage();
-		if(session == null)
+		if (session == null)
 			return;
-		
+
 		varAdd = session.getCommand().getVarAdd();
 		leadLabel.setText(session.getCommand().getLead());
 		cooldownLabel.setText(session.getCommand().getCmdCooldown());
@@ -776,6 +753,18 @@ public class CommandPanel extends JPanel{
 		for (ControlDataPanel elem : controls) {
 			elem.updateLang(event);
 		}
-		
+
+	}
+
+	@Handler
+	public void updateTheme(ColorThemeUpdateEvent event) {
+		if (event.getTheme() != null) {
+			this.setBackground(event.getTheme().getBackground());
+			leadLabel.setForeground(event.getTheme().getFont());
+			cooldownLabel.setForeground(event.getTheme().getFont());
+			typeLabel.setForeground(event.getTheme().getFont());
+			varsLabel.setForeground(event.getTheme().getFont());
+			modeLabel.setForeground(event.getTheme().getFont());
+		}
 	}
 }

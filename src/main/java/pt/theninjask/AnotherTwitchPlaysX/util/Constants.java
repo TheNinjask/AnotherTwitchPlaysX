@@ -123,13 +123,20 @@ public final class Constants {
 	public static final Dimension X_BUTTON = new Dimension(23, 23);
 
 	// MAYBE RECOMENDED
-	public static final Color TWITCH_COLOR = new Color(123, 50, 250);
+	//public static final Color TWITCH_COLOR = new Color(123, 50, 250);
 
-	public static final Color TWITCH_COLOR_COMPLEMENT = new Color(0xe5e5e5);
+	//public static final Color TWITCH_COLOR_COMPLEMENT = new Color(0xe5e5e5);
+
+	public static final ColorTheme TWITCH_THEME = new ColorTheme("Twitch", new Color(0xe5e5e5),
+			new Color(123, 50, 250));
+
+	public static final ColorTheme NIGHT_THEME = new ColorTheme("Night", Color.WHITE, Color.BLACK);
+
+	public static final ColorTheme DAY_THEME = new ColorTheme("Day", Color.BLACK, Color.WHITE);
 
 	// JUST FOR ME :) BUT NOT RECOMENDED
-	@Deprecated
-	public static final Color BLUE_COLOR = new Color(0x123456);
+	//@Deprecated
+	//public static final Color BLUE_COLOR = new Color(0x123456);
 
 	public static int stopKey = NativeKeyEvent.VC_ESCAPE;
 
@@ -279,20 +286,20 @@ public final class Constants {
 				break;
 			case THIRD_PARTY:
 				JTextArea msg = new JTextArea(DataManager.getLanguage().getConstants().getModInfo());
-				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
+				msg.setForeground(DataManager.getTheme().getFont());
 				msg.setOpaque(false);
 				showCustomColorMessageDialog(null, msg,
 						String.format(DataManager.getLanguage().getConstants().getModInfoTitle(), modFile.getName()),
-						JOptionPane.INFORMATION_MESSAGE, null, TWITCH_COLOR);
+						JOptionPane.INFORMATION_MESSAGE, null, DataManager.getTheme().getBackground());
 				break;
 			case UNKNOWN:
 			default:
 				msg = new JTextArea(DataManager.getLanguage().getConstants().getModWarn());
-				msg.setForeground(TWITCH_COLOR_COMPLEMENT);
+				msg.setForeground(DataManager.getTheme().getFont());
 				msg.setOpaque(false);
 				int resp = showCustomColorOptionDialog(null, msg,
 						String.format(DataManager.getLanguage().getConstants().getModWarnTitle(), modFile.getName()),
-						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null, TWITCH_COLOR);
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null, DataManager.getTheme().getBackground());
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -500,11 +507,11 @@ public final class Constants {
 		JTextArea message = new JTextArea(msg);
 		message.setOpaque(false);
 		message.setEditable(false);
-		message.setForeground(TWITCH_COLOR_COMPLEMENT);
+		message.setForeground(DataManager.getTheme().getFont());
 		Object paneBG = UIManager.get("OptionPane.background");
 		Object panelBG = UIManager.get("Panel.background");
-		UIManager.put("OptionPane.background", TWITCH_COLOR);
-		UIManager.put("Panel.background", TWITCH_COLOR);
+		UIManager.put("OptionPane.background", DataManager.getTheme().getBackground());
+		UIManager.put("Panel.background", DataManager.getTheme().getBackground());
 		JOptionPane.showMessageDialog(null, message, title.length > 0 ? title[0] : "", JOptionPane.PLAIN_MESSAGE, null);
 		UIManager.put("OptionPane.background", paneBG);
 		UIManager.put("Panel.background", panelBG);
@@ -524,11 +531,11 @@ public final class Constants {
 		JTextArea exception = new JTextArea(e.getMessage());
 		exception.setOpaque(false);
 		exception.setEditable(false);
-		exception.setForeground(TWITCH_COLOR_COMPLEMENT);
+		exception.setForeground(DataManager.getTheme().getFont());
 		Object paneBG = UIManager.get("OptionPane.background");
 		Object panelBG = UIManager.get("Panel.background");
-		UIManager.put("OptionPane.background", TWITCH_COLOR);
-		UIManager.put("Panel.background", TWITCH_COLOR);
+		UIManager.put("OptionPane.background", DataManager.getTheme().getBackground());
+		UIManager.put("Panel.background", DataManager.getTheme().getBackground());
 		JOptionPane.showMessageDialog(null, exception, e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE, null);
 		UIManager.put("OptionPane.background", paneBG);
 		UIManager.put("Panel.background", panelBG);
@@ -625,6 +632,7 @@ public final class Constants {
 
 			// message.setEditorKit(new WrapEditorKit());
 			message.setEditable(false);
+			message.setBorder(null);
 			scroll.setViewportView(message);
 			scroll.setFocusable(false);
 			scroll.setEnabled(false);
@@ -634,7 +642,7 @@ public final class Constants {
 			scroll.getViewport().setOpaque(false);
 
 			message.setOpaque(false);
-			message.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+			message.setForeground(DataManager.getTheme().getFont());
 
 			scroll.setPreferredSize(new Dimension(151, 151));
 			content.add(scroll, BorderLayout.CENTER);
@@ -654,6 +662,17 @@ public final class Constants {
 			readme.content = renderer.render(node);
 
 			message.setContentType(MediaType.TEXT_HTML);
+
+			// Change to colours
+			ColorTheme theme = ExternalConsole.getTheme();
+			StringBuilder newReadmeContent = new StringBuilder(String.format(
+					"<body style=\"background-color:rgb(%s,%s,%s);color:rgb(%s,%s,%s);\">\n",
+					theme.getBackground().getRed(), theme.getBackground().getGreen(), theme.getBackground().getBlue(),
+					theme.getFont().getRed(), theme.getFont().getGreen(), theme.getFont().getBlue()));
+
+			newReadmeContent.append(readme.content);
+			newReadmeContent.append("\n</body>");
+			readme.content = newReadmeContent.toString();
 
 			// Fixes to local links
 			Pattern pattern = Pattern.compile("\"./(.*)\"");
@@ -700,7 +719,7 @@ public final class Constants {
 					}
 				}
 			});
-			content.setBackground(Constants.TWITCH_COLOR);
+			content.setBackground(DataManager.getTheme().getBackground());
 
 			readmeFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			message.setCaretPosition(0);

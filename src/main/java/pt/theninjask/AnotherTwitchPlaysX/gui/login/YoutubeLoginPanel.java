@@ -22,7 +22,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
@@ -58,11 +61,12 @@ public class YoutubeLoginPanel extends JPanel {
 
 	private YoutubeLoginPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", YoutubeLoginPanel.class.getSimpleName()));
-		this.setBackground(Constants.TWITCH_COLOR);
+		this.setBackground(DataManager.getTheme().getBackground());
 		this.setLayout(new GridLayout(3, 1));
 		this.add(setupSecretSlot());
 		this.add(setupVideoSlot());
 		this.add(setupStartAppSlot());
+		EventManager.registerEventListener(this);
 	}
 
 	public static YoutubeLoginPanel getInstance() {
@@ -96,7 +100,7 @@ public class YoutubeLoginPanel extends JPanel {
 		secretLabel.setOpaque(false);
 		secretLabel.setFocusable(false);
 		// secretLabel.setToolTipText("");
-		secretLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		secretLabel.setForeground(DataManager.getTheme().getFont());
 		return secretLabel;
 	}
 
@@ -173,7 +177,7 @@ public class YoutubeLoginPanel extends JPanel {
 		videoLabel.setOpaque(false);
 		videoLabel.setFocusable(false);
 		//videoLabel.setToolTipText("");
-		videoLabel.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		videoLabel.setForeground(DataManager.getTheme().getFont());
 		return videoLabel;
 	}
 
@@ -210,10 +214,10 @@ public class YoutubeLoginPanel extends JPanel {
 				String[] options = { DataManager.getLanguage().getOkOpt(),
 						DataManager.getLanguage().getLogin().getMissingSecretGet() };
 				JLabel msg = new JLabel(DataManager.getLanguage().getLogin().getMissingSecretMsg());
-				msg.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+				msg.setForeground(DataManager.getTheme().getFont());
 				switch (Constants.showCustomColorOptionDialog(null, msg,
 						DataManager.getLanguage().getLogin().getMissingSecretTitle(), JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, null, Constants.TWITCH_COLOR)) {
+						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().getBackground())) {
 				case JOptionPane.NO_OPTION:
 					Constants.openWebsite(Constants.YOUTUBE_CHAT_SECRET);
 					break;
@@ -234,7 +238,7 @@ public class YoutubeLoginPanel extends JPanel {
 		rememberSession = new JCheckBox();
 		rememberSession.setOpaque(false);
 		rememberSession.setText(DataManager.getLanguage().getLogin().getRememberSession());
-		rememberSession.setForeground(Constants.TWITCH_COLOR_COMPLEMENT);
+		rememberSession.setForeground(DataManager.getTheme().getFont());
 		return rememberSession;
 	}
 
@@ -288,6 +292,16 @@ public class YoutubeLoginPanel extends JPanel {
 		rememberSession.setText(event.getLanguage().getLogin().getRememberSession());
 		
 		back.setText(event.getLanguage().getLogin().getGoBack());
+	}
+	
+	@Handler
+	public void updateTheme(ColorThemeUpdateEvent event) {
+		if(event.getTheme()!=null) {
+			this.setBackground(event.getTheme().getBackground());
+			secretLabel.setForeground(event.getTheme().getFont());
+			videoLabel.setForeground(event.getTheme().getFont());
+			rememberSession.setForeground(event.getTheme().getFont());
+		}
 	}
 
 }

@@ -10,7 +10,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.ColorThemeUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.gui.util.ClosePopOutFrameEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.gui.util.OpenPopOutFrameEvent;
@@ -38,7 +40,7 @@ public class PopOutFrame extends JFrame{
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
-		this.setBackground(Constants.TWITCH_COLOR);
+		this.setBackground(DataManager.getTheme().getBackground());
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		comp.requestFocusInWindow();
@@ -52,6 +54,7 @@ public class PopOutFrame extends JFrame{
 				//EventManager.unregisterEventListener(tmp);
 			}
 		});
+		EventManager.registerEventListener(this);
 	}
 	
 	public PopOutFrame(JComponent comp, JFrame parentInc) {
@@ -70,7 +73,7 @@ public class PopOutFrame extends JFrame{
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
-		this.setBackground(Constants.TWITCH_COLOR);
+		this.setBackground(DataManager.getTheme().getBackground());
 		//DataManager.registerLangEvent(this);
 		PopOutFrame tmp = this;
 		this.addWindowListener(new WindowAdapter() {
@@ -86,7 +89,7 @@ public class PopOutFrame extends JFrame{
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		comp.requestFocusInWindow();
-		this.setVisible(true);
+		EventManager.registerEventListener(this);
 	}
 	
 	public JFrame getParent() {
@@ -98,6 +101,12 @@ public class PopOutFrame extends JFrame{
 	public void updateLang(LanguageUpdateEvent event) {
 		if(event.getLanguage()!=null)
 			this.setTitle(event.getLanguage().getTitle());
+	}
+	
+	@Handler
+	public void updateTheme(ColorThemeUpdateEvent event) {
+		if(event.getTheme()!=null)
+			this.setBackground(event.getTheme().getBackground());
 	}
 	
 }
