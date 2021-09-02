@@ -10,19 +10,18 @@ public interface ExternalConsoleCommand {
 		return "N/A";
 	}
 
-	/**
-	 * 
-	 * @param args
-	 * @return true if success else false
-	 */
 	public boolean executeCommand(String[] args);
 
 	/**
 	 * 
-	 * @param number - options of parameter in number
+	 */
+	/**
+	 * 
+	 * @param number   - options of parameter in number
+	 * @param currArgs - current arguments of command
 	 * @return null if nothing to provide else all available options
 	 */
-	public default String[] getParamOptions(int number) {
+	public default String[] getParamOptions(int number, String[] currArgs) {
 		return null;
 	}
 

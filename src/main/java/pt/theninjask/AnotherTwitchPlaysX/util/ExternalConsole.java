@@ -153,7 +153,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--auto", "--manual" };
@@ -210,7 +210,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--none", "--verbose", "--warning" };
@@ -263,7 +263,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--true", "--false" };
@@ -317,7 +317,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--true", "--false" };
@@ -370,7 +370,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--true", "--false" };
@@ -423,7 +423,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--true", "--false" };
@@ -575,10 +575,22 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--add", "--remove", "--clear", "--list" };
+			case 1:
+				switch(currArgs[0]) {
+					case "-r":
+					case "-remove":
+					case "--remove":
+					return ATPXModManager.getAllMods().stream().map(c->{
+						return c.getClass().getSimpleName();
+					}).toList().toArray(new String[0]);
+					default:
+						return null;
+				}
+				
 			default:
 				return null;
 			}
@@ -646,7 +658,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--true", "--false" };
@@ -710,7 +722,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--day", "--night", "--twitch" };
@@ -763,7 +775,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 		@Override
-		public String[] getParamOptions(int number) {
+		public String[] getParamOptions(int number, String[] currArgs) {
 			switch (number) {
 			case 0:
 				return new String[] { "--chatframe", "--externalconsole" };
@@ -1030,7 +1042,7 @@ public class ExternalConsole extends JFrame {
 		messagePanel = new JPanel(new BorderLayout());
 		input = new JTextField();
 		input.setBorder(null);
-
+		
 		input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		input.setForeground(Color.BLACK);
 		input.setCaretColor(Color.BLACK);
@@ -1066,7 +1078,12 @@ public class ExternalConsole extends JFrame {
 					if (ref == null) {
 						ref = args[args.length - 1];
 					}
-					if (args.length == 0 || cmd == null || cmd.getParamOptions(args.length - 2) == null) {
+					String[] currArgs;
+					if (args.length > 2)
+						currArgs = Arrays.copyOfRange(args, 1, args.length - 1);
+					else
+						currArgs = new String[] {};
+					if (args.length == 0 || cmd == null || cmd.getParamOptions(args.length - 2, currArgs) == null) {
 						List<ExternalConsoleCommand> options = cmds.values().stream()
 								.filter(c -> c.getCommand().startsWith(ref)).sorted(ExternalConsoleCommand.comparator)
 								.toList();
@@ -1079,7 +1096,7 @@ public class ExternalConsole extends JFrame {
 						args[args.length - 1] = options.get(tabPos).getCommand();
 						input.setText(String.join(" ", args));
 					} else {
-						String[] paramOptions = cmd.getParamOptions(args.length - 2);
+						String[] paramOptions = cmd.getParamOptions(args.length - 2, currArgs);
 						List<String> options = Stream.of(paramOptions).filter(c -> c.startsWith(ref)).toList();
 						if (next)
 							tabPos = tabPos + 1 >= options.size() ? 0 : tabPos + 1;
