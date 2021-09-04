@@ -70,6 +70,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
@@ -123,9 +124,9 @@ public final class Constants {
 	public static final Dimension X_BUTTON = new Dimension(23, 23);
 
 	// MAYBE RECOMENDED
-	//public static final Color TWITCH_COLOR = new Color(123, 50, 250);
+	// public static final Color TWITCH_COLOR = new Color(123, 50, 250);
 
-	//public static final Color TWITCH_COLOR_COMPLEMENT = new Color(0xe5e5e5);
+	// public static final Color TWITCH_COLOR_COMPLEMENT = new Color(0xe5e5e5);
 
 	public static final ColorTheme TWITCH_THEME = new ColorTheme("Twitch", new Color(0xe5e5e5),
 			new Color(123, 50, 250));
@@ -135,8 +136,8 @@ public final class Constants {
 	public static final ColorTheme DAY_THEME = new ColorTheme("Day", Color.BLACK, Color.WHITE);
 
 	// JUST FOR ME :) BUT NOT RECOMENDED
-	//@Deprecated
-	//public static final Color BLUE_COLOR = new Color(0x123456);
+	// @Deprecated
+	// public static final Color BLUE_COLOR = new Color(0x123456);
 
 	public static int stopKey = NativeKeyEvent.VC_ESCAPE;
 
@@ -155,6 +156,12 @@ public final class Constants {
 	public static final String REPO_OWNER = "TheNinjask";
 
 	public static final String LATEST_VERSION_URL = String.format("https://api.github.com/repos/%s/%s/releases/latest",
+			REPO_OWNER, REPO_NAME);
+
+	public static final String RELEASE_URL = String.format("https://api.github.com/repos/%s/%s/releases", REPO_OWNER,
+			REPO_NAME);
+
+	public static final String RELEASE_TAG_URL = String.format("https://api.github.com/repos/%s/%s/releases/tags",
 			REPO_OWNER, REPO_NAME);
 
 	public static final String README_URL = String.format("https://api.github.com/repos/%s/%s/readme", REPO_OWNER,
@@ -299,7 +306,8 @@ public final class Constants {
 				msg.setOpaque(false);
 				int resp = showCustomColorOptionDialog(null, msg,
 						String.format(DataManager.getLanguage().getConstants().getModWarnTitle(), modFile.getName()),
-						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null, DataManager.getTheme().getBackground());
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null,
+						DataManager.getTheme().getBackground());
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -572,7 +580,7 @@ public final class Constants {
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	@JsonInclude(Include.NON_NULL)
-	public static class GitHubLatestJson {
+	public static class GitHubReleaseJson {
 		public String html_url;
 		public String tag_name;
 		@JsonProperty("name")
@@ -588,10 +596,10 @@ public final class Constants {
 
 	}
 
-	public static GitHubLatestJson getLatestRelease() {
+	public static GitHubReleaseJson getLatestRelease() {
 		try {
 			Client client = ClientBuilder.newClient();
-			return client.target(LATEST_VERSION_URL).request(MediaType.APPLICATION_JSON).get(GitHubLatestJson.class);
+			return client.target(LATEST_VERSION_URL).request(MediaType.APPLICATION_JSON).get(GitHubReleaseJson.class);
 		} catch (WebApplicationException e) {
 			printVerboseMessage(Level.WARNING, e);
 			/*
@@ -607,6 +615,53 @@ public final class Constants {
 		} catch (Exception e) {
 			printVerboseMessage(Level.WARNING, e);
 			return null;
+		}
+	}
+
+	public static GitHubReleaseJson getRelease(String tag) {
+		try {
+			Client client = ClientBuilder.newClient();
+			return client.target(RELEASE_TAG_URL + "/" + tag).request(MediaType.APPLICATION_JSON)
+					.get(GitHubReleaseJson.class);
+		} catch (WebApplicationException e) {
+			printVerboseMessage(Level.WARNING, e);
+			/*
+			 * String response = "Unknown"; if (e.getResponse().hasEntity()) { try {
+			 * response = new String(((InputStream)
+			 * e.getResponse().getEntity()).readAllBytes()); response = new
+			 * ObjectMapper().readValue(response, GitHubAPIError.class).message; } catch
+			 * (IOException e1) { printVerboseMessage(Level.WARNING, e); } }
+			 */
+			// printVerboseMessage(Level.WARNING, String.format("%s - %s",
+			// e.getResponse().getStatus(), response));
+			return null;
+		} catch (Exception e) {
+			printVerboseMessage(Level.WARNING, e);
+			return null;
+		}
+	}
+
+	public static String[] getAllReleases() {
+		try {
+			Client client = ClientBuilder.newClient();
+			return client.target(RELEASE_URL).request(MediaType.APPLICATION_JSON)
+					.get(new GenericType<List<GitHubReleaseJson>>() {
+					}).stream().map(e -> e.tag_name).toList().toArray(new String[0]);
+		} catch (WebApplicationException e) {
+			printVerboseMessage(Level.WARNING, e);
+			/*
+			 * String response = "Unknown"; if (e.getResponse().hasEntity()) { try {
+			 * response = new String(((InputStream)
+			 * e.getResponse().getEntity()).readAllBytes()); response = new
+			 * ObjectMapper().readValue(response, GitHubAPIError.class).message; } catch
+			 * (IOException e1) { printVerboseMessage(Level.WARNING, e); } }
+			 */
+			// printVerboseMessage(Level.WARNING, String.format("%s - %s",
+			// e.getResponse().getStatus(), response));
+			return null;
+		} catch (Exception e) {
+			printVerboseMessage(Level.WARNING, e);
+			return new String[0];
 		}
 	}
 

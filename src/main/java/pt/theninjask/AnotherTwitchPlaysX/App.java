@@ -54,7 +54,7 @@ import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
-import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubLatestJson;
+import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubReleaseJson;
 import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsole;
 import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
 import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorErrorOutputStream;
@@ -291,7 +291,7 @@ public class App {
 
 	private static void checkForUpdate() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.checkForUpdate()", App.class.getSimpleName()));
-		GitHubLatestJson update = Constants.getLatestRelease();
+		GitHubReleaseJson update = Constants.getLatestRelease();
 		if (update == null)
 			return;
 		StringBuilder builder = new StringBuilder(update.tag_name.replaceAll("[^\\d]", ""));

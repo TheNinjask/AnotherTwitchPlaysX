@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -58,7 +60,7 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
-import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubLatestJson;
+import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubReleaseJson;
 
 public class ExternalConsole extends JFrame {
 
@@ -82,7 +84,7 @@ public class ExternalConsole extends JFrame {
 	private Map<String, ExternalConsoleCommand> cmds;
 
 	private ColorTheme currentTheme;
-	
+
 	private static ExternalConsoleCommand help = new ExternalConsoleCommand() {
 
 		@Override
@@ -582,17 +584,17 @@ public class ExternalConsole extends JFrame {
 			case 0:
 				return new String[] { "--add", "--remove", "--clear", "--list" };
 			case 1:
-				switch(currArgs[0]) {
-					case "-r":
-					case "-remove":
-					case "--remove":
-					return ATPXModManager.getAllMods().stream().map(c->{
+				switch (currArgs[0]) {
+				case "-r":
+				case "-remove":
+				case "--remove":
+					return ATPXModManager.getAllMods().stream().map(c -> {
 						return c.getClass().getSimpleName();
 					}).toList().toArray(new String[0]);
-					default:
-						return null;
+				default:
+					return null;
 				}
-				
+
 			default:
 				return null;
 			}
@@ -705,7 +707,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					String current = "Unknown";
-					if (singleton.currentTheme!=null)
+					if (singleton.currentTheme != null)
 						current = singleton.currentTheme.getName();
 					println(String.format("Theme is set as: %s", current));
 					println("Options: -d, -n, -t");
@@ -765,7 +767,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					String current = "Unknown";
-					if (DataManager.getTheme()!=null)
+					if (DataManager.getTheme() != null)
 						current = DataManager.getTheme().getName();
 					println(String.format("App Theme is set as: %s", current));
 					println("Options: -d, -n, -t");
@@ -789,7 +791,7 @@ public class ExternalConsole extends JFrame {
 		}
 
 	};
-	
+
 	private static ExternalConsoleCommand localmsg = new ExternalConsoleCommand() {
 
 		@Override
@@ -896,7 +898,7 @@ public class ExternalConsole extends JFrame {
 
 		@Override
 		public boolean executeCommand(String[] args) {
-			GitHubLatestJson update = Constants.getLatestRelease();
+			GitHubReleaseJson update = Constants.getLatestRelease();
 			if (update == null) {
 				println("Could not check update.");
 				return true;
@@ -913,6 +915,87 @@ public class ExternalConsole extends JFrame {
 				println(String.format("Update Available: %s", update.tag_name));
 			return true;
 		}
+	};
+
+	private static ExternalConsoleCommand changelog = new ExternalConsoleCommand() {
+
+		private String[] tagsCache = null;
+
+		@Override
+		public String getCommand() {
+			return "changelog";
+		}
+
+		@Override
+		public String getDescription() {
+			return "View Changelogs";
+		}
+
+		@Override
+		public boolean executeCommand(String[] args) {
+			GitHubReleaseJson release;
+			if (args.length <= 0) {
+				println("Showing latest");
+				release = Constants.getLatestRelease();
+
+			} else {
+				println("Showing " + args[0]);
+				release = Constants.getRelease(args[0]);
+			}
+
+			JPanel content = new JPanel(new BorderLayout());
+			JScrollPane scroll = new JScrollPane();
+			JTextPane message = new JTextPane();
+			JTextField title = new JTextField();
+			scroll = new JScrollPane();
+			message = new JTextPane();
+
+			title.setOpaque(false);
+			title.setForeground(DataManager.getTheme().getFont());
+			title.setText(String.format(DataManager.getLanguage().getUpdateNoticeTitleContent(), release.tag_name,
+					release.update_name));
+			title.setBorder(null);
+			title.setFont(
+					new Font(title.getFont().getFontName(), title.getFont().getStyle(), title.getFont().getSize() + 7));
+			title.setEditable(false);
+
+			message.setEditorKit(new WrapEditorKit());
+			message.setEditable(false);
+			scroll.setViewportView(message);
+			scroll.setFocusable(false);
+			scroll.setEnabled(false);
+			scroll.setBorder(null);
+			scroll.setWheelScrollingEnabled(true);
+			scroll.setOpaque(false);
+			scroll.getViewport().setOpaque(false);
+
+			message.setOpaque(false);
+			message.setForeground(DataManager.getTheme().getFont());
+
+			scroll.setPreferredSize(new Dimension(151, 151));
+			content.add(scroll, BorderLayout.CENTER);
+			content.add(title, BorderLayout.NORTH);
+			content.setOpaque(false);
+
+			message.setText(release.body);
+
+			Constants.showCustomColorMessageDialog(null, content, "Changelog: " + release.tag_name,
+					JOptionPane.PLAIN_MESSAGE, null, DataManager.getTheme().getBackground());
+			return true;
+		}
+
+		@Override
+		public String[] getParamOptions(int number, String[] currArgs) {
+			switch (number) {
+			case 0:
+				if (tagsCache == null)
+					tagsCache = Constants.getAllReleases();
+				return tagsCache;
+			default:
+				return null;
+			}
+		}
+
 	};
 
 	private static class UsedCommand {
@@ -1008,7 +1091,8 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(readme.getCommand(), readme);
 		this.cmds.put(update.getCommand(), update);
 		this.cmds.put(apptheme.getCommand(), apptheme);
-
+		this.cmds.put(changelog.getCommand(), changelog);
+		
 		this.last = UsedCommand.NULL_UC;
 
 		this.console.setForeground(currentTheme.getFont());
@@ -1086,7 +1170,7 @@ public class ExternalConsole extends JFrame {
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
 		console.setOpaque(false);
-		//console.setForeground(Color.BLACK);
+		// console.setForeground(Color.BLACK);
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent event) {
@@ -1100,11 +1184,11 @@ public class ExternalConsole extends JFrame {
 		messagePanel = new JPanel(new BorderLayout());
 		input = new JTextField();
 		input.setBorder(null);
-		
-		//input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-		//input.setForeground(Color.BLACK);
-		//input.setCaretColor(Color.BLACK);
-		//input.setBackground(Color.WHITE);
+
+		// input.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		// input.setForeground(Color.BLACK);
+		// input.setCaretColor(Color.BLACK);
+		// input.setBackground(Color.WHITE);
 		input.setFocusTraversalKeysEnabled(false);
 		input.addKeyListener(new KeyListener() {
 
@@ -1329,11 +1413,11 @@ public class ExternalConsole extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static ColorTheme getTheme() {
 		return singleton.currentTheme;
 	}
-	
+
 	private class ExternalConsoleInputStream extends InputStream {
 
 		private byte[] contents;
