@@ -7,9 +7,10 @@ import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.exception.AlreadyConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoSessionDataException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NotSetupException;
+import pt.theninjask.AnotherTwitchPlaysX.stream.Player;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class YouTubePlayer {
+public class YouTubePlayer implements Player {
 
 	private static YouTubePlayer singleton = new YouTubePlayer();
 
@@ -30,6 +31,7 @@ public class YouTubePlayer {
 		return singleton;
 	}
 
+	@Override
 	public boolean hasRequired() {
 		return session != null;
 	}
@@ -40,14 +42,17 @@ public class YouTubePlayer {
 		this.session = session;
 	}
 
+	@Override
 	public boolean isConnected() {
 		return connected;
 	}
 	
+	@Override
 	public boolean isSetup() {
 		return client!=null;
 	}
 
+	@Override
 	public void setup() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setup()", YouTubePlayer.class.getSimpleName()));
 		if (session == null)
@@ -57,30 +62,35 @@ public class YouTubePlayer {
 		client = new YouTubeChatService(App.ID, App.NAME);
 	}
 
+	@Override
 	public void setupAndConnect() {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.setupAndConnect()", YouTubePlayer.class.getSimpleName()));
-		if (session == null)
+		/*if (session == null)
 			throw new NoSessionDataException();
 		if (connected)
 			throw new AlreadyConnectedException();
-		client = new YouTubeChatService(App.ID, App.NAME);
+		client = new YouTubeChatService(App.ID, App.NAME);*/
+		setup();
 		client.start(session.getVideoId(), session.getSecret());
 		connected = true;
 	}
 
+	@Override
 	public void registerEventListener(Object listener) {
 		if(client==null)
 			throw new NotSetupException();
 		client.subscribe(listener);
 	}
 
+	@Override
 	public void unregisterEventListener(Object listener) {
 		if(client==null)
 			throw new NotSetupException();
 		client.unsubscribe(listener);
 	}
 
+	@Override
 	public void connect() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.connect()", YouTubePlayer.class.getSimpleName()));
 		if (client != null) {
@@ -89,6 +99,7 @@ public class YouTubePlayer {
 		}
 	}
 
+	@Override
 	public void disconnect() {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.disconnect()", YouTubePlayer.class.getSimpleName()));
@@ -98,6 +109,7 @@ public class YouTubePlayer {
 		client = null;
 	}
 
+	@Override
 	public void sendMessage(String message) {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.sendMessage()", YouTubePlayer.class.getSimpleName()));

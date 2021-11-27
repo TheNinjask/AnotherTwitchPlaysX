@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,9 @@ import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
+import org.kitteh.irc.client.library.exception.KittehConnectionException;
+
+import com.google.api.client.auth.oauth2.TokenResponseException;
 
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
@@ -192,38 +196,77 @@ public class MainMenuPanel extends JPanel {
 		connectButton = new JButton(DataManager.getLanguage().getMainMenu().getConnect());
 		connectButton.setFocusable(false);
 		connectButton.addActionListener(l -> {
-			if (inConnection.get()) {
-				sponsor.setEnabled(false);
-				sponsor.setSelected(false);
-				SponsorBot.getInstance().stop();
-				if (TwitchPlayer.getInstance().isConnected())
-					TwitchPlayer.getInstance().disconnect();
-				if (YouTubePlayer.getInstance().isConnected())
-					YouTubePlayer.getInstance().disconnect();
-				connectButton.setText(DataManager.getLanguage().getMainMenu().getConnect());
-				twitchChatButton.setEnabled(false);
-				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
-				gameButton.setEnabled(false);
-				gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
-				changeSessionButton.setEnabled(true);
-				ChatFrame.getInstance().setVisible(false);
-				ChatFrame.getInstance().clearChat();
-				inConnection.set(false);
-			} else {
-				if (TwitchPlayer.getInstance().hasRequired() && !TwitchPlayer.getInstance().isConnected())
-					TwitchPlayer.getInstance().setupAndConnect();
-				if (YouTubePlayer.getInstance().hasRequired() && !YouTubePlayer.getInstance().isConnected())
-					YouTubePlayer.getInstance().setupAndConnect();
-				connectButton.setText(DataManager.getLanguage().getMainMenu().getDisconnect());
-				twitchChatButton.setEnabled(true);
-				if (shouldGameButtonBeEnabled())
-					gameButton.setEnabled(true);
-				changeSessionButton.setEnabled(false);
-				sponsor.setEnabled(true);
-				inConnection.set(true);
-			}
+			if (inConnection.get())
+				disconnectPhase();
+			else
+				connectPhase();
+
 		});
 		return connectButton;
+	}
+
+	@Handler
+	public void onNotConnectedError(UnknownHostException exception) {
+		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
+		if(inConnection.get())
+			disconnectPhase();
+	}
+	
+	@Handler
+	public void onNotConnectedError(KittehConnectionException exception) {
+		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
+		if(inConnection.get())
+			disconnectPhase();
+	}
+	
+	@Handler
+	public void onYoutubeTokenError(TokenResponseException exception) {
+		Constants.showMessageDialog(DataManager.getLanguage().getMainMenu().getYouTubeTokenError(), String.format("%s - %s", exception.getStatusCode(), exception.getStatusMessage()));
+		if(inConnection.get())
+			disconnectPhase();
+	}
+	
+	private void connectPhase() {
+		//if (TwitchPlayer.getInstance().hasRequired() && !TwitchPlayer.getInstance().isConnected())
+		//	TwitchPlayer.getInstance().setupAndConnect();
+		//if (YouTubePlayer.getInstance().hasRequired() && !YouTubePlayer.getInstance().isConnected())
+		//	YouTubePlayer.getInstance().setupAndConnect();
+		if (TwitchPlayer.getInstance().hasRequired() && !TwitchPlayer.getInstance().isConnected()) {
+			TwitchPlayer.getInstance().setup();
+			TwitchPlayer.getInstance().registerEventListener(this);
+			TwitchPlayer.getInstance().connect();
+		}
+		if (YouTubePlayer.getInstance().hasRequired() && !YouTubePlayer.getInstance().isConnected()) {
+			YouTubePlayer.getInstance().setup();
+			YouTubePlayer.getInstance().registerEventListener(this);
+			YouTubePlayer.getInstance().connect();
+		}
+		connectButton.setText(DataManager.getLanguage().getMainMenu().getDisconnect());
+		twitchChatButton.setEnabled(true);
+		if (shouldGameButtonBeEnabled())
+			gameButton.setEnabled(true);
+		changeSessionButton.setEnabled(false);
+		sponsor.setEnabled(true);
+		inConnection.set(true);
+	}
+
+	private void disconnectPhase() {
+		sponsor.setEnabled(false);
+		sponsor.setSelected(false);
+		SponsorBot.getInstance().stop();
+		if (TwitchPlayer.getInstance().isConnected())
+			TwitchPlayer.getInstance().disconnect();
+		if (YouTubePlayer.getInstance().isConnected())
+			YouTubePlayer.getInstance().disconnect();
+		connectButton.setText(DataManager.getLanguage().getMainMenu().getConnect());
+		twitchChatButton.setEnabled(false);
+		twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowChat());
+		gameButton.setEnabled(false);
+		gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
+		changeSessionButton.setEnabled(true);
+		ChatFrame.getInstance().setVisible(false);
+		ChatFrame.getInstance().clearChat();
+		inConnection.set(false);
 	}
 
 	private JPanel commandsButton() {
@@ -400,13 +443,13 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private JButton twitchChatButton() {
-		twitchChatButton = new JButton(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
+		twitchChatButton = new JButton(DataManager.getLanguage().getMainMenu().getShowChat());
 		twitchChatButton.setFocusable(false);
 		twitchChatButton.setEnabled(false);
 		twitchChatButton.addActionListener(l -> {
 			if (ChatFrame.getInstance().isVisible()) {
 				ChatFrame.getInstance().setVisible(false);
-				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
+				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowChat());
 				ChatFrame.getInstance().clearChat();
 				if (TwitchPlayer.getInstance().isSetup())
 					TwitchPlayer.getInstance().unregisterEventListener(ChatFrame.getInstance());
@@ -414,7 +457,7 @@ public class MainMenuPanel extends JPanel {
 					YouTubePlayer.getInstance().unregisterEventListener(ChatFrame.getInstance());
 			} else {
 				ChatFrame.getInstance().setVisible(true);
-				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getHideTwitchChat());
+				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getHideChat());
 				if (TwitchPlayer.getInstance().isSetup())
 					TwitchPlayer.getInstance().registerEventListener(ChatFrame.getInstance());
 				if (YouTubePlayer.getInstance().isSetup())
@@ -424,7 +467,7 @@ public class MainMenuPanel extends JPanel {
 		ChatFrame.getInstance().addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
-				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowTwitchChat());
+				twitchChatButton.setText(DataManager.getLanguage().getMainMenu().getShowChat());
 				ChatFrame.getInstance().clearChat();
 				if (TwitchPlayer.getInstance().isSetup())
 					TwitchPlayer.getInstance().unregisterEventListener(ChatFrame.getInstance());
@@ -466,7 +509,7 @@ public class MainMenuPanel extends JPanel {
 		JPanel tmp = new JPanel(new BorderLayout());
 		tmp.setOpaque(false);
 		tmp.setFocusable(false);
-		twitchChatOptionsLabel = new JLabel(DataManager.getLanguage().getMainMenu().getTwitchChatOptions());
+		twitchChatOptionsLabel = new JLabel(DataManager.getLanguage().getMainMenu().getChatOptions());
 		twitchChatOptionsLabel.setForeground(DataManager.getTheme().getFont());
 		twitchChatOptionsLabel.setHorizontalAlignment(JLabel.CENTER);
 		twitchChatOptionsLabel.setFocusable(false);
@@ -563,19 +606,19 @@ public class MainMenuPanel extends JPanel {
 	private JCheckBox setTwitchChatOnTop() {
 		twitchChatOnTop = new JCheckBox();
 
-		twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsTwitchChatOnTop());
+		twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsChatOnTop());
 		twitchChatOnTop.setHorizontalTextPosition(JCheckBox.LEFT);
 		twitchChatOnTop.setForeground(DataManager.getTheme().getFont());
 		twitchChatOnTop.setHorizontalAlignment(JCheckBox.CENTER);
 		twitchChatOnTop.setOpaque(false);
 		twitchChatOnTop.setFocusable(false);
-		twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsTwitchChatOnTop());
+		twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsChatOnTop());
 		twitchChatOnTop.addActionListener(l -> {
 			if (twitchChatOnTop.isSelected()) {
 				ChatFrame.getInstance().setAlwaysOnTop(true);
 				ChatFrame.getInstance().disableDragAndResize();
 			} else {
-				twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsTwitchChatOnTop());
+				twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsChatOnTop());
 				ChatFrame.getInstance().setAlwaysOnTop(false);
 				ChatFrame.getInstance().enableDragAndResize();
 				MainFrame.getInstance().toFront();
@@ -863,15 +906,15 @@ public class MainMenuPanel extends JPanel {
 		changeSessionButton.setText(session.getMainMenu().getChangeSession());
 
 		if (ChatFrame.getInstance().isVisible())
-			twitchChatButton.setText(session.getMainMenu().getHideTwitchChat());
+			twitchChatButton.setText(session.getMainMenu().getHideChat());
 		else
-			twitchChatButton.setText(session.getMainMenu().getShowTwitchChat());
+			twitchChatButton.setText(session.getMainMenu().getShowChat());
 
 		int value = twitchChatSize.getValue();
 		twitchChatSliderLabel.setText(String.format(session.getMainMenu().getCurrentChatSize(),
 				value < ChatFrame.MSG_DISPLAY_INFINITE ? value : session.getMainMenu().getInfinite()));
 
-		twitchChatOptionsLabel.setText(session.getMainMenu().getTwitchChatOptions());
+		twitchChatOptionsLabel.setText(session.getMainMenu().getChatOptions());
 
 		light.setText(session.getMainMenu().getLightMode());
 		night.setText(session.getMainMenu().getNightMode());
@@ -881,7 +924,7 @@ public class MainMenuPanel extends JPanel {
 		semisolid.setText(session.getMainMenu().getSemiSolid());
 		solid.setText(session.getMainMenu().getSolid());
 
-		twitchChatOnTop.setText(session.getMainMenu().getIsTwitchChatOnTop());
+		twitchChatOnTop.setText(session.getMainMenu().getIsChatOnTop());
 
 		twitchChatInput.setText(session.getMainMenu().getShowInputTextBoxInChat());
 

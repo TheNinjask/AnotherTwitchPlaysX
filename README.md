@@ -7,7 +7,7 @@
 
 ### Before Using App Reminder
 
-* Requires Java 16;
+* Requires Java;
 
 * This is no where explicit so for now I'll leave a message here.
 ```
@@ -56,7 +56,7 @@ To make a mod for this app, you start a maven project and add the following [dep
   <groupId>pt.theninjask</groupId>
   <artifactId>anothertwitchplaysx</artifactId>
   <scope>provided</scope>
-  <version>1.6.2</version>
+  <version>1.7.0</version>
 </dependency>
 ```
 and when you use `mvn package`, the .jar created has to be a fat .jar (but it won't require the dependency above.)

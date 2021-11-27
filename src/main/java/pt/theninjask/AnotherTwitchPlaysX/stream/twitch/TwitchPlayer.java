@@ -12,9 +12,10 @@ import pt.theninjask.AnotherTwitchPlaysX.exception.AlreadyConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NoSessionDataException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NotConnectedException;
 import pt.theninjask.AnotherTwitchPlaysX.exception.NotSetupException;
+import pt.theninjask.AnotherTwitchPlaysX.stream.Player;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
-public class TwitchPlayer {
+public class TwitchPlayer implements Player{
 
 	private static final String SERVER = "irc.chat.twitch.tv";
 
@@ -39,6 +40,7 @@ public class TwitchPlayer {
 		return instance;
 	}
 
+	@Override
 	public boolean hasRequired() {
 		return session != null;
 	}
@@ -48,14 +50,17 @@ public class TwitchPlayer {
 		this.session = session;
 	}
 
+	@Override
 	public boolean isConnected() {
 		return connected;
 	}
 	
+	@Override
 	public boolean isSetup() {
 		return client!=null;
 	}
 
+	@Override
 	public void setup() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.setup()", TwitchPlayer.class.getSimpleName()));
 		if (session == null)
@@ -70,12 +75,16 @@ public class TwitchPlayer {
 			client.addChannel(session.getChannel().toLowerCase());
 		else
 			client.addChannel(session.getNickname().toLowerCase());
+		client.setExceptionListener((t)->{
+			client.getEventManager().callEvent(t);
+		});
 	}
 
+	@Override
 	public void setupAndConnect() {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.setupAndConnect()", TwitchPlayer.class.getSimpleName()));
-		if (session == null)
+		/*if (session == null)
 			throw new NoSessionDataException();
 		if (connected)
 			throw new AlreadyConnectedException();
@@ -87,22 +96,29 @@ public class TwitchPlayer {
 			client.addChannel(session.getChannel().toLowerCase());
 		else
 			client.addChannel(session.getNickname().toLowerCase());
+		client.setExceptionListener((t)->{
+			client.getEventManager().callEvent(t);
+		});*/
+		setup();
 		client.connect();
 		connected = true;
 	}
 
+	@Override
 	public void registerEventListener(Object listener) {
 		if (client == null)
 			throw new NotSetupException();
 		client.getEventManager().registerEventListener(listener);
 	}
 
+	@Override
 	public void unregisterEventListener(Object listener) {
 		if (client == null)
 			throw new NotSetupException();
 		client.getEventManager().unregisterEventListener(listener);
 	}
 
+	@Override
 	public void connect() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.connect()", TwitchPlayer.class.getSimpleName()));
 		if (client != null) {
@@ -111,6 +127,7 @@ public class TwitchPlayer {
 		}
 	}
 
+	@Override
 	public void disconnect() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.disconnect()", TwitchPlayer.class.getSimpleName()));
 		connected = false;
@@ -119,6 +136,7 @@ public class TwitchPlayer {
 		client = null;
 	}
 
+	@Override
 	public void sendMessage(String message) {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s.sendMessage()", TwitchPlayer.class.getSimpleName()));

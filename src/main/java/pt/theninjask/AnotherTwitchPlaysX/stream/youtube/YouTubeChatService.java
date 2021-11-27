@@ -3,6 +3,7 @@ package pt.theninjask.AnotherTwitchPlaysX.stream.youtube;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -15,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeScopes;
 import com.google.api.services.youtube.model.LiveBroadcast;
@@ -147,6 +149,9 @@ public class YouTubeChatService {
 				poll(response.getPollingIntervalMillis());
 				log("YTC Service started", Level.INFO);
 			} catch (Throwable t) {
+				stop();
+				if(t instanceof TokenResponseException || t instanceof UnknownHostException)
+					dispatcher.post(t).now();
 				log(t.getMessage(), Level.WARNING);
 				t.printStackTrace();
 			}
@@ -201,6 +206,9 @@ public class YouTubeChatService {
 					if (!echoMessage)
 						localMsg.add(id);
 				} catch (Throwable t) {
+					stop();
+					if(t instanceof TokenResponseException || t instanceof UnknownHostException)
+						dispatcher.post(t).now();
 					log(t.getMessage(), Level.WARNING);
 					t.printStackTrace();
 				}
@@ -219,6 +227,9 @@ public class YouTubeChatService {
 					YouTube.LiveChatMessages.Delete liveChatDelete = youtube.liveChatMessages().delete(messageId);
 					liveChatDelete.execute();
 				} catch (Throwable t) {
+					stop();
+					if(t instanceof TokenResponseException || t instanceof UnknownHostException)
+						dispatcher.post(t).now();
 					log(t.getMessage(), Level.WARNING);
 					t.printStackTrace();
 				}
@@ -258,6 +269,9 @@ public class YouTubeChatService {
 					log("POLL DELAY: " + response.getPollingIntervalMillis(), Level.INFO);
 					poll(response.getPollingIntervalMillis());
 				} catch (Throwable t) {
+					stop();
+					if(t instanceof TokenResponseException || t instanceof UnknownHostException)
+						dispatcher.post(t).now();
 					log(t.getMessage(), Level.WARNING);
 					t.printStackTrace();
 				}

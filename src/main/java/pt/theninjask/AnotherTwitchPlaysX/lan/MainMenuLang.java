@@ -30,11 +30,11 @@ public interface MainMenuLang {
 		return "Change Session";
 	}
 	
-	public default String getShowTwitchChat() {
+	public default String getShowChat() {
 		return "Show Chat";
 	}
 	
-	public default String getHideTwitchChat() {
+	public default String getHideChat() {
 		return "Hide Chat";
 	}
 	
@@ -46,7 +46,7 @@ public interface MainMenuLang {
 		return "Infinite";
 	}
 	
-	public default String getTwitchChatOptions() {
+	public default String getChatOptions() {
 		return "Chat Options";
 	}
 	
@@ -74,7 +74,7 @@ public interface MainMenuLang {
 		return "Solid";
 	}
 	
-	public default String getIsTwitchChatOnTop() {
+	public default String getIsChatOnTop() {
 		return "Set Chat Always On Top & Locked?";
 	}
 	
@@ -132,6 +132,10 @@ public interface MainMenuLang {
 	
 	public default String getYesCheck() {
 		return "Yes and check message";
+	}
+	
+	public default String getYouTubeTokenError() {
+		return "Please refresh your YouTube Token.";
 	}
 	
 }

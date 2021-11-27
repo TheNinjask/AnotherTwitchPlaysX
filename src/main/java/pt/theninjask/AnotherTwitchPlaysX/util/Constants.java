@@ -135,6 +135,9 @@ public final class Constants {
 
 	public static final ColorTheme DAY_THEME = new ColorTheme("Day", Color.BLACK, Color.WHITE);
 
+	public static final Map<String, ColorTheme> THEMES = Map.of(TWITCH_THEME.getName(), TWITCH_THEME,
+			NIGHT_THEME.getName(), NIGHT_THEME, DAY_THEME.getName(), DAY_THEME);
+
 	// JUST FOR ME :) BUT NOT RECOMENDED
 	// @Deprecated
 	// public static final Color BLUE_COLOR = new Color(0x123456);

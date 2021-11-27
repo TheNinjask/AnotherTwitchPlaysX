@@ -121,6 +121,9 @@ public class App {
 			CommandLineParser parser = new DefaultParser();
 			CommandLine cmd = parser.parse(options, args);
 			ATPXConfig config = loadConfigFile();
+			if(config.getTheme()!=null) {
+				DataManager.setTheme(Constants.THEMES.getOrDefault(config.getTheme(), Constants.TWITCH_THEME));
+			}
 			if (cmd.hasOption('o') || config.isOutsideConsole()) {
 				RedirectorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleOutputStream());
 				RedirectorErrorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());

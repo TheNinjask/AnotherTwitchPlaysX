@@ -78,7 +78,7 @@ public class EnglishLang implements Lang{
 	}
 
 	@Override
-	public pt.theninjask.AnotherTwitchPlaysX.lan.ControlDataLang getControlData() {
+	public ControlDataLang getControlData() {
 		return ControlDataLang;
 	}
 

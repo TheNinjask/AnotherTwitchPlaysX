@@ -12,6 +12,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -47,6 +50,12 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
@@ -59,6 +68,8 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModManager;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
+import pt.theninjask.AnotherTwitchPlaysX.lan.custom.CustomLang;
+import pt.theninjask.AnotherTwitchPlaysX.lan.en.EnglishLang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubReleaseJson;
 
@@ -998,6 +1009,85 @@ public class ExternalConsole extends JFrame {
 
 	};
 
+	private static ExternalConsoleCommand lang = new ExternalConsoleCommand() {
+
+		@Override
+		public String getCommand() {
+			return "lang";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Operations on language";
+		}
+
+		@Override
+		public boolean executeCommand(String[] args) {
+			Options options = new Options();
+			OptionGroup mod = new OptionGroup();
+			// print.setRequired(true);
+			mod.addOption(new Option("l", "load", false, "Load a language from a file"));
+			mod.addOption(new Option("d", "default", false, "Sets to the default language (English)"));
+			mod.addOption(new Option("e", "extract", false, "Extracts a sample of lang json"));
+			options.addOptionGroup(mod);
+			try {
+				CommandLineParser parser = new DefaultParser();
+				parser.parse(options, args);
+				switch (String.valueOf(mod.getSelected())) {
+				case "l":
+					try {
+						File file = Constants.showOpenFile(new FileNameExtensionFilter("JSON", "json"), null,
+								Paths.get(Constants.SAVE_PATH).toFile());
+						JsonReader json = new JsonReader(new FileReader(file));
+						CustomLang lang = new CustomLang(JsonParser.parseReader(json).getAsJsonObject());
+						DataManager.setLanguage(lang);
+						println("Set lang as: " + lang.getLanTag());
+					} catch (Exception e) {
+						println(e.getMessage());
+						return false;
+					}
+					break;
+				case "d":
+					DataManager.setLanguage(new EnglishLang());
+					println("Set lang to default");
+					break;
+				case "e":
+					try {
+						File file = Constants.showSaveFile(new File("lang.json"),
+								new FileNameExtensionFilter("JSON", "json"), null,
+								Paths.get(Constants.SAVE_PATH).toFile());
+						try (FileWriter writer = new FileWriter(file)) {
+							new GsonBuilder().setPrettyPrinting().serializeNulls().create()
+									.toJson(new CustomLang(new JsonObject()).toJson(), writer);
+						}
+					} catch (JsonIOException | IOException e) {
+						e.printStackTrace();
+					}
+					println("Extracted lang json");
+					break;
+				default:
+					println("Current: " + DataManager.getLanguage().getLanTag());
+					println("Options: -l, -d, -e");
+					break;
+				}
+			} catch (ParseException e) {
+				println(e.getMessage());
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public String[] getParamOptions(int number, String[] currArgs) {
+			switch (number) {
+			case 0:
+				return new String[] { "--load", "--default", "--extract" };
+			default:
+				return null;
+			}
+		}
+	};
+
 	private static class UsedCommand {
 
 		private UsedCommand previous;
@@ -1062,10 +1152,12 @@ public class ExternalConsole extends JFrame {
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent windowEvent) {
-				if (currentTheme == Constants.NIGHT_THEME)
-					setTheme(Constants.DAY_THEME);
-				else
-					setTheme(Constants.NIGHT_THEME);
+				List<ColorTheme> others = Constants.THEMES.values().stream().filter(t -> t != currentTheme).toList();
+				setTheme(others.get(ThreadLocalRandom.current().nextInt(others.size())));
+				/*
+				 * if (currentTheme == Constants.NIGHT_THEME) setTheme(Constants.DAY_THEME);
+				 * else setTheme(Constants.NIGHT_THEME);
+				 */
 			}
 		});
 
@@ -1092,7 +1184,8 @@ public class ExternalConsole extends JFrame {
 		this.cmds.put(update.getCommand(), update);
 		this.cmds.put(apptheme.getCommand(), apptheme);
 		this.cmds.put(changelog.getCommand(), changelog);
-		
+		this.cmds.put(lang.getCommand(), lang);
+
 		this.last = UsedCommand.NULL_UC;
 
 		this.console.setForeground(currentTheme.getFont());
@@ -1229,10 +1322,8 @@ public class ExternalConsole extends JFrame {
 						List<ExternalConsoleCommand> options = cmds.values().stream()
 								.filter(c -> c.getCommand().startsWith(ref)).sorted(ExternalConsoleCommand.comparator)
 								.toList();
-						if (next)
-							tabPos = tabPos + 1 >= options.size() ? 0 : tabPos + 1;
-						else
-							tabPos = tabPos - 1 < 0 ? options.size() - 1 : tabPos - 1;
+						tabPos = next ? tabPos + 1 >= options.size() ? 0 : tabPos + 1
+								: tabPos - 1 < 0 ? options.size() - 1 : tabPos - 1;
 						if (tabPos < 0 || tabPos >= options.size())
 							break;
 						args[args.length - 1] = options.get(tabPos).getCommand();
@@ -1240,10 +1331,8 @@ public class ExternalConsole extends JFrame {
 					} else {
 						String[] paramOptions = cmd.getParamOptions(args.length - 2, currArgs);
 						List<String> options = Stream.of(paramOptions).filter(c -> c.startsWith(ref)).toList();
-						if (next)
-							tabPos = tabPos + 1 >= options.size() ? 0 : tabPos + 1;
-						else
-							tabPos = tabPos - 1 < 0 ? options.size() - 1 : tabPos - 1;
+						tabPos = next ? tabPos + 1 >= options.size() ? 0 : tabPos + 1
+								: tabPos - 1 < 0 ? options.size() - 1 : tabPos - 1;
 						if (tabPos < 0 || tabPos >= options.size())
 							break;
 						args[args.length - 1] = options.get(tabPos);
@@ -1272,10 +1361,6 @@ public class ExternalConsole extends JFrame {
 				case KeyEvent.VK_ENTER:
 					InputCommandExternalConsoleEvent event = new InputCommandExternalConsoleEvent(
 							input.getText().split(" "));
-					/*
-					 * EventManager.triggerEvent(event); if (event.isCancelled()) return;
-					 */
-
 					while (last.getNext() != UsedCommand.NULL_UC)
 						last = last.getNext();
 					if (last == UsedCommand.NULL_UC)

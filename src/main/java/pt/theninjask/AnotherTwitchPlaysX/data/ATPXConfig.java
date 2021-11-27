@@ -6,6 +6,10 @@ public class ATPXConfig implements Data {
 		NONE,VERBOSE,WARNING
 	}
 	
+	private String lang = null;
+	
+	private String theme = null;
+	
 	private boolean outsideConsole = false;
 	
 	private Verbose verbose = Verbose.NONE;
@@ -127,6 +131,22 @@ public class ATPXConfig implements Data {
 
 	public void setYoutubeVideoId(String youtubeVideoId) {
 		this.youtubeVideoId = youtubeVideoId;
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
+
+	public String getTheme() {
+		return theme;
+	}
+
+	public void setTheme(String theme) {
+		this.theme = theme;
 	}
 	
 	
