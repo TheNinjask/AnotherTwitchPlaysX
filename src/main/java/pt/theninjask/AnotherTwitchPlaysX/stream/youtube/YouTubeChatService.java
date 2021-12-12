@@ -98,7 +98,7 @@ public class YouTubeChatService {
 				// Build auth scopes
 				List<String> scopes = new ArrayList<String>();
 				scopes.add(YouTubeScopes.YOUTUBE_FORCE_SSL);
-				scopes.add(YouTubeScopes.YOUTUBE);
+				scopes.add(YouTubeScopes.YOUTUBE_READONLY);
 
 				// Authorize the request
 				PrintStream tmp = System.out;
@@ -112,8 +112,8 @@ public class YouTubeChatService {
 				String identity;
 				if (videoId != null && !videoId.isEmpty()) {
 					identity = "videoId " + videoId;
-					YouTube.Videos.List videoList = youtube.videos().list("liveStreamingDetails")
-							.setFields("items/liveStreamingDetails/activeLiveChatId").setId(videoId);
+					YouTube.Videos.List videoList = youtube.videos().list(List.of("liveStreamingDetails"))
+							.setFields("items/liveStreamingDetails/activeLiveChatId").setId(List.of(videoId));
 					VideoListResponse response = videoList.execute();
 					for (Video v : response.getItems()) {
 						liveChatId = v.getLiveStreamingDetails().getActiveLiveChatId();
@@ -124,7 +124,7 @@ public class YouTubeChatService {
 					}
 				} else {
 					identity = "current user";
-					YouTube.LiveBroadcasts.List broadcastList = youtube.liveBroadcasts().list("snippet")
+					YouTube.LiveBroadcasts.List broadcastList = youtube.liveBroadcasts().list(List.of("snippet"))
 							.setFields("items/snippet/liveChatId").setBroadcastType("all").setBroadcastStatus("active");
 					LiveBroadcastListResponse broadcastListResponse = broadcastList.execute();
 					for (LiveBroadcast b : broadcastListResponse.getItems()) {
@@ -142,7 +142,7 @@ public class YouTubeChatService {
 				}
 
 				// Initialize next page token
-				LiveChatMessageListResponse response = youtube.liveChatMessages().list(liveChatId, "snippet")
+				LiveChatMessageListResponse response = youtube.liveChatMessages().list(liveChatId, List.of("snippet"))
 						.setFields("nextPageToken, pollingIntervalMillis").execute();
 				nextPageToken = response.getNextPageToken();
 				isInitialized = true;
@@ -150,8 +150,8 @@ public class YouTubeChatService {
 				log("YTC Service started", Level.INFO);
 			} catch (Throwable t) {
 				stop();
-				if(t instanceof TokenResponseException || t instanceof UnknownHostException)
-					dispatcher.post(t).now();
+				if (t instanceof TokenResponseException || t instanceof UnknownHostException || t instanceof IOException)
+					dispatcher.post(new YouTubeChatServiceException(t)).now();
 				log(t.getMessage(), Level.WARNING);
 				t.printStackTrace();
 			}
@@ -174,6 +174,19 @@ public class YouTubeChatService {
 
 	public void subscribe(Object listener) {
 		dispatcher.subscribe(listener);
+	}
+	
+	public class YouTubeChatServiceException extends RuntimeException{
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		public YouTubeChatServiceException(Throwable reason) {
+			super(reason);
+		}
+		
 	}
 
 	public void unsubscribe(Object listener) {
@@ -200,15 +213,15 @@ public class YouTubeChatService {
 					details.setMessageText(message);
 					snippet.setTextMessageDetails(details);
 					liveChatMessage.setSnippet(snippet);
-					YouTube.LiveChatMessages.Insert liveChatInsert = youtube.liveChatMessages().insert("snippet",
-							liveChatMessage);
+					YouTube.LiveChatMessages.Insert liveChatInsert = youtube.liveChatMessages()
+							.insert(List.of("snippet"), liveChatMessage);
 					String id = liveChatInsert.execute().getId();
 					if (!echoMessage)
 						localMsg.add(id);
 				} catch (Throwable t) {
 					stop();
-					if(t instanceof TokenResponseException || t instanceof UnknownHostException)
-						dispatcher.post(t).now();
+					if (t instanceof TokenResponseException || t instanceof UnknownHostException || t instanceof IOException)
+						dispatcher.post(new YouTubeChatServiceException(t)).now();
 					log(t.getMessage(), Level.WARNING);
 					t.printStackTrace();
 				}
@@ -228,7 +241,7 @@ public class YouTubeChatService {
 					liveChatDelete.execute();
 				} catch (Throwable t) {
 					stop();
-					if(t instanceof TokenResponseException || t instanceof UnknownHostException)
+					if (t instanceof TokenResponseException || t instanceof UnknownHostException)
 						dispatcher.post(t).now();
 					log(t.getMessage(), Level.WARNING);
 					t.printStackTrace();
@@ -246,7 +259,7 @@ public class YouTubeChatService {
 					// Get chat messages from YouTube
 					log("Getting live chat messages", Level.INFO);
 					LiveChatMessageListResponse response = youtube.liveChatMessages()
-							.list(liveChatId, "id, snippet, authorDetails").setPageToken(nextPageToken)
+							.list(liveChatId, List.of("id", "snippet", "authorDetails")).setPageToken(nextPageToken)
 							.setFields(LIVE_CHAT_FIELDS).execute();
 					nextPageToken = response.getNextPageToken();
 					final List<LiveChatMessage> messages = response.getItems();
@@ -270,7 +283,7 @@ public class YouTubeChatService {
 					poll(response.getPollingIntervalMillis());
 				} catch (Throwable t) {
 					stop();
-					if(t instanceof TokenResponseException || t instanceof UnknownHostException)
+					if (t instanceof TokenResponseException || t instanceof UnknownHostException)
 						dispatcher.post(t).now();
 					log(t.getMessage(), Level.WARNING);
 					t.printStackTrace();

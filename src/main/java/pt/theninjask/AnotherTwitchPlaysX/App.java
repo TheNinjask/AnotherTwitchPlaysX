@@ -72,7 +72,10 @@ public class App {
 	public static final String VERSION = getVersion();
 
 	public static void main(String[] args) {
-
+		
+		//To mitigate the exploit in case use there is use of this logger from dependencies
+		System.setProperty("Dlog4j2.formatMsgNoLookups", "true");
+		
 		RedirectorOutputStream.changeRedirect(System.out);
 		RedirectorOutputStream.changeDefault(System.out);
 		System.setOut(RedirectorOutputStream.getInstance());

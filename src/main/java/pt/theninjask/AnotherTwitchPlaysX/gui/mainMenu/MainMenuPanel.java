@@ -37,8 +37,6 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.kitteh.irc.client.library.exception.KittehConnectionException;
 
-import com.google.api.client.auth.oauth2.TokenResponseException;
-
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
@@ -61,6 +59,7 @@ import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.SponsorBot;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubeChatService.YouTubeChatServiceException;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsole;
@@ -220,8 +219,8 @@ public class MainMenuPanel extends JPanel {
 	}
 	
 	@Handler
-	public void onYoutubeTokenError(TokenResponseException exception) {
-		Constants.showMessageDialog(DataManager.getLanguage().getMainMenu().getYouTubeTokenError(), String.format("%s - %s", exception.getStatusCode(), exception.getStatusMessage()));
+	public void onYoutubeTokenError(YouTubeChatServiceException exception) {
+		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
 		if(inConnection.get())
 			disconnectPhase();
 	}

@@ -45,6 +45,7 @@ import javax.swing.text.StyledDocument;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
@@ -156,7 +157,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println(String.format("autoscroll is set as: %s", singleton.autoScroll));
-					println("Options: -a, -m");
+					new HelpFormatter().printHelp("autoscroll", options, true);
 					break;
 				}
 
@@ -214,7 +215,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println(String.format("verbose is set as: %s", Constants.getLoggerLevel()));
-					println("Options: -n, -v, -w");
+					new HelpFormatter().printHelp("verbose", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -267,7 +268,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println(String.format("Print Commands Execution is set as: %s", CommandData.isEnableLogging()));
-					println("Options: -t, -f");
+					new HelpFormatter().printHelp("printcommand", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -320,7 +321,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println(String.format("Print Event Trigger is set as: %s", EventManager.isEnableLogging()));
-					println("Options: -t, -f");
+					new HelpFormatter().printHelp("eventlog", options, true);
 					break;
 				}
 
@@ -374,7 +375,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println(String.format("Debug is set as: %s", Constants.debug));
-					println("Options: -t, -f");
+					new HelpFormatter().printHelp("debug", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -427,7 +428,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println(String.format("DisableSession is set as: %s", DataManager.disableSession));
-					println("Options: -t, -f");
+					new HelpFormatter().printHelp("disablesession", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -579,7 +580,7 @@ public class ExternalConsole extends JFrame {
 					}
 					break;
 				default:
-					println("Options: -a, -r <mod>, -c, -l");
+					new HelpFormatter().printHelp("mod", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -662,7 +663,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println(String.format("AlwaysOnTop is set as: %s", singleton.isAlwaysOnTop()));
-					println("Options: -t, -f");
+					new HelpFormatter().printHelp("top", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -721,7 +722,7 @@ public class ExternalConsole extends JFrame {
 					if (singleton.currentTheme != null)
 						current = singleton.currentTheme.getName();
 					println(String.format("Theme is set as: %s", current));
-					println("Options: -d, -n, -t");
+					new HelpFormatter().printHelp("theme", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -781,7 +782,7 @@ public class ExternalConsole extends JFrame {
 					if (DataManager.getTheme() != null)
 						current = DataManager.getTheme().getName();
 					println(String.format("App Theme is set as: %s", current));
-					println("Options: -d, -n, -t");
+					new HelpFormatter().printHelp("apptheme", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -834,7 +835,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println(String.format("localmsg: %s", getDescription()));
-					println("Options: -f, -e");
+					new HelpFormatter().printHelp("localmsg", options, true);
 					break;
 				}
 			} catch (ParseException e) {
@@ -1067,7 +1068,7 @@ public class ExternalConsole extends JFrame {
 					break;
 				default:
 					println("Current: " + DataManager.getLanguage().getLanTag());
-					println("Options: -l, -d, -e");
+					new HelpFormatter().printHelp("lang", options, true);
 					break;
 				}
 			} catch (ParseException e) {
