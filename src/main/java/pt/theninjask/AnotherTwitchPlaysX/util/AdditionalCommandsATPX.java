@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -660,13 +662,30 @@ public class AdditionalCommandsATPX {
 				ExternalConsole.println("Could not check update.");
 				return 0;
 			}
-			StringBuilder builder = new StringBuilder(update.tag_name.replaceAll("[^\\d]", ""));
-			builder.insert(0, 0);
-			int gitVersion = Integer.parseInt(builder.toString());
-			builder = new StringBuilder(App.VERSION.replaceAll("[^\\d]", ""));
-			builder.insert(0, 0);
-			int currentVersion = Integer.parseInt(builder.toString());
-			if (gitVersion <= currentVersion)
+			String regex = "v?(\\d+).(\\d+).(\\d+)";
+			Pattern pattern = Pattern.compile(regex);
+			Matcher matcher = pattern.matcher(update.tag_name);
+			int gitVersionMajor = 0;
+			int gitVersionMinor = 0;
+			int gitVersionPatch = 0;
+			if (matcher.matches()) {
+				gitVersionMajor = Integer.parseInt(matcher.group(1));
+				gitVersionMinor = Integer.parseInt(matcher.group(2));
+				gitVersionPatch = Integer.parseInt(matcher.group(3));
+			}
+			matcher = pattern.matcher(App.VERSION);
+			int currVersionMajor = 0;
+			int currVersionMinor = 0;
+			int currVersionPatch = 0;
+			if (matcher.matches()) {
+				currVersionMajor = Integer.parseInt(matcher.group(1));
+				currVersionMinor = Integer.parseInt(matcher.group(2));
+				currVersionPatch = Integer.parseInt(matcher.group(3));
+			}
+			if (currVersionMajor > gitVersionMajor
+					|| (currVersionMajor == gitVersionMajor && currVersionMinor > gitVersionMinor)
+					|| (currVersionMajor == gitVersionMajor && currVersionMinor == gitVersionMinor
+							&& currVersionPatch >= gitVersionPatch))
 				ExternalConsole.println(String.format("No Update Available. (Current Version: %s)", App.VERSION));
 			else
 				ExternalConsole.println(String.format("Update Available: %s", update.tag_name));

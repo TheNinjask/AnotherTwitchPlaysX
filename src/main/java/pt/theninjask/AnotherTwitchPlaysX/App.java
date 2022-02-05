@@ -13,6 +13,8 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -76,12 +78,12 @@ public class App {
 		// To mitigate the exploit in case use there is use of this logger from
 		// dependencies
 		System.setProperty("Dlog4j2.formatMsgNoLookups", "true");
-		
+
 		setupExternalConsole();
-		
+
 		DataManager.setLanguage(new EnglishLang());
 		DataManager.setTheme(Constants.TWITCH_THEME);
-		
+
 		TrayManager.getInstance().setToolTip(DataManager.getLanguage().getID());
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
@@ -291,13 +293,30 @@ public class App {
 		GitHubReleaseJson update = Constants.getLatestRelease();
 		if (update == null)
 			return;
-		StringBuilder builder = new StringBuilder(update.tag_name.replaceAll("[^\\d]", ""));
-		builder.insert(0, 0);
-		int gitVersion = Integer.parseInt(builder.toString());
-		builder = new StringBuilder(VERSION.replaceAll("[^\\d]", ""));
-		builder.insert(0, 0);
-		int currentVersion = Integer.parseInt(builder.toString());
-		if (gitVersion <= currentVersion)
+		String regex = "v?(\\d+).(\\d+).(\\d+)";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(update.tag_name);
+		int gitVersionMajor = 0;
+		int gitVersionMinor = 0;
+		int gitVersionPatch = 0;
+		if (matcher.matches()) {
+			gitVersionMajor = Integer.parseInt(matcher.group(1));
+			gitVersionMinor = Integer.parseInt(matcher.group(2));
+			gitVersionPatch = Integer.parseInt(matcher.group(3));
+		}
+		matcher = pattern.matcher(VERSION);
+		int currVersionMajor = 0;
+		int currVersionMinor = 0;
+		int currVersionPatch = 0;
+		if (matcher.matches()) {
+			currVersionMajor = Integer.parseInt(matcher.group(1));
+			currVersionMinor = Integer.parseInt(matcher.group(2));
+			currVersionPatch = Integer.parseInt(matcher.group(3));
+		}
+		if (currVersionMajor > gitVersionMajor
+				|| (currVersionMajor == gitVersionMajor && currVersionMinor > gitVersionMinor)
+				|| (currVersionMajor == gitVersionMajor && currVersionMinor == gitVersionMinor
+						&& currVersionPatch >= gitVersionPatch))
 			return;
 
 		JPanel content = new JPanel(new BorderLayout());
@@ -440,12 +459,12 @@ public class App {
 			throw e;
 		}
 	}
-	
+
 	private static void setupExternalConsole() {
 		ExternalConsole.setClosable(false);
 		ExternalConsole.setIcon(Constants.ICON_PATH);
 		ExternalConsole.setConsoleTitle(String.format("%s's Console", ID));
-		for(ExternalConsoleCommand cmd : AdditionalCommandsATPX.getCommands()) {
+		for (ExternalConsoleCommand cmd : AdditionalCommandsATPX.getCommands()) {
 			ExternalConsole.addCommand(cmd);
 		}
 	}
