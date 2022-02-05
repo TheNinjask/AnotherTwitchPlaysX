@@ -672,64 +672,12 @@ public class CommandPanel extends JPanel {
 		return controls;
 	}
 
-	public JPanel getAddPanel() {
-		return addPanel;
-	}
-
-	public JButton getLeft() {
-		return left;
-	}
-
-	public JButton getRight() {
-		return right;
-	}
-
-	public JButton getMode() {
-		return mode;
-	}
-
 	public Set<String> getVarsBag() {
 		return varsBag;
 	}
 
-	public JButton getBack() {
-		return back;
-	}
-
-	public JButton getSyntax() {
-		return syntax;
-	}
-
-	public JButton getHelp() {
-		return help;
-	}
-
-	public JButton getSave() {
-		return save;
-	}
-
-	public JButton getDelete() {
-		return delete;
-	}
-
-	public JTextField getLead() {
-		return lead;
-	}
-
-	public JComboBox<CommandType> getType() {
-		return type;
-	}
-
 	public JComboBox<JComboItem<Pair<String, CommandVarType>>> getVars() {
 		return vars;
-	}
-
-	public JButton getVarsRemove() {
-		return varsRemove;
-	}
-
-	public JButton getAdd() {
-		return add;
 	}
 
 	// @Handler

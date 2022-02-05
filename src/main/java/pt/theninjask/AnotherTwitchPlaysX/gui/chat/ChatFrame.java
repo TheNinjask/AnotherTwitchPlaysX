@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -54,11 +53,11 @@ public class ChatFrame extends JFrame {
 
 	private static ChatFrame singleton = new ChatFrame();
 
-	public static int MSG_DISPLAY_MIN = 5;
+	private static int MSG_DISPLAY_MIN = 5;
 
-	public static int MSG_DISPLAY_MAX = 50;
+	private static int MSG_DISPLAY_MAX = 50;
 
-	public static int MSG_DISPLAY_INFINITE = 51;
+	private static int MSG_DISPLAY_INFINITE = MSG_DISPLAY_MAX + 1;
 
 	public enum ChatType {
 		MINECRAFT("Minecraft Style", "<%s> %s\n"), TWITCH("Twitch Style", "%s: %s\n");
@@ -152,6 +151,39 @@ public class ChatFrame extends JFrame {
 	public static ChatFrame getInstance() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.getInstance()", ChatFrame.class.getSimpleName()));
 		return singleton;
+	}
+
+	public static boolean setMsgDisplayMin(int min) {
+		if (min < 0)
+			return false;
+		MSG_DISPLAY_MIN = min;
+		if (MSG_DISPLAY_MAX < MSG_DISPLAY_MIN) {
+			MSG_DISPLAY_MAX = MSG_DISPLAY_MIN;
+			MSG_DISPLAY_INFINITE = MSG_DISPLAY_MAX + 1;
+		}
+		return true;
+	}
+
+	public static int getMsgDisplayMin() {
+		return MSG_DISPLAY_MIN;
+	}
+
+	public static boolean setMsgDisplayMax(int max) {
+		if (max < 0)
+			return false;
+		MSG_DISPLAY_MAX = max;
+		MSG_DISPLAY_INFINITE = MSG_DISPLAY_MAX + 1;
+		if (MSG_DISPLAY_MAX < MSG_DISPLAY_MIN)
+			MSG_DISPLAY_MIN = MSG_DISPLAY_MAX;
+		return true;
+	}
+
+	public static int getMsgDisplayMax() {
+		return MSG_DISPLAY_MAX;
+	}
+
+	public static int getMsgDisplayInf() {
+		return MSG_DISPLAY_INFINITE;
 	}
 
 	private JScrollPane insertChat() {
@@ -421,14 +453,6 @@ public class ChatFrame extends JFrame {
 
 	public ChatType getChatType() {
 		return type;
-	}
-
-	public JScrollPane getScroll() {
-		return scroll;
-	}
-
-	public JEditorPane getChat() {
-		return chat;
 	}
 
 	public void setChatMode(ChatMode mode) {

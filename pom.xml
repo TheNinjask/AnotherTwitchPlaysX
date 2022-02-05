@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>pt.theninjask</groupId>
@@ -15,9 +13,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>16</maven.compiler.source>
-		<maven.compiler.target>16</maven.compiler.target>
-		<java.version>16</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+		<java.version>17</java.version>
 		<jarName>ATPXapp</jarName>
 	</properties>
 
@@ -99,6 +97,11 @@
 			<artifactId>commonmark</artifactId>
 			<version>0.18.1</version>
 		</dependency>
+		<dependency>
+			<groupId>pt.theninjask</groupId>
+			<artifactId>externalconsole</artifactId>
+			<version>0.1.0</version>
+		</dependency>
 		<!-- Not using it but to prevent using older version -->
 		<!-- <dependency> <groupId>org.apache.logging.log4j</groupId> <artifactId>log4j-core</artifactId> 
 			<version>[2.15.0,)</version> </dependency> -->
@@ -165,7 +168,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
 				<configuration>
-					<release>16</release>
+					<release>17</release>
 				</configuration>
 			</plugin>
 			<plugin>

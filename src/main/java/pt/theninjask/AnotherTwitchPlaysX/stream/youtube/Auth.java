@@ -80,11 +80,13 @@ public class Auth {
     return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize(USER_ID);
   }
 
-  public static void clearCredentials() throws IOException {
+  public static boolean clearCredentials() throws IOException {
     File directory = new File(getCredentialsDirectory());
     if (directory.exists()) {
       deleteDirectory(directory);
+      return true;
     }
+    return false;
   }
 
   private static boolean deleteDirectory(File path) {

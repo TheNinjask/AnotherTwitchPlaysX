@@ -7,7 +7,7 @@
 
 ### Before Using App Reminder
 
-* Requires Java;
+* Requires Java 17;
 
 * This is no where explicit so for now I'll leave a message here.
 ```

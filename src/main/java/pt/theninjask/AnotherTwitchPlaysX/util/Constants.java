@@ -59,6 +59,7 @@ import org.apache.bcel.classfile.JavaClass;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -67,6 +68,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import externalconsole.console.ExternalConsole;
+import externalconsole.util.ColorTheme;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -602,6 +605,7 @@ public final class Constants {
 	public static GitHubReleaseJson getLatestRelease() {
 		try {
 			Client client = ClientBuilder.newClient();
+			client.register(JacksonJsonProvider.class);
 			return client.target(LATEST_VERSION_URL).request(MediaType.APPLICATION_JSON).get(GitHubReleaseJson.class);
 		} catch (WebApplicationException e) {
 			printVerboseMessage(Level.WARNING, e);
@@ -624,6 +628,7 @@ public final class Constants {
 	public static GitHubReleaseJson getRelease(String tag) {
 		try {
 			Client client = ClientBuilder.newClient();
+			client.register(JacksonJsonProvider.class);
 			return client.target(RELEASE_TAG_URL + "/" + tag).request(MediaType.APPLICATION_JSON)
 					.get(GitHubReleaseJson.class);
 		} catch (WebApplicationException e) {

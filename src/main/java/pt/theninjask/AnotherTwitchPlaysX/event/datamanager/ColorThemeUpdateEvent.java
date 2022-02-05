@@ -1,7 +1,7 @@
 package pt.theninjask.AnotherTwitchPlaysX.event.datamanager;
 
+import externalconsole.util.ColorTheme;
 import pt.theninjask.AnotherTwitchPlaysX.event.BasicEvent;
-import pt.theninjask.AnotherTwitchPlaysX.util.ColorTheme;
 
 public class ColorThemeUpdateEvent extends BasicEvent {
 

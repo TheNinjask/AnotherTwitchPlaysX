@@ -83,4 +83,16 @@ public interface Lang {
 	public default String getUpdateNoticeTitleContent() {
 		return "Update %s - %s";
 	}
+	
+	public default String getHiddedItemTray() {
+		return "Hide Window";
+	}
+	
+	public default String getConsoleItemTray() {
+		return "Show/Hide Console";
+	}
+	
+	public default String getExitItemTray() {
+		return "Exit";
+	}
 }

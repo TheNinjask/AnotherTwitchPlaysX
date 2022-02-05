@@ -104,7 +104,7 @@ public class EmbeddedModMenuPanel extends JPanel {
 		dummy.add(back);
 		this.add(dummy);
 		
-		MainMenuPanel.getInstance().getModButton().setText(DataManager.getLanguage().getMainMenu().getMod());
+		//MainMenuPanel.getInstance().getModButton().setText(DataManager.getLanguage().getMainMenu().getMod());
 	}
 	
 	public static EmbeddedModMenuPanel getInstance() {

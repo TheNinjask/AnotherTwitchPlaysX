@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import externalconsole.util.ColorTheme;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
 import pt.theninjask.AnotherTwitchPlaysX.data.YouTubeSessionData;
@@ -14,7 +15,6 @@ import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.TwitchSessionUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.YoutubeSessionUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
-import pt.theninjask.AnotherTwitchPlaysX.util.ColorTheme;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 public class DataManager {

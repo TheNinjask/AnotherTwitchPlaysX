@@ -11,10 +11,16 @@ import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import net.engio.mbassy.listener.Handler;
+import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
+import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
+import pt.theninjask.AnotherTwitchPlaysX.event.gui.mainMenu.ModButtonClickEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
-import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
+import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
+import pt.theninjask.AnotherTwitchPlaysX.lan.MainMenuLang;
+import pt.theninjask.AnotherTwitchPlaysX.lan.en.EnglishLang;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 
 @ATPXModProps(keepLoaded = false)
@@ -24,7 +30,11 @@ public class ChangeStopShortCutMod extends ATPXMod {
 
 	private JPanel panel;
 
+	private boolean disableModButton = false;
+
 	public ChangeStopShortCutMod() {
+		EventManager.registerEventListener(this);
+
 		panel = new JPanel(new GridLayout(2, 1));
 		panel.setBackground(Constants.TWITCH_THEME.getBackground());
 		press = new JLabel(String.format("Press a key (Current: %s)", NativeKeyEvent.getKeyText(Constants.stopKey)));
@@ -42,12 +52,29 @@ public class ChangeStopShortCutMod extends ATPXMod {
 				MainFrame.replacePanel(MainMenuPanel.getInstance());
 			} catch (NativeHookException e1) {
 				Constants.showExceptionDialog(e1);
-				MainMenuPanel.getInstance().getModButton().setEnabled(false);
+				disableModButton = true;
 				MainFrame.replacePanel(MainMenuPanel.getInstance());
 			}
 		});
 		panel.add(ok);
-		MainMenuPanel.getInstance().getModButton().setText("Change Stop Key");
+		
+		// hack to preserve behaviour
+		MainMenuPanel.getInstance().updateLang(new LanguageUpdateEvent(new EnglishLang() {
+			private MainMenuLang mainMenuLang;
+			{
+				mainMenuLang = new MainMenuLang() {
+					public String getMod() {
+						return "Change Stop Key";
+					}
+				};
+			}
+			@Override
+			public MainMenuLang getMainMenu() {
+				return mainMenuLang;
+			}
+
+		}));
+		
 	}
 
 	@Override
@@ -76,7 +103,7 @@ public class ChangeStopShortCutMod extends ATPXMod {
 			});
 		} catch (NativeHookException e) {
 			Constants.showExceptionDialog(e);
-			MainMenuPanel.getInstance().getModButton().setEnabled(false);
+			disableModButton = true;
 			MainFrame.replacePanel(MainMenuPanel.getInstance());
 		}
 	}
@@ -84,6 +111,11 @@ public class ChangeStopShortCutMod extends ATPXMod {
 	@Override
 	public JPanel getJPanelInstance() {
 		return panel;
+	}
+
+	@Handler(priority = 1)
+	public void disableModButton(ModButtonClickEvent event) {
+		event.setCancelled(disableModButton);
 	}
 
 }

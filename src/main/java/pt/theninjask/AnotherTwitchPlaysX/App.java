@@ -35,6 +35,8 @@ import org.jnativehook.GlobalScreen;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 
+import externalconsole.console.ExternalConsole;
+import externalconsole.console.ExternalConsoleCommand;
 import pt.theninjask.AnotherTwitchPlaysX.data.ATPXConfig;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
@@ -53,14 +55,12 @@ import pt.theninjask.AnotherTwitchPlaysX.lan.en.EnglishLang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
+import pt.theninjask.AnotherTwitchPlaysX.util.AdditionalCommandsATPX;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubReleaseJson;
-import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsole;
 import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
-import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorErrorOutputStream;
-import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorInputStream;
-import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorOutputStream;
 import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
+import pt.theninjask.AnotherTwitchPlaysX.util.TrayManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.WrapEditorKit;
 
 public class App {
@@ -72,27 +72,20 @@ public class App {
 	public static final String VERSION = getVersion();
 
 	public static void main(String[] args) {
-		
-		//To mitigate the exploit in case use there is use of this logger from dependencies
+
+		// To mitigate the exploit in case use there is use of this logger from
+		// dependencies
 		System.setProperty("Dlog4j2.formatMsgNoLookups", "true");
 		
-		RedirectorOutputStream.changeRedirect(System.out);
-		RedirectorOutputStream.changeDefault(System.out);
-		System.setOut(RedirectorOutputStream.getInstance());
-
-		RedirectorErrorOutputStream.changeRedirect(System.err);
-		RedirectorErrorOutputStream.changeDefault(System.err);
-		System.setErr(RedirectorErrorOutputStream.getInstance());
-
-		RedirectorInputStream.changeRedirect(System.in);
-		RedirectorInputStream.changeDefault(System.in);
-		System.setIn(RedirectorInputStream.getInstance());
+		setupExternalConsole();
 		
 		DataManager.setLanguage(new EnglishLang());
 		DataManager.setTheme(Constants.TWITCH_THEME);
 		
+		TrayManager.getInstance().setToolTip(DataManager.getLanguage().getID());
+
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyPressedAdapter());
-		
+
 		int amountOfRequiredTwitchSessionOptions = 0;
 		int amountOfRequiredYouTubeSessionOptions = 0;
 		Options options = new Options();
@@ -124,13 +117,11 @@ public class App {
 			CommandLineParser parser = new DefaultParser();
 			CommandLine cmd = parser.parse(options, args);
 			ATPXConfig config = loadConfigFile();
-			if(config.getTheme()!=null) {
+			if (config.getTheme() != null) {
 				DataManager.setTheme(Constants.THEMES.getOrDefault(config.getTheme(), Constants.TWITCH_THEME));
 			}
 			if (cmd.hasOption('o') || config.isOutsideConsole()) {
-				RedirectorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleOutputStream());
-				RedirectorErrorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());
-				RedirectorInputStream.changeRedirect(ExternalConsole.getExternalConsoleInputStream());
+				ExternalConsole.setSystemStreams();
 				ExternalConsole.setViewable(true);
 			}
 			if (cmd.hasOption('h') || config.isHelp()) {
@@ -315,14 +306,16 @@ public class App {
 		JTextField title = new JTextField();
 		scroll = new JScrollPane();
 		message = new JTextPane();
-		
+
 		title.setOpaque(false);
 		title.setForeground(DataManager.getTheme().getFont());
-		title.setText(String.format(DataManager.getLanguage().getUpdateNoticeTitleContent(), update.tag_name, update.update_name));
+		title.setText(String.format(DataManager.getLanguage().getUpdateNoticeTitleContent(), update.tag_name,
+				update.update_name));
 		title.setBorder(null);
-		title.setFont(new Font(title.getFont().getFontName(), title.getFont().getStyle(), title.getFont().getSize()+7));
+		title.setFont(
+				new Font(title.getFont().getFontName(), title.getFont().getStyle(), title.getFont().getSize() + 7));
 		title.setEditable(false);
-		
+
 		message.setEditorKit(new WrapEditorKit());
 		message.setEditable(false);
 		scroll.setViewportView(message);
@@ -335,14 +328,14 @@ public class App {
 
 		message.setOpaque(false);
 		message.setForeground(DataManager.getTheme().getFont());
-		
+
 		scroll.setPreferredSize(new Dimension(151, 151));
 		content.add(scroll, BorderLayout.CENTER);
 		content.add(title, BorderLayout.NORTH);
 		content.setOpaque(false);
-		
+
 		message.setText(update.body);
-		
+
 		String[] options = { DataManager.getLanguage().getUpdateNoticeWebsiteOption(),
 				DataManager.getLanguage().getUpdateNoticeDownloadOption(),
 				DataManager.getLanguage().getUpdateNoticeSkipOption() };
@@ -368,7 +361,7 @@ public class App {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.globalSetUp()", App.class.getSimpleName()));
 		PrintStream tmp = System.out;
 		try {
-			ThreadPool.execute(()->{
+			ThreadPool.execute(() -> {
 				checkForUpdate();
 			});
 
@@ -445,6 +438,15 @@ public class App {
 		} catch (Exception | Error e) {
 			System.setOut(tmp);
 			throw e;
+		}
+	}
+	
+	private static void setupExternalConsole() {
+		ExternalConsole.setClosable(false);
+		ExternalConsole.setIcon(Constants.ICON_PATH);
+		ExternalConsole.setConsoleTitle(String.format("%s's Console", ID));
+		for(ExternalConsoleCommand cmd : AdditionalCommandsATPX.getCommands()) {
+			ExternalConsole.addCommand(cmd);
 		}
 	}
 }

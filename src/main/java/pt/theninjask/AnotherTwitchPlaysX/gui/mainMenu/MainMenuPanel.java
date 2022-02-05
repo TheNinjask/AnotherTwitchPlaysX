@@ -22,7 +22,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,6 +36,7 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.kitteh.irc.client.library.exception.KittehConnectionException;
 
+import externalconsole.console.ExternalConsole;
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
@@ -59,14 +59,11 @@ import pt.theninjask.AnotherTwitchPlaysX.lan.Lang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.SponsorBot;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
+import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.Auth;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubeChatService.YouTubeChatServiceException;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
-import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsole;
 import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
-import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorErrorOutputStream;
-import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorInputStream;
-import pt.theninjask.AnotherTwitchPlaysX.util.RedirectorOutputStream;
 
 public class MainMenuPanel extends JPanel {
 
@@ -206,30 +203,46 @@ public class MainMenuPanel extends JPanel {
 
 	@Handler
 	public void onNotConnectedError(UnknownHostException exception) {
-		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
-		if(inConnection.get())
+		if (inConnection.get())
 			disconnectPhase();
+		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
 	}
-	
+
 	@Handler
 	public void onNotConnectedError(KittehConnectionException exception) {
-		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
-		if(inConnection.get())
+		if (inConnection.get())
 			disconnectPhase();
+		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
 	}
-	
+
+	private static final int MAX_RETRIES = 1;
+
+	private static int curr_retry = 0;
+
 	@Handler
 	public void onYoutubeTokenError(YouTubeChatServiceException exception) {
-		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
-		if(inConnection.get())
+		if (inConnection.get())
 			disconnectPhase();
+		if (curr_retry < MAX_RETRIES)
+			try {
+				curr_retry++;
+				if (Auth.clearCredentials()) {
+					connectPhase();
+					return;
+				}
+			} catch (Exception e) {
+			}
+		curr_retry = 0;
+		Constants.showMessageDialog(exception.getMessage(), exception.getClass().getSimpleName());
 	}
-	
+
 	private void connectPhase() {
-		//if (TwitchPlayer.getInstance().hasRequired() && !TwitchPlayer.getInstance().isConnected())
-		//	TwitchPlayer.getInstance().setupAndConnect();
-		//if (YouTubePlayer.getInstance().hasRequired() && !YouTubePlayer.getInstance().isConnected())
-		//	YouTubePlayer.getInstance().setupAndConnect();
+		// if (TwitchPlayer.getInstance().hasRequired() &&
+		// !TwitchPlayer.getInstance().isConnected())
+		// TwitchPlayer.getInstance().setupAndConnect();
+		// if (YouTubePlayer.getInstance().hasRequired() &&
+		// !YouTubePlayer.getInstance().isConnected())
+		// YouTubePlayer.getInstance().setupAndConnect();
 		if (TwitchPlayer.getInstance().hasRequired() && !TwitchPlayer.getInstance().isConnected()) {
 			TwitchPlayer.getInstance().setup();
 			TwitchPlayer.getInstance().registerEventListener(this);
@@ -276,14 +289,10 @@ public class MainMenuPanel extends JPanel {
 			boolean changeConsole = KeyPressedAdapter.isKeyPressed(KeyEvent.VK_SHIFT);
 			if (changeConsole) {
 				if (ExternalConsole.isViewable()) {
-					RedirectorOutputStream.changeRedirectToDefault();
-					RedirectorErrorOutputStream.changeRedirectToDefault();
-					RedirectorInputStream.changeRedirectToDefault();
+					ExternalConsole.revertSystemStreams();
 					ExternalConsole.setViewable(false);
 				} else {
-					RedirectorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleOutputStream());
-					RedirectorErrorOutputStream.changeRedirect(ExternalConsole.getExternalConsoleErrorOutputStream());
-					RedirectorInputStream.changeRedirect(ExternalConsole.getExternalConsoleInputStream());
+					ExternalConsole.setSystemStreams();
 					ExternalConsole.setViewable(true);
 				}
 				return;
@@ -412,7 +421,8 @@ public class MainMenuPanel extends JPanel {
 									gameButton.setText(DataManager.getLanguage().getMainMenu().getStart());
 									commandsButton.setEnabled(true);
 									connectButton.setEnabled(true);
-									MainFrame.getInstance().setState(JFrame.NORMAL);
+									//MainFrame.getInstance().setState(JFrame.NORMAL);
+									MainFrame.getInstance().setVisible(true);
 									isAppStarted.set(false);
 								} catch (NativeHookException nativeHookException) {
 									Constants.showExceptionDialog(nativeHookException);
@@ -420,7 +430,8 @@ public class MainMenuPanel extends JPanel {
 							}
 						}
 					});
-					MainFrame.getInstance().setState(JFrame.ICONIFIED);
+					//MainFrame.getInstance().setState(JFrame.ICONIFIED);
+					MainFrame.getInstance().dispose();
 					isAppStarted.set(true);
 				} catch (NativeHookException e) {
 					Constants.showExceptionDialog(e);
@@ -478,7 +489,7 @@ public class MainMenuPanel extends JPanel {
 	}
 
 	private JSlider twitchChatSlider() {
-		twitchChatSize = new JSlider(ChatFrame.MSG_DISPLAY_MIN, ChatFrame.MSG_DISPLAY_INFINITE, 5);
+		twitchChatSize = new JSlider(ChatFrame.getMsgDisplayMin(), ChatFrame.getMsgDisplayInf(), 5);
 		twitchChatSize.setMajorTickSpacing(45);
 		twitchChatSize.setPaintLabels(true);
 		twitchChatSize.setOpaque(false);
@@ -495,7 +506,7 @@ public class MainMenuPanel extends JPanel {
 		twitchChatSize.addChangeListener(e -> {
 			int value = twitchChatSize.getValue();
 			twitchChatSliderLabel.setText(String.format(DataManager.getLanguage().getMainMenu().getCurrentChatSize(),
-					value < ChatFrame.MSG_DISPLAY_INFINITE ? value
+					value < ChatFrame.getMsgDisplayInf() ? value
 							: DataManager.getLanguage().getMainMenu().getInfinite()));
 			ChatFrame.getInstance().setMessageCap(value);
 			ChatFrame.getInstance().updateChatSize();
@@ -843,33 +854,9 @@ public class MainMenuPanel extends JPanel {
 		return tmp;
 	}
 
-	public JButton getConnectButton() {
-		return connectButton;
-	}
-
-	public JButton getCommandsButton() {
-		return commandsButton;
-	}
-
-	public JButton getModButton() {
-		return modButton;
-	}
-
-	public JButton getGameButton() {
-		return gameButton;
-	}
-
-	public JButton getChangeSessionButton() {
-		return changeSessionButton;
-	}
-
-	public JButton getTwitchChatButton() {
-		return twitchChatButton;
-	}
-
-	public List<JComponent> getTwitchChatOptions() {
-		return twitchChatOptions;
-	}
+	/*
+	 * public JButton getModButton() { return modButton; }
+	 */
 
 	public AtomicBoolean getIsAppStarted() {
 		return isAppStarted;
@@ -895,7 +882,7 @@ public class MainMenuPanel extends JPanel {
 
 		commandsButton.setText(session.getMainMenu().getSetCommands());
 
-		if (mod != null)
+		if (mod == null)
 			modButton.setText(session.getMainMenu().getMod());
 
 		if (isAppStarted.get())
@@ -911,7 +898,7 @@ public class MainMenuPanel extends JPanel {
 
 		int value = twitchChatSize.getValue();
 		twitchChatSliderLabel.setText(String.format(session.getMainMenu().getCurrentChatSize(),
-				value < ChatFrame.MSG_DISPLAY_INFINITE ? value : session.getMainMenu().getInfinite()));
+				value < ChatFrame.getMsgDisplayInf() ? value : session.getMainMenu().getInfinite()));
 
 		twitchChatOptionsLabel.setText(session.getMainMenu().getChatOptions());
 

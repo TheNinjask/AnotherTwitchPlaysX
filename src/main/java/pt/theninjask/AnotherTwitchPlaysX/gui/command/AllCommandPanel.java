@@ -322,54 +322,6 @@ public class AllCommandPanel extends JPanel{
 			this.table.clearAndSet(DataManager.getCommands());
 	}
 
-	public JPanel getCurrentPanel() {
-		return currentPanel;
-	}
-
-	public void setCurrentPanel(JPanel newer) {
-		this.currentPanel = newer;
-	}
-
-	public JButton getCreate() {
-		return create;
-	}
-
-	public JButton getLoad() {
-		return load;
-	}
-
-	public JButton getBack() {
-		return back;
-	}
-
-	public JTableCommand getTable() {
-		return table;
-	}
-
-	public JPanel getMainCommandPanel() {
-		return mainCommandPanel;
-	}
-
-	public JButton getInsert() {
-		return insert;
-	}
-
-	public JButton getHelp() {
-		return help;
-	}
-
-	public JButton getPopout() {
-		return popout;
-	}
-
-	public JButton getSave() {
-		return save;
-	}
-
-	public JButton getKeycodes() {
-		return keycodes;
-	}
-
 	//@Handler
 	public void updateLang(LanguageUpdateEvent event) {
 		Lang session = event.getLanguage();

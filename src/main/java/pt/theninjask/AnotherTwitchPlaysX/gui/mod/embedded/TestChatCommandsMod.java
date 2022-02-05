@@ -129,7 +129,7 @@ public class TestChatCommandsMod extends ATPXMod {
 	public void updateChatSize() {
 		synchronized (chat) {
 			try {
-				if (messageCap < ChatFrame.MSG_DISPLAY_INFINITE) {
+				if (messageCap < ChatFrame.getMsgDisplayInf()) {
 					int toClear = chat.getLineCount() - messageCap - 1;
 					if (toClear >= 0) {
 						chat.replaceRange("", 0, chat.getLineEndOffset(toClear));

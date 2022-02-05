@@ -17,6 +17,8 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import externalconsole.console.ExternalConsole;
+import externalconsole.console.ExternalConsoleCommand;
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
@@ -24,8 +26,6 @@ import pt.theninjask.AnotherTwitchPlaysX.event.data.CommandDataOnExecute;
 import pt.theninjask.AnotherTwitchPlaysX.event.gui.mainMenu.GameButtonClickEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
-import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsole;
-import pt.theninjask.AnotherTwitchPlaysX.util.ExternalConsoleCommand;
 
 @ATPXModProps(hasPanel = false)
 public class DemocracyMod extends ATPXMod {
@@ -101,7 +101,7 @@ public class DemocracyMod extends ATPXMod {
 		}
 
 		@Override
-		public boolean executeCommand(String[] args) {
+		public int executeCommand(String[] args) {
 			Options options = new Options();
 			OptionGroup dem = new OptionGroup();
 			// print.setRequired(true);
@@ -140,9 +140,9 @@ public class DemocracyMod extends ATPXMod {
 				}
 			} catch (ParseException e) {
 				ExternalConsole.println(e.getMessage());
-				return false;
+				return 1;
 			}
-			return true;
+			return 0;
 		}
 	};
 

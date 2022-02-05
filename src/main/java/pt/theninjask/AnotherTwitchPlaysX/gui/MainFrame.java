@@ -1,7 +1,12 @@
 package pt.theninjask.AnotherTwitchPlaysX.gui;
 
+import java.awt.CheckboxMenuItem;
 import java.awt.Dimension;
+import java.awt.MenuItem;
+import java.awt.MenuShortcut;
 import java.awt.Toolkit;
+import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -16,6 +21,7 @@ import javax.swing.JTextField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import externalconsole.console.ExternalConsole;
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;
@@ -31,6 +37,7 @@ import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.stream.twitch.TwitchPlayer;
 import pt.theninjask.AnotherTwitchPlaysX.stream.youtube.YouTubePlayer;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
+import pt.theninjask.AnotherTwitchPlaysX.util.TrayManager;
 
 public class MainFrame extends JFrame {
 
@@ -39,6 +46,12 @@ public class MainFrame extends JFrame {
 	private static MainFrame singleton = new MainFrame();
 
 	private JPanel currentPanel = MainLoginPanel.getInstance();
+
+	private CheckboxMenuItem hide;
+
+	private MenuItem ec;
+
+	private MenuItem exit;
 
 	private MainFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainFrame.class.getSimpleName()));
@@ -60,17 +73,32 @@ public class MainFrame extends JFrame {
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
-				if (TwitchLoginPanel.getInstance().rememberSession())
-					saveTwitchSession();
-				if (YoutubeLoginPanel.getInstance().rememberSession())
-					saveYouTubeSession();
-				if (TwitchPlayer.getInstance().isConnected())
-					TwitchPlayer.getInstance().disconnect();
-
-				if (YouTubePlayer.getInstance().isConnected())
-					YouTubePlayer.getInstance().disconnect();
+				onClose();
 			}
 		});
+		hide = new CheckboxMenuItem(DataManager.getLanguage().getHiddedItemTray());
+		hide.addItemListener(l->{
+			if(l.getStateChange()==ItemEvent.SELECTED)
+				singleton.dispose();
+			else if(l.getStateChange()==ItemEvent.DESELECTED)
+				singleton.setVisible(true);
+		});
+		ec = new MenuItem(DataManager.getLanguage().getConsoleItemTray(), new MenuShortcut(KeyEvent.VK_C));
+		ec.addActionListener(l->{
+			if (ExternalConsole.isViewable()) {
+				ExternalConsole.revertSystemStreams();
+				ExternalConsole.setViewable(false);
+			} else {
+				ExternalConsole.setSystemStreams();
+				ExternalConsole.setViewable(true);
+			}
+		});
+		exit = new MenuItem(DataManager.getLanguage().getExitItemTray(), new MenuShortcut(KeyEvent.VK_C));
+		exit.addActionListener(l->{
+			onClose();
+			System.exit(0);
+		});
+		TrayManager.getInstance().addMenuItem(exit).addMenuItem(ec).addMenuItem(hide).refresh();
 	}
 
 	private void saveTwitchSession() {
@@ -145,6 +173,20 @@ public class MainFrame extends JFrame {
 				Constants.showExceptionDialog(e);
 			}
 	}
+	
+	private void onClose() {
+		Constants.printVerboseMessage(Level.INFO, String.format("%s.onClose()", MainFrame.class.getSimpleName()));
+		if (TwitchLoginPanel.getInstance().rememberSession())
+			saveTwitchSession();
+		if (YoutubeLoginPanel.getInstance().rememberSession())
+			saveYouTubeSession();
+		if (TwitchPlayer.getInstance().isConnected())
+			TwitchPlayer.getInstance().disconnect();
+
+		if (YouTubePlayer.getInstance().isConnected())
+			YouTubePlayer.getInstance().disconnect();
+		TrayManager.getInstance().stop();
+	}
 
 	public static void replacePanel(JPanel newPanel) {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s.replacePanel()", MainFrame.class.getSimpleName()));
@@ -161,10 +203,18 @@ public class MainFrame extends JFrame {
 		singleton.repaint();
 	}
 
+	public static JPanel getCurrentPanel() {
+		return singleton.currentPanel;
+	}
+	
 	// @Handler
 	public void updateLang(LanguageUpdateEvent event) {
-		if (event.getLanguage() != null)
+		if (event.getLanguage() != null) {
 			this.setTitle(String.format("%s - v%s", event.getLanguage().getID(), App.VERSION));
+			hide.setLabel(event.getLanguage().getHiddedItemTray());
+			ec.setLabel(DataManager.getLanguage().getConsoleItemTray());
+			exit.setLabel(DataManager.getLanguage().getExitItemTray());
+		}
 	}
 	
 	@Handler
@@ -173,5 +223,16 @@ public class MainFrame extends JFrame {
 			this.getContentPane().setBackground(event.getTheme().getBackground());
 		}
 	}
-
+	
+	@Override
+	public void dispose() {
+		super.dispose();
+		hide.setState(true);
+	}
+	
+	@Override
+	public void setVisible(boolean b) {
+		super.setVisible(b);
+		hide.setState(!b);
+	}
 }
