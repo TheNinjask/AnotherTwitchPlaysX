@@ -101,7 +101,7 @@ public class DemocracyMod extends ATPXMod {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup dem = new OptionGroup();
 			// print.setRequired(true);

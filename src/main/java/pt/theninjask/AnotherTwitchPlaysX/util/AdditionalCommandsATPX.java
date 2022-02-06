@@ -36,8 +36,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
-import externalconsole.console.ExternalConsoleCommand;
 import externalconsole.console.ExternalConsole;
+import externalconsole.console.ExternalConsoleCommand;
 import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
@@ -69,7 +69,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup verbose = new OptionGroup();
 			// verbose.setRequired(true);
@@ -131,7 +131,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup print = new OptionGroup();
 			// print.setRequired(true);
@@ -190,7 +190,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup event = new OptionGroup();
 			// event.setRequired(true);
@@ -250,7 +250,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup debug = new OptionGroup();
 			// debug.setRequired(true);
@@ -308,7 +308,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup disableSession = new OptionGroup();
 			// disableSession.setRequired(true);
@@ -361,7 +361,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			try {
 				Desktop.getDesktop().open(new File(Constants.SAVE_PATH));
 			} catch (IOException e) {
@@ -390,7 +390,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup mod = new OptionGroup();
 			// print.setRequired(true);
@@ -511,7 +511,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup theme = new OptionGroup();
 			theme.addOption(new Option("t", "twitch", false, "Set App's Theme to Twitch"));
@@ -575,7 +575,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup local = new OptionGroup();
 			local.addOption(new Option("f", "chatframe", true, "Sends local message to ChatFrame"));
@@ -632,7 +632,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Constants.showREADME();
 			return 0;
 		}
@@ -656,11 +656,11 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			GitHubReleaseJson update = Constants.getLatestRelease();
 			if (update == null) {
 				ExternalConsole.println("Could not check update.");
-				return 0;
+				return -1;
 			}
 			String regex = "v?(\\d+).(\\d+).(\\d+)";
 			Pattern pattern = Pattern.compile(regex);
@@ -685,11 +685,78 @@ public class AdditionalCommandsATPX {
 			if (currVersionMajor > gitVersionMajor
 					|| (currVersionMajor == gitVersionMajor && currVersionMinor > gitVersionMinor)
 					|| (currVersionMajor == gitVersionMajor && currVersionMinor == gitVersionMinor
-							&& currVersionPatch >= gitVersionPatch))
+							&& currVersionPatch >= gitVersionPatch)) {
 				ExternalConsole.println(String.format("No Update Available. (Current Version: %s)", App.VERSION));
-			else
-				ExternalConsole.println(String.format("Update Available: %s", update.tag_name));
-			return 0;
+				return 0;
+			}
+
+			JPanel content = new JPanel(new BorderLayout());
+			JScrollPane scroll = new JScrollPane();
+			JTextPane message = new JTextPane();
+			JTextField title = new JTextField();
+			scroll = new JScrollPane();
+			message = new JTextPane();
+
+			title.setOpaque(false);
+			title.setForeground(DataManager.getTheme().getFont());
+			title.setText(String.format(DataManager.getLanguage().getUpdateNoticeTitleContent(), update.tag_name,
+					update.update_name));
+			title.setBorder(null);
+			title.setFont(
+					new Font(title.getFont().getFontName(), title.getFont().getStyle(), title.getFont().getSize() + 7));
+			title.setEditable(false);
+
+			message.setEditorKit(new WrapEditorKit());
+			message.setEditable(false);
+			scroll.setViewportView(message);
+			scroll.setFocusable(false);
+			scroll.setEnabled(false);
+			scroll.setBorder(null);
+			scroll.setWheelScrollingEnabled(true);
+			scroll.setOpaque(false);
+			scroll.getViewport().setOpaque(false);
+
+			message.setOpaque(false);
+			message.setForeground(DataManager.getTheme().getFont());
+
+			scroll.setPreferredSize(new Dimension(151, 151));
+			content.add(scroll, BorderLayout.CENTER);
+			content.add(title, BorderLayout.NORTH);
+			content.setOpaque(false);
+
+			message.setText(update.body);
+
+			String[] options = { DataManager.getLanguage().getUpdateNoticeWebsiteOption(),
+					DataManager.getLanguage().getUpdateNoticeDownloadOption(),
+					DataManager.getLanguage().getUpdateNoticeSkipOption() };
+
+			int resp = Constants.showCustomColorOptionDialog(null, content,
+					DataManager.getLanguage().getUpdateNoticeTitle(), JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE, null, options, null, DataManager.getTheme().getBackground());
+			switch (resp) {
+			case JOptionPane.YES_OPTION:
+				Constants.openWebsite(update.html_url);
+				break;
+			case JOptionPane.NO_OPTION:
+				Constants.openWebsite(update.assets.get(0).browser_download_url);
+				break;
+			default:
+			case JOptionPane.CANCEL_OPTION:
+			case JOptionPane.CLOSED_OPTION:
+				break;
+			}
+			return 1;
+			/*switch (result) {
+			case 0:
+				ExternalConsole.println(String.format("No Update Available. (Current Version: %s)", App.VERSION));
+				return 0;
+			case 1:
+				ExternalConsole.println("Update Available. Showing Update");
+				return 1;
+			default:
+				ExternalConsole.println("Could not check update.");
+				return -1;
+			}*/
 		}
 
 		@Override
@@ -713,7 +780,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			GitHubReleaseJson release;
 			if (args.length <= 0) {
 				ExternalConsole.println("Showing latest");
@@ -796,7 +863,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			Options options = new Options();
 			OptionGroup mod = new OptionGroup();
 			// print.setRequired(true);
@@ -880,10 +947,10 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public int executeCommand(String[] args) {
+		public int executeCommand(String... args) {
 			try {
-				ExternalConsole.println(IdentifierUI.getIDFrom(MainFrame.getCurrentPanel()));				
-			}catch(Exception e) {
+				ExternalConsole.println(IdentifierUI.getIDFrom(MainFrame.getCurrentPanel()));
+			} catch (Exception e) {
 				e.printStackTrace();
 				return 0;
 			}

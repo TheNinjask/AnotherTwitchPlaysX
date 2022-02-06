@@ -95,4 +95,24 @@ public interface Lang {
 	public default String getExitItemTray() {
 		return "Exit";
 	}
+	
+	public default String getCheckUpdateItemTray() {
+		return "Check for update";
+	}
+	
+	public default String getCheckUpdateErrorItemTray() {
+		return "An error occurred when checking for update.";
+	}
+	
+	public default String getCheckUpdateErrorTitleItemTray() {
+		return "Could not find update";
+	}
+	
+	public default String getCheckUpdateNoneItemTray() {
+		return "This ATPX's version is up to date!";
+	}
+	
+	public default String getCheckUpdateNoneTitleItemTray() {
+		return "No updates found";
+	}
 }

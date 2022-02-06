@@ -53,6 +53,8 @@ public class MainFrame extends JFrame {
 
 	private MenuItem exit;
 
+	private MenuItem update;
+
 	private MainFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainFrame.class.getSimpleName()));
 		this.onStart();
@@ -98,7 +100,21 @@ public class MainFrame extends JFrame {
 			onClose();
 			System.exit(0);
 		});
-		TrayManager.getInstance().addMenuItem(exit).addMenuItem(ec).addMenuItem(hide).refresh();
+		update = new MenuItem(DataManager.getLanguage().getCheckUpdateItemTray());
+		update.addActionListener(l->{
+			int result = ExternalConsole.getCommand("update").executeCommand();
+			switch (result) {
+			case 0:
+				Constants.showMessageDialog(DataManager.getLanguage().getCheckUpdateNoneItemTray(), DataManager.getLanguage().getCheckUpdateNoneTitleItemTray());
+				break;
+			case 1:
+				break;
+			default:
+				Constants.showMessageDialog(DataManager.getLanguage().getCheckUpdateErrorItemTray(), DataManager.getLanguage().getCheckUpdateErrorTitleItemTray());
+				break;
+			}
+		});
+		TrayManager.getInstance().addMenuItem(exit).addMenuItem(update).addMenuItem(ec).addMenuItem(hide).refresh();
 	}
 
 	private void saveTwitchSession() {
@@ -214,6 +230,7 @@ public class MainFrame extends JFrame {
 			hide.setLabel(event.getLanguage().getHiddedItemTray());
 			ec.setLabel(DataManager.getLanguage().getConsoleItemTray());
 			exit.setLabel(DataManager.getLanguage().getExitItemTray());
+			update.setLabel(DataManager.getLanguage().getCheckUpdateItemTray());
 		}
 	}
 	
