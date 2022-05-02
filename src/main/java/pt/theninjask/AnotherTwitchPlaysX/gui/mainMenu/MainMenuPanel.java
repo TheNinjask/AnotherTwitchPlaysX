@@ -36,7 +36,7 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.kitteh.irc.client.library.exception.KittehConnectionException;
 
-import externalconsole.console.ExternalConsole;
+import pt.theninjask.externalconsole.console.ExternalConsole;
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
@@ -47,6 +47,7 @@ import pt.theninjask.AnotherTwitchPlaysX.event.gui.mainMenu.ModButtonClickEvent;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame.ChatMode;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame.ChatStyle;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame.ChatType;
 import pt.theninjask.AnotherTwitchPlaysX.gui.command.AllCommandPanel;
 import pt.theninjask.AnotherTwitchPlaysX.gui.login.MainLoginPanel;
@@ -146,6 +147,8 @@ public class MainMenuPanel extends JPanel {
 
 	private JRadioButton twitchRadio;
 
+	private JPanel twitchChatType;
+
 	private MainMenuPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainMenuPanel.class.getSimpleName()));
 		this.isAppStarted = new AtomicBoolean(false);
@@ -164,8 +167,9 @@ public class MainMenuPanel extends JPanel {
 		twitchChatFontSize();
 		twitchChatTransparencyModePanel();
 		setTwitchChatInput();
+		twitchChatType();
 		twitchChatOptions = new ArrayList<JComponent>(
-				Arrays.asList(twitchChatColorModePanel, twitchChatMode, twitchChatFontPanel, twitchChatFontSizePanel,
+				Arrays.asList(twitchChatColorModePanel, twitchChatType, twitchChatMode, twitchChatFontPanel, twitchChatFontSizePanel,
 						twitchChatTransparencyModePanel, twitchChatInput, twitchChatOnTop));
 		this.add(twitchChatOptionsLabel());
 		this.add(twitchChatOptionsPanel());
@@ -659,19 +663,19 @@ public class MainMenuPanel extends JPanel {
 		twitchChatMode = new JPanel(new FlowLayout());
 		twitchChatMode.setOpaque(false);
 		ButtonGroup group = new ButtonGroup();
-		mineRadio = new JRadioButton(ChatType.MINECRAFT.getType());
+		mineRadio = new JRadioButton(ChatStyle.MINECRAFT.getStyle());
 		mineRadio.setOpaque(false);
 		mineRadio.setFocusable(false);
 		mineRadio.setForeground(DataManager.getTheme().getFont());
 		mineRadio.addActionListener(i -> {
-			ChatFrame.getInstance().setChatType(ChatType.MINECRAFT);
+			ChatFrame.getInstance().setChatStyle(ChatStyle.MINECRAFT);
 		});
-		twitchRadio = new JRadioButton(ChatType.TWITCH.getType());
+		twitchRadio = new JRadioButton(ChatStyle.TWITCH.getStyle());
 		twitchRadio.setOpaque(false);
 		twitchRadio.setFocusable(false);
 		twitchRadio.setForeground(DataManager.getTheme().getFont());
 		twitchRadio.addActionListener(i -> {
-			ChatFrame.getInstance().setChatType(ChatType.TWITCH);
+			ChatFrame.getInstance().setChatStyle(ChatStyle.TWITCH);
 		});
 		mineRadio.setSelected(true);
 		group.add(mineRadio);
@@ -679,6 +683,34 @@ public class MainMenuPanel extends JPanel {
 		twitchChatMode.add(mineRadio);
 		twitchChatMode.add(twitchRadio);
 		return twitchChatMode;
+	}
+	
+	//TODO
+	//What is there TODO??
+	private JPanel twitchChatType() {
+		twitchChatType = new JPanel(new FlowLayout());
+		twitchChatType.setOpaque(false);
+		ButtonGroup group = new ButtonGroup();
+		JRadioButton normalChat = new JRadioButton(DataManager.getLanguage().getMainMenu().getNormalChatRadioButton());
+		normalChat.setOpaque(false);
+		normalChat.setFocusable(false);
+		normalChat.setForeground(DataManager.getTheme().getFont());
+		normalChat.addActionListener(i -> {
+			ChatFrame.getInstance().setChatType(ChatType.STREAM);
+		});
+		JRadioButton cmdChat = new JRadioButton(DataManager.getLanguage().getMainMenu().getCmdChatRadioButton());
+		cmdChat.setOpaque(false);
+		cmdChat.setFocusable(false);
+		cmdChat.setForeground(DataManager.getTheme().getFont());
+		cmdChat.addActionListener(i -> {
+			ChatFrame.getInstance().setChatType(ChatType.CMD);
+		});
+		normalChat.setSelected(true);
+		group.add(normalChat);
+		group.add(cmdChat);
+		twitchChatType.add(normalChat);
+		twitchChatType.add(cmdChat);
+		return twitchChatType;
 	}
 
 	private JPanel twitchChatOptionsPanel() {

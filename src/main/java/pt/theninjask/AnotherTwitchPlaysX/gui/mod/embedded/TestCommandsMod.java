@@ -135,7 +135,7 @@ public class TestCommandsMod extends ATPXMod {
 				try {
 					Thread.sleep(Long.parseLong(cooldown.getText()) * 1000);
 					worker.run(() -> {
-						selec.getItemAt(selec.getSelectedIndex()).get().onMessage(selec.getItemAt(selec.getSelectedIndex()).get().getRegexExample());
+						selec.getItemAt(selec.getSelectedIndex()).get().onMessage("dummy",selec.getItemAt(selec.getSelectedIndex()).get().getRegexExample());
 					});
 				} catch (Exception e) {
 					Constants.showExceptionDialog(e);
@@ -146,7 +146,7 @@ public class TestCommandsMod extends ATPXMod {
 				try {
 					Thread.sleep(Long.parseLong(cooldown.getText()) * 1000);
 					for (CommandData cmd : DataManager.getCommands()) {
-						cmd.onMessage(cmd.getRegexExample());
+						cmd.onMessage("dummy",cmd.getRegexExample());
 						Thread.sleep(Long.parseLong(delay.getText()) * 1000);
 					}
 				} catch (Exception e) {

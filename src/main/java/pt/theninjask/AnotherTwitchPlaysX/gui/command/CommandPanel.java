@@ -120,6 +120,7 @@ public class CommandPanel extends JPanel {
 			this.current = data.clone();
 			this.saved = data;
 		}
+		//TODO fix
 		controls = new ArrayList<ControlDataPanel>();
 		this.setBackground(DataManager.getTheme().getBackground());
 		this.setLayout(new GridLayout(2, 1));
@@ -537,8 +538,9 @@ public class CommandPanel extends JPanel {
 		controlsPanel.setOpaque(false);
 		displayAdd();
 		for (ControlData elem : current.getControls()) {
-			new ControlDataPanel(elem, controls, this);
+			new ControlDataPanel(elem, this);
 		}
+		controls.forEach(c->c.refreshIndex());
 		if (controls.isEmpty()) {
 			controlsPanel.add(addPanel);
 			right.setEnabled(false);
@@ -561,7 +563,7 @@ public class CommandPanel extends JPanel {
 				if (!right) {
 					this.right.setEnabled(true);
 					ControlDataPanel tmp = controls.get(controls.size() - 1);
-					tmp.refreshIndex();
+					//tmp.refreshIndex();
 					controlsPanel.add(tmp);
 					if (controls.size() == 1)
 						this.left.setEnabled(false);
@@ -578,18 +580,18 @@ public class CommandPanel extends JPanel {
 					this.right.setEnabled(false);
 				} else {
 					ControlDataPanel tmp = controls.get(currentIndex + 1);
-					tmp.refreshIndex();
+					//tmp.refreshIndex();
 					controlsPanel.add(tmp);
 				}
 			} else {
 				if (currentIndex - 1 <= 0) {
 					ControlDataPanel tmp = controls.get(0);
-					tmp.refreshIndex();
+					//tmp.refreshIndex();
 					controlsPanel.add(tmp);
 					this.left.setEnabled(false);
 				} else {
 					ControlDataPanel tmp = controls.get(currentIndex - 1);
-					tmp.refreshIndex();
+					//tmp.refreshIndex();
 					controlsPanel.add(tmp);
 				}
 			}
@@ -651,12 +653,13 @@ public class CommandPanel extends JPanel {
 				return;
 			}
 			controlsPanel.removeAll();
-			ControlDataPanel tmp = new ControlDataPanel(cData, controls, this);
+			ControlDataPanel tmp = new ControlDataPanel(cData, this);
 			if (mode.getText().equals("Vars"))
 				tmp.setMode(Type.VAR);
 			controlsPanel.add(tmp);
 			controlsPanel.revalidate();
 			controlsPanel.repaint();
+			controls.forEach(c->c.refreshIndex());
 			right.setEnabled(true);
 		});
 		addPanel.add(add);
@@ -680,6 +683,42 @@ public class CommandPanel extends JPanel {
 		return vars;
 	}
 
+	public void joinListControlDataPanel(ControlDataPanel panel) {
+		controls.add(panel);
+		updateListControlDataPanel();
+	}
+	
+	public void updateListControlDataPanel() {
+		controls.parallelStream().forEach(c->c.refreshIndex());
+	}
+	
+	public void moveListControlDataPanel(int index, ControlDataPanel panel) {
+		controls.remove(panel);
+		controls.add(index, panel);
+		resetMoveControlDisplayButtons();
+		updateListControlDataPanel();
+	}
+	
+	public void leaveListControlDataPanel(ControlDataPanel panel) {
+		controls.remove(panel);
+		if (controls.isEmpty())
+			moveControlDisplay(true);
+		else
+			moveControlDisplay(false);
+		this.revalidate();
+		this.repaint();
+
+		updateListControlDataPanel();
+	}
+	
+	public int getIndexListControlDataPanel(ControlDataPanel panel) {
+		return controls.indexOf(panel);
+	}
+	
+	public int sizeOfListControlDataPanel() {
+		return controls.size();
+	}
+	
 	// @Handler
 	public void updateLang(LanguageUpdateEvent event) {
 		Lang session = event.getLanguage();

@@ -34,6 +34,7 @@ import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import com.google.api.services.youtube.model.LiveChatMessage;
 
 import net.engio.mbassy.listener.Handler;
+import pt.theninjask.AnotherTwitchPlaysX.data.CommandDataOnMessageMatchedEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
 import pt.theninjask.AnotherTwitchPlaysX.event.datamanager.LanguageUpdateEvent;
 import pt.theninjask.AnotherTwitchPlaysX.event.gui.chat.ChatFrameOnMessageEvent;
@@ -59,20 +60,20 @@ public class ChatFrame extends JFrame {
 
 	private static int MSG_DISPLAY_INFINITE = MSG_DISPLAY_MAX + 1;
 
-	public enum ChatType {
+	public enum ChatStyle {
 		MINECRAFT("Minecraft Style", "<%s> %s\n"), TWITCH("Twitch Style", "%s: %s\n");
 
-		private String type;
+		private String style;
 
 		private String format;
 
-		private ChatType(String type, String format) {
-			this.type = type;
+		private ChatStyle(String style, String format) {
+			this.style = style;
 			this.format = format;
 		}
 
-		public String getType() {
-			return type;
+		public String getStyle() {
+			return style;
 		}
 
 		public String getFormat() {
@@ -96,15 +97,44 @@ public class ChatFrame extends JFrame {
 
 	}
 
+	public enum ChatType {
+		NONE("NONE", 0x0), CMD("CMD", 0x1), TWITCH("TWITCH", 0x10), YOUTUBE("YOUTUBE", 0x100), STREAM("STREAM", 0x110),
+		ALL("ALL", 0x111);
+
+		private String name;
+
+		private int id;
+
+		private ChatType(String name, int id) {
+			this.name = name;
+			this.id = id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public int getId() {
+			return id;
+		}
+		
+		public boolean equals(ChatType type) {
+			return this == type || (this.id & type.id) != 0;
+		}
+
+	}
+
 	private JTextPane chat;
 
 	private JScrollPane scroll;
 
 	private int messageCap = 5;
 
-	private ChatType type;
+	private ChatStyle style;
 
 	private ChatMode mode;
+	
+	private ChatType type;
 
 	private int posX, posY;
 
@@ -120,11 +150,13 @@ public class ChatFrame extends JFrame {
 
 	private ChatFrame() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", ChatFrame.class.getSimpleName()));
-		this.type = ChatType.MINECRAFT;
+		this.style = ChatStyle.MINECRAFT;
 		this.mode = ChatMode.SOLID;
+		this.type = ChatType.STREAM;
 		// this.setTitle(String.format("%s's Twitch Chat",
 		// DataManager.getInstance().getSession().getChannel().substring(1)));
-		this.setMinimumSize(new Dimension(300, 300));
+		this.setMinimumSize(new Dimension(150, 150));
+		this.setSize(300, 300);
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
 		this.setLayout(new BorderLayout());
@@ -145,6 +177,7 @@ public class ChatFrame extends JFrame {
 		enabledDR = new AtomicBoolean(false);
 		enableDragAndResize();
 		// DataManager.registerLangEvent(this);
+		EventManager.registerEventListener(this);
 		this.setTitle(String.format(DataManager.getLanguage().getChat().getTitle(), DataManager.getLanguage().getID()));
 	}
 
@@ -332,7 +365,7 @@ public class ChatFrame extends JFrame {
 					updateChatSize();
 					// chat.append(String.format(type.getFormat(), nick, message));
 					StyledDocument doc = chat.getStyledDocument();
-					doc.insertString(doc.getLength(), String.format(type.getFormat(), nick, message), null);
+					doc.insertString(doc.getLength(), String.format(style.getFormat(), nick, message), null);
 					scroll.repaint();
 					scroll.revalidate();
 				} catch (BadLocationException e) {
@@ -344,6 +377,8 @@ public class ChatFrame extends JFrame {
 
 	@Handler
 	public void onMessage(ChannelMessageEvent event) {
+		if(!type.equals(ChatType.TWITCH))
+			return;
 		ChatFrameOnTwitchMessageEvent trigger = new ChatFrameOnTwitchMessageEvent(this, event);
 		EventManager.triggerEvent(trigger);
 		if (trigger.isCancelled())
@@ -353,6 +388,8 @@ public class ChatFrame extends JFrame {
 
 	@Handler
 	public void onMessage(LiveChatMessage event) {
+		if(!type.equals(ChatType.YOUTUBE))
+			return;
 		ChatFrameOnYouTubeMessageEvent trigger = new ChatFrameOnYouTubeMessageEvent(this, event);
 		EventManager.triggerEvent(trigger);
 		if (trigger.isCancelled())
@@ -360,6 +397,13 @@ public class ChatFrame extends JFrame {
 		onMessage(event.getAuthorDetails().getDisplayName(), event.getSnippet().getDisplayMessage());
 	}
 
+	@Handler
+	public void onMessage(CommandDataOnMessageMatchedEvent event) {
+		if(!type.equals(ChatType.CMD))
+			return;
+		onMessage(event.getUser(), event.getMessage());
+	}
+	
 	public void clearChat() {
 		synchronized (chat) {
 			chat.setText("");
@@ -447,12 +491,12 @@ public class ChatFrame extends JFrame {
 		return chat.getFont();
 	}
 
-	public void setChatType(ChatType type) {
-		this.type = type;
+	public void setChatStyle(ChatStyle style) {
+		this.style = style;
 	}
 
-	public ChatType getChatType() {
-		return type;
+	public ChatStyle getChatStyle() {
+		return style;
 	}
 
 	public void setChatMode(ChatMode mode) {
@@ -461,6 +505,14 @@ public class ChatFrame extends JFrame {
 		Color currentColor = getBGColor();
 		this.mode = mode;
 		setBGColor(currentColor);
+	}
+	
+	public void setChatType(ChatType type) {
+		this.type = type;
+	}
+
+	public ChatType getChatType() {
+		return type;
 	}
 
 	public void showInputMessage(boolean show) {

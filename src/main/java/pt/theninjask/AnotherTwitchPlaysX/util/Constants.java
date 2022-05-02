@@ -68,8 +68,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import externalconsole.console.ExternalConsole;
-import externalconsole.util.ColorTheme;
+import pt.theninjask.externalconsole.console.ExternalConsole;
+import pt.theninjask.externalconsole.util.ColorTheme;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;

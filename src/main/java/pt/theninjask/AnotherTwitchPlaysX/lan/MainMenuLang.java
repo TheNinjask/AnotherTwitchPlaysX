@@ -138,4 +138,12 @@ public interface MainMenuLang {
 		return "Please refresh your YouTube Token.";
 	}
 	
+	public default String getNormalChatRadioButton() {
+		return "Normal Chat";
+	}
+	
+	public default String getCmdChatRadioButton() {
+		return "Cmd Only Chat";
+	}
+	
 }

@@ -36,12 +36,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
-import externalconsole.console.ExternalConsole;
-import externalconsole.console.ExternalConsoleCommand;
 import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
-import pt.theninjask.AnotherTwitchPlaysX.gui.IdentifierUI;
 import pt.theninjask.AnotherTwitchPlaysX.gui.MainFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mainMenu.MainMenuPanel;
@@ -53,6 +50,8 @@ import pt.theninjask.AnotherTwitchPlaysX.lan.custom.CustomLang;
 import pt.theninjask.AnotherTwitchPlaysX.lan.en.EnglishLang;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 import pt.theninjask.AnotherTwitchPlaysX.util.Constants.GitHubReleaseJson;
+import pt.theninjask.externalconsole.console.ExternalConsole;
+import pt.theninjask.externalconsole.console.ExternalConsoleCommand;
 
 public class AdditionalCommandsATPX {
 
@@ -113,7 +112,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -172,7 +171,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -232,7 +231,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -290,7 +289,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -372,7 +371,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -557,7 +556,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -614,7 +613,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -638,7 +637,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -746,21 +745,16 @@ public class AdditionalCommandsATPX {
 				break;
 			}
 			return 1;
-			/*switch (result) {
-			case 0:
-				ExternalConsole.println(String.format("No Update Available. (Current Version: %s)", App.VERSION));
-				return 0;
-			case 1:
-				ExternalConsole.println("Update Available. Showing Update");
-				return 1;
-			default:
-				ExternalConsole.println("Could not check update.");
-				return -1;
-			}*/
+			/*
+			 * switch (result) { case 0: ExternalConsole.println(String.
+			 * format("No Update Available. (Current Version: %s)", App.VERSION)); return 0;
+			 * case 1: ExternalConsole.println("Update Available. Showing Update"); return
+			 * 1; default: ExternalConsole.println("Could not check update."); return -1; }
+			 */
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -845,7 +839,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -929,7 +923,7 @@ public class AdditionalCommandsATPX {
 		}
 
 		@Override
-		public boolean accessableInCode() {
+		public boolean accessibleInCode() {
 			return true;
 		}
 	};
@@ -949,7 +943,6 @@ public class AdditionalCommandsATPX {
 		@Override
 		public int executeCommand(String... args) {
 			try {
-				ExternalConsole.println(IdentifierUI.getIDFrom(MainFrame.getCurrentPanel()));
 			} catch (Exception e) {
 				e.printStackTrace();
 				return 0;
@@ -959,8 +952,10 @@ public class AdditionalCommandsATPX {
 	};
 
 	private AdditionalCommandsATPX() {
+		
 	}
 
+	// It may expose not AccessibleInCode Commands
 	public static ExternalConsoleCommand[] getCommands() {
 		return new ExternalConsoleCommand[] { verbose, printcommand, eventlog, debug, disablesession, appfolder, mod,
 				apptheme, localmsg, readme, update, changelog, lang, dummy };

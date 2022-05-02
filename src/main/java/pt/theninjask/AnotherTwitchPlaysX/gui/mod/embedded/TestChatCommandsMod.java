@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.text.DefaultCaret;
 
 import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame;
-import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame.ChatType;
+import pt.theninjask.AnotherTwitchPlaysX.gui.chat.ChatFrame.ChatStyle;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXMod;
 import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
@@ -26,7 +26,7 @@ import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
 public class TestChatCommandsMod extends ATPXMod {
 
 	private int messageCap = 5;
-	private ChatType type = ChatType.MINECRAFT;
+	private ChatStyle type = ChatStyle.MINECRAFT;
 
 	private JPanel mainPanel;
 	private JScrollPane scroll;
@@ -107,13 +107,14 @@ public class TestChatCommandsMod extends ATPXMod {
 	public void onMessage(String nick, String message) {
 		ThreadPool.execute(() -> {
 			DataManager.getCommands().forEach(cmd -> {
-				cmd.onMessage(message);
+				cmd.onMessage(nick, message);
 			});
 		});
 		synchronized (scroll) {
 			synchronized (chat) {
 				updateChatSize();
 				chat.append(String.format(type.getFormat(), nick, message));
+				//ChatFrame.getInstance().onMessage(nick, message);
 				scroll.repaint();
 				scroll.revalidate();
 			}

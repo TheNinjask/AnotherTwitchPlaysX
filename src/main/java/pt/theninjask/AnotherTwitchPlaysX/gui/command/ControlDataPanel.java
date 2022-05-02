@@ -51,7 +51,7 @@ public class ControlDataPanel extends JPanel {
 
 	private ControlData data;
 
-	private List<ControlDataPanel> in;
+	//private List<ControlDataPanel> in;
 
 	private JComboBox<Integer> index;
 
@@ -224,14 +224,14 @@ public class ControlDataPanel extends JPanel {
 		}
 	}
 
-	public ControlDataPanel(ControlData newData, List<ControlDataPanel> in, CommandPanel parent) {
+	public ControlDataPanel(ControlData newData, CommandPanel parent) {
 		Constants.printVerboseMessage(Level.INFO,
 				String.format("%s(%s)", ControlDataPanel.class.getSimpleName(), this.hashCode()));
 		this.data = newData;
 		this.parent = parent;
-		this.in = in;
+		//this.in = in;
 		this.isRefreshActive = new AtomicBoolean(false);
-		this.in.add(this);
+		//this.in.add(this);
 		this.setLayout(new BorderLayout());
 		this.setOpaque(false);
 
@@ -1056,16 +1056,10 @@ public class ControlDataPanel extends JPanel {
 		left.add(indexLabel);
 		index = new JComboBox<Integer>();
 		index.setFocusable(false);
-		for (JPanel jPanel : in) {
-			index.addItem(this.in.indexOf(jPanel));
-		}
-		index.setSelectedIndex(this.in.indexOf(this));
 		index.addActionListener(l -> {
 			if (isRefreshActive.get())
 				return;
-			this.in.remove(this);
-			this.in.add(index.getSelectedIndex(), this);
-			this.parent.resetMoveControlDisplayButtons();
+			parent.moveListControlDataPanel(index.getSelectedIndex(), this);
 		});
 		left.add(index);
 		// left.add(indexPanel);
@@ -1073,22 +1067,18 @@ public class ControlDataPanel extends JPanel {
 		remove = new JButton(DataManager.getLanguage().getControlData().getRemove());
 		remove.setFocusable(false);
 		remove.addActionListener(l -> {
-			this.in.remove(this);
-			if (in.isEmpty())
-				this.parent.moveControlDisplay(true);
-			else
-				this.parent.moveControlDisplay(false);
+			this.parent.leaveListControlDataPanel(this);
 			if (listener != null)
 				MouseCoords.getInstance().unregisterListener(listener);
 			if (listenerFinal != null)
 				MouseCoords.getInstance().unregisterListener(listenerFinal);
-			this.parent.revalidate();
-			this.parent.repaint();
 		});
 		left.add(remove);
 		// left.setPreferredSize(new Dimension(50, 151));
 		this.add(left, BorderLayout.EAST);
 		EventManager.registerEventListener(this);
+		
+		this.parent.joinListControlDataPanel(this);
 	}
 
 	public void refreshIndex() {
@@ -1096,10 +1086,10 @@ public class ControlDataPanel extends JPanel {
 		// System.out.println(index.getItemCount());
 		isRefreshActive.set(true);
 		index.removeAllItems();
-		for (JPanel jPanel : in) {
-			index.addItem(in.indexOf(jPanel));
+		for (int i=0; i<parent.sizeOfListControlDataPanel(); i++) {
+			index.addItem(i);
 		}
-		index.setSelectedIndex(in.indexOf(this));
+		index.setSelectedIndex(parent.getIndexListControlDataPanel(this));
 		isRefreshActive.set(false);
 	}
 

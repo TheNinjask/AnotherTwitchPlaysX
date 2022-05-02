@@ -100,7 +100,7 @@
 		<dependency>
 			<groupId>pt.theninjask</groupId>
 			<artifactId>externalconsole</artifactId>
-			<version>0.1.0</version>
+			<version>0.1.1</version>
 		</dependency>
 		<!-- Not using it but to prevent using older version -->
 		<!-- <dependency> <groupId>org.apache.logging.log4j</groupId> <artifactId>log4j-core</artifactId> 

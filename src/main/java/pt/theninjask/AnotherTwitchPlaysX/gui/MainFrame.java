@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import externalconsole.console.ExternalConsole;
+import pt.theninjask.externalconsole.console.ExternalConsole;
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.App;
 import pt.theninjask.AnotherTwitchPlaysX.data.TwitchSessionData;

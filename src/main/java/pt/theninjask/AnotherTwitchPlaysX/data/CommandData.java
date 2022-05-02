@@ -69,9 +69,9 @@ public class CommandData implements Data {
 			logger.setLevel(Level.OFF);
 		}
 	}
-	
+
 	public static boolean isEnableLogging() {
-		if(logger.getLevel().equals(Level.ALL))
+		if (logger.getLevel().equals(Level.ALL))
 			return true;
 		else
 			return false;
@@ -252,18 +252,22 @@ public class CommandData implements Data {
 		return copy;
 	}
 
-	public void onMessage(String message) {
+	public void onMessage(String user, String message) {
 		// if(!event.getActor().getNick().equalsIgnoreCase("mytwitchusername69420"))
 		// return;
 		CommandDataOnMessageEvent event = new CommandDataOnMessageEvent(this);
 		EventManager.triggerEvent(event);
-		if(event.isCancelled())
+		if (event.isCancelled())
 			return;
 		Pattern pattern = Pattern.compile(getRegex(), Pattern.CASE_INSENSITIVE);
 		Matcher match = pattern.matcher(message);
 		Map<String, String> map = new HashMap<String, String>();
 		if (!match.matches())
 			return;
+
+		CommandDataOnMessageMatchedEvent ethereal = new CommandDataOnMessageMatchedEvent(this, user, message);
+		EventManager.triggerEvent(ethereal);
+
 		for (Pair<String, CommandVarType> elem : vars) {
 			String value = match.group(elem.getLeft());
 			if (value != null && value.isEmpty())
@@ -278,27 +282,27 @@ public class CommandData implements Data {
 	public void onMessage(ChannelMessageEvent event) {
 		CommandDataOnTwitchMessageEvent trigger = new CommandDataOnTwitchMessageEvent(this, event);
 		EventManager.triggerEvent(trigger);
-		if(trigger.isCancelled())
+		if (trigger.isCancelled())
 			return;
-		onMessage(event.getMessage());
+		onMessage(event.getActor().getNick(), event.getMessage());
 	}
-	
+
 	@Handler
 	public void onMessage(LiveChatMessage event) {
 		CommandDataOnYouTubeMessage trigger = new CommandDataOnYouTubeMessage(this, event);
 		EventManager.triggerEvent(trigger);
-		if(trigger.isCancelled())
+		if (trigger.isCancelled())
 			return;
-		onMessage(event.getSnippet().getDisplayMessage());
+		onMessage(event.getAuthorDetails().getDisplayName(), event.getSnippet().getDisplayMessage());
 	}
 
 	public void execute() {
-		
+
 		CommandDataOnExecute event = new CommandDataOnExecute(this);
 		EventManager.triggerEvent(event);
-		if(event.isCancelled())
+		if (event.isCancelled())
 			return;
-		
+
 		switch (type) {
 		case SINGLE:
 			executeSingle();
@@ -311,12 +315,12 @@ public class CommandData implements Data {
 	}
 
 	public void execute(Map<String, String> map) {
-		
+
 		CommandDataOnExecute event = new CommandDataOnExecute(this, map);
 		EventManager.triggerEvent(event);
-		if(event.isCancelled())
+		if (event.isCancelled())
 			return;
-		
+
 		switch (type) {
 		case SINGLE:
 			if (map.isEmpty())

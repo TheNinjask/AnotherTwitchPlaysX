@@ -28,8 +28,8 @@ import org.jnativehook.GlobalScreen;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 
-import externalconsole.console.ExternalConsole;
-import externalconsole.console.ExternalConsoleCommand;
+import pt.theninjask.externalconsole.console.ExternalConsole;
+import pt.theninjask.externalconsole.console.ExternalConsoleCommand;
 import pt.theninjask.AnotherTwitchPlaysX.data.ATPXConfig;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
@@ -364,6 +364,7 @@ public class App {
 	private static void setupExternalConsole() {
 		ExternalConsole.setClosable(false);
 		ExternalConsole.setIcon(Constants.ICON_PATH);
+		ExternalConsole.executeCommand("top", "--true");
 		ExternalConsole.setConsoleTitle(String.format("%s's Console", ID));
 		for (ExternalConsoleCommand cmd : AdditionalCommandsATPX.getCommands()) {
 			ExternalConsole.addCommand(cmd);

@@ -17,8 +17,8 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import externalconsole.console.ExternalConsole;
-import externalconsole.console.ExternalConsoleCommand;
+import pt.theninjask.externalconsole.console.ExternalConsole;
+import pt.theninjask.externalconsole.console.ExternalConsoleCommand;
 import net.engio.mbassy.listener.Handler;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.event.EventManager;
