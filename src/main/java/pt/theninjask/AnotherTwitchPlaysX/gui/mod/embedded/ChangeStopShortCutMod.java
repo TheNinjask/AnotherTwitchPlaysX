@@ -36,9 +36,9 @@ public class ChangeStopShortCutMod extends ATPXMod {
 		EventManager.registerEventListener(this);
 
 		panel = new JPanel(new GridLayout(2, 1));
-		panel.setBackground(Constants.TWITCH_THEME.getBackground());
+		panel.setBackground(Constants.TWITCH_THEME.background());
 		press = new JLabel(String.format("Press a key (Current: %s)", NativeKeyEvent.getKeyText(Constants.stopKey)));
-		press.setForeground(Constants.TWITCH_THEME.getFont());
+		press.setForeground(Constants.TWITCH_THEME.font());
 		press.setHorizontalAlignment(JLabel.CENTER);
 		panel.add(press);
 		panel.setFocusable(true);

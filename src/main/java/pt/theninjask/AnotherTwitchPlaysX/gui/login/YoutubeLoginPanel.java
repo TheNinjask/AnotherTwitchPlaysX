@@ -61,7 +61,7 @@ public class YoutubeLoginPanel extends JPanel {
 
 	private YoutubeLoginPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", YoutubeLoginPanel.class.getSimpleName()));
-		this.setBackground(DataManager.getTheme().getBackground());
+		this.setBackground(DataManager.getTheme().background());
 		this.setLayout(new GridLayout(3, 1));
 		this.add(setupSecretSlot());
 		this.add(setupVideoSlot());
@@ -100,7 +100,7 @@ public class YoutubeLoginPanel extends JPanel {
 		secretLabel.setOpaque(false);
 		secretLabel.setFocusable(false);
 		// secretLabel.setToolTipText("");
-		secretLabel.setForeground(DataManager.getTheme().getFont());
+		secretLabel.setForeground(DataManager.getTheme().font());
 		return secretLabel;
 	}
 
@@ -177,7 +177,7 @@ public class YoutubeLoginPanel extends JPanel {
 		videoLabel.setOpaque(false);
 		videoLabel.setFocusable(false);
 		//videoLabel.setToolTipText("");
-		videoLabel.setForeground(DataManager.getTheme().getFont());
+		videoLabel.setForeground(DataManager.getTheme().font());
 		return videoLabel;
 	}
 
@@ -214,10 +214,10 @@ public class YoutubeLoginPanel extends JPanel {
 				String[] options = { DataManager.getLanguage().getOkOpt(),
 						DataManager.getLanguage().getLogin().getMissingSecretGet() };
 				JLabel msg = new JLabel(DataManager.getLanguage().getLogin().getMissingSecretMsg());
-				msg.setForeground(DataManager.getTheme().getFont());
+				msg.setForeground(DataManager.getTheme().font());
 				switch (Constants.showCustomColorOptionDialog(null, msg,
 						DataManager.getLanguage().getLogin().getMissingSecretTitle(), JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().getBackground())) {
+						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().background())) {
 				case JOptionPane.NO_OPTION:
 					Constants.openWebsite(Constants.YOUTUBE_CHAT_SECRET);
 					break;
@@ -238,7 +238,7 @@ public class YoutubeLoginPanel extends JPanel {
 		rememberSession = new JCheckBox();
 		rememberSession.setOpaque(false);
 		rememberSession.setText(DataManager.getLanguage().getLogin().getRememberSession());
-		rememberSession.setForeground(DataManager.getTheme().getFont());
+		rememberSession.setForeground(DataManager.getTheme().font());
 		return rememberSession;
 	}
 
@@ -297,10 +297,10 @@ public class YoutubeLoginPanel extends JPanel {
 	@Handler
 	public void updateTheme(ColorThemeUpdateEvent event) {
 		if(event.getTheme()!=null) {
-			this.setBackground(event.getTheme().getBackground());
-			secretLabel.setForeground(event.getTheme().getFont());
-			videoLabel.setForeground(event.getTheme().getFont());
-			rememberSession.setForeground(event.getTheme().getFont());
+			this.setBackground(event.getTheme().background());
+			secretLabel.setForeground(event.getTheme().font());
+			videoLabel.setForeground(event.getTheme().font());
+			rememberSession.setForeground(event.getTheme().font());
 		}
 	}
 

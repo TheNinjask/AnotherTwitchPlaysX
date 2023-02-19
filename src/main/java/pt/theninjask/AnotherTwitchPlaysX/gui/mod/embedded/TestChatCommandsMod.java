@@ -37,7 +37,7 @@ public class TestChatCommandsMod extends ATPXMod {
 	public TestChatCommandsMod() {
 
 		mainPanel = new JPanel(new BorderLayout());
-		mainPanel.setBackground(Constants.TWITCH_THEME.getBackground());
+		mainPanel.setBackground(Constants.TWITCH_THEME.background());
 
 		mainPanel.add(setupChat(), BorderLayout.CENTER);
 
@@ -94,13 +94,13 @@ public class TestChatCommandsMod extends ATPXMod {
 		scroll.setBorder(null);
 		scroll.setWheelScrollingEnabled(false);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		scroll.getViewport().setBackground(Constants.TWITCH_THEME.getBackground());
+		scroll.getViewport().setBackground(Constants.TWITCH_THEME.background());
 
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
 
 		chat.setOpaque(false);
-		chat.setForeground(Constants.TWITCH_THEME.getFont());
+		chat.setForeground(Constants.TWITCH_THEME.font());
 		return scroll;
 	}
 

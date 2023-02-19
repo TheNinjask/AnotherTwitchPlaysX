@@ -79,7 +79,7 @@ public class AllCommandPanel extends JPanel{
 
 	private AllCommandPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", AllCommandPanel.class.getSimpleName()));
-		this.setBackground(DataManager.getTheme().getBackground());
+		this.setBackground(DataManager.getTheme().background());
 		this.setLayout(new BorderLayout());
 		this.add(currentPanel, BorderLayout.CENTER);
 		mainCommandPanel();
@@ -164,7 +164,7 @@ public class AllCommandPanel extends JPanel{
 		title = new JLabel(DataManager.getLanguage().getAllCommand().getListOfCmds());
 		title.setHorizontalAlignment(JLabel.CENTER);
 		title.setFont(new Font(title.getFont().getName(), title.getFont().getStyle(), 25));
-		title.setForeground(DataManager.getTheme().getFont());
+		title.setForeground(DataManager.getTheme().font());
 		title.setFocusable(false);
 		mainCommandPanel.add(title, BorderLayout.NORTH);
 
@@ -257,11 +257,11 @@ public class AllCommandPanel extends JPanel{
 					tmp.setEditable(false);
 					tmp.setBorder(null);
 					tmp.setOpaque(false);
-					tmp.setForeground(DataManager.getTheme().getFont());
+					tmp.setForeground(DataManager.getTheme().font());
 					objectMapper.writeValue(file, DataManager.getCommands());
 					Constants.showCustomColorMessageDialog(null, tmp,
 							DataManager.getLanguage().getAllCommand().getSaveTitle(), JOptionPane.INFORMATION_MESSAGE,
-							null, DataManager.getTheme().getBackground());
+							null, DataManager.getTheme().background());
 				} catch (IOException e) {
 					Constants.showExceptionDialog(e);
 				}
@@ -346,8 +346,8 @@ public class AllCommandPanel extends JPanel{
 	@Handler
 	public void updateTheme(ColorThemeUpdateEvent event) {
 		if(event.getTheme()!=null) {
-			this.setBackground(event.getTheme().getBackground());
-			title.setForeground(event.getTheme().getFont());
+			this.setBackground(event.getTheme().background());
+			title.setForeground(event.getTheme().font());
 		}
 	}
 

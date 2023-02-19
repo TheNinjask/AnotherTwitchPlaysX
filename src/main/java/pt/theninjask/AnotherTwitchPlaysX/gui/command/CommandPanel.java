@@ -122,7 +122,7 @@ public class CommandPanel extends JPanel {
 		}
 		//TODO fix
 		controls = new ArrayList<ControlDataPanel>();
-		this.setBackground(DataManager.getTheme().getBackground());
+		this.setBackground(DataManager.getTheme().background());
 		this.setLayout(new GridLayout(2, 1));
 		JPanel tmp = new JPanel(new BorderLayout());
 		tmp.setOpaque(false);
@@ -149,7 +149,7 @@ public class CommandPanel extends JPanel {
 		JPanel leadPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		leadPanel.setOpaque(false);
 		leadLabel = new JLabel(DataManager.getLanguage().getCommand().getLead());
-		leadLabel.setForeground(DataManager.getTheme().getFont());
+		leadLabel.setForeground(DataManager.getTheme().font());
 		leadPanel.add(leadLabel);
 		lead = new JTextField("");
 		if (current.getLead() != null)
@@ -173,7 +173,7 @@ public class CommandPanel extends JPanel {
 		JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		cooldownPanel.setOpaque(false);
 		cooldownLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdCooldown());
-		cooldownLabel.setForeground(DataManager.getTheme().getFont());
+		cooldownLabel.setForeground(DataManager.getTheme().font());
 		cooldownPanel.add(cooldownLabel);
 		cooldown = new JFormattedTextField(cooldownFormatter);
 		if (current.getCooldown() != null)
@@ -238,7 +238,7 @@ public class CommandPanel extends JPanel {
 		JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		typePanel.setOpaque(false);
 		typeLabel = new JLabel(DataManager.getLanguage().getCommand().getCmdType());
-		typeLabel.setForeground(DataManager.getTheme().getFont());
+		typeLabel.setForeground(DataManager.getTheme().font());
 		typePanel.add(typeLabel);
 		type = new JComboBox<CommandType>(CommandType.getAll());
 		type.setSelectedItem(current.getType());
@@ -252,7 +252,7 @@ public class CommandPanel extends JPanel {
 		JPanel varsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		varsPanel.setOpaque(false);
 		varsLabel = new JLabel(DataManager.getLanguage().getCommand().getVars());
-		varsLabel.setForeground(DataManager.getTheme().getFont());
+		varsLabel.setForeground(DataManager.getTheme().font());
 		varsPanel.add(varsLabel);
 
 		// TODO?
@@ -309,10 +309,10 @@ public class CommandPanel extends JPanel {
 				Optional<String> var = varsBag.stream().findAny();
 				if (!var.isPresent()) {
 					JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarAddWarnMsg());
-					msg.setForeground(DataManager.getTheme().getFont());
+					msg.setForeground(DataManager.getTheme().font());
 					Constants.showCustomColorMessageDialog(null, msg,
 							DataManager.getLanguage().getCommand().getVarAddWarnTitle(), JOptionPane.WARNING_MESSAGE,
-							null, DataManager.getTheme().getBackground());
+							null, DataManager.getTheme().background());
 					vars.setSelectedItem(null);
 					varsRemove.setVisible(false);
 					varsRemove.setEnabled(false);
@@ -320,12 +320,12 @@ public class CommandPanel extends JPanel {
 				}
 
 				JLabel msg = new JLabel(DataManager.getLanguage().getCommand().getVarType());
-				msg.setForeground(DataManager.getTheme().getFont());
+				msg.setForeground(DataManager.getTheme().font());
 				String[] opt = { DataManager.getLanguage().getCommand().getVarDigit(),
 						DataManager.getLanguage().getCommand().getVarString() };
 				int resp = Constants.showCustomColorOptionDialog(null, msg,
 						DataManager.getLanguage().getCommand().getVarTitle(), JOptionPane.YES_NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE, null, opt, null, DataManager.getTheme().getBackground());
+						JOptionPane.QUESTION_MESSAGE, null, opt, null, DataManager.getTheme().background());
 				CommandVarType type;
 				switch (resp) {
 				case JOptionPane.YES_OPTION:
@@ -391,7 +391,7 @@ public class CommandPanel extends JPanel {
 		JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		modePanel.setOpaque(false);
 		modeLabel = new JLabel(DataManager.getLanguage().getCommand().getViewMode());
-		modeLabel.setForeground(DataManager.getTheme().getFont());
+		modeLabel.setForeground(DataManager.getTheme().font());
 		modePanel.add(modeLabel);
 		mode = new JButton("Normal");
 		mode.setMargin(new Insets(0, 0, 0, 0));
@@ -430,13 +430,13 @@ public class CommandPanel extends JPanel {
 			if (saved == null || !saved.equals(current)) {
 				JTextArea msg = new JTextArea();
 				msg.setText(DataManager.getLanguage().getCommand().getNotSavedMsg());
-				msg.setForeground(DataManager.getTheme().getFont());
+				msg.setForeground(DataManager.getTheme().font());
 				msg.setFocusable(false);
 				msg.setOpaque(false);
 				String[] options = { DataManager.getLanguage().getOkOpt(), DataManager.getLanguage().getGoBackOpt() };
 				int resp = Constants.showCustomColorOptionDialog(null, msg,
 						DataManager.getLanguage().getCommand().getNotSavedTitle(), JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().getBackground());
+						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().background());
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -461,15 +461,15 @@ public class CommandPanel extends JPanel {
 				tmp.setOpaque(false);
 				JLabel syntaxLabel = new JLabel(
 						String.format(DataManager.getLanguage().getCommand().getSyntaxFull(), current.getRegex()));
-				syntaxLabel.setForeground(DataManager.getTheme().getFont());
+				syntaxLabel.setForeground(DataManager.getTheme().font());
 				tmp.add(syntaxLabel);
 				JLabel egLabel = new JLabel(String.format(DataManager.getLanguage().getCommand().getSyntaxDemo(),
 						current.getRegexExample()));
-				egLabel.setForeground(DataManager.getTheme().getFont());
+				egLabel.setForeground(DataManager.getTheme().font());
 				tmp.add(egLabel);
 				Constants.showCustomColorMessageDialog(null, tmp,
 						DataManager.getLanguage().getCommand().getSyntaxTitle(), JOptionPane.PLAIN_MESSAGE, null,
-						DataManager.getTheme().getBackground());
+						DataManager.getTheme().background());
 			} catch (Exception e) {
 				Constants.showExpectedExceptionDialog(e);
 			}
@@ -629,14 +629,14 @@ public class CommandPanel extends JPanel {
 			msg.setText(DataManager.getLanguage().getCommand().getAddChooseControlType());
 			msg.setOpaque(false);
 			msg.setFocusable(false);
-			msg.setForeground(DataManager.getTheme().getFont());
+			msg.setForeground(DataManager.getTheme().font());
 			String[] options = { DataManager.getLanguage().getCommand().getAddKeyboard(),
 					DataManager.getLanguage().getCommand().getAddMouseClick(),
 					DataManager.getLanguage().getCommand().getAddMouseDrag() };
 			int resp = Constants.showCustomColorOptionDialog(null, msg,
 					DataManager.getLanguage().getCommand().getAddChooseControlTypeTitle(),
 					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, null,
-					DataManager.getTheme().getBackground());
+					DataManager.getTheme().background());
 			ControlData cData = new ControlData();
 			switch (resp) {
 			case JOptionPane.NO_OPTION:
@@ -746,12 +746,12 @@ public class CommandPanel extends JPanel {
 	@Handler
 	public void updateTheme(ColorThemeUpdateEvent event) {
 		if (event.getTheme() != null) {
-			this.setBackground(event.getTheme().getBackground());
-			leadLabel.setForeground(event.getTheme().getFont());
-			cooldownLabel.setForeground(event.getTheme().getFont());
-			typeLabel.setForeground(event.getTheme().getFont());
-			varsLabel.setForeground(event.getTheme().getFont());
-			modeLabel.setForeground(event.getTheme().getFont());
+			this.setBackground(event.getTheme().background());
+			leadLabel.setForeground(event.getTheme().font());
+			cooldownLabel.setForeground(event.getTheme().font());
+			typeLabel.setForeground(event.getTheme().font());
+			varsLabel.setForeground(event.getTheme().font());
+			modeLabel.setForeground(event.getTheme().font());
 		}
 	}
 }

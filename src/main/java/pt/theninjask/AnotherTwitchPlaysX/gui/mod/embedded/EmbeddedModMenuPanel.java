@@ -34,12 +34,12 @@ public class EmbeddedModMenuPanel extends JPanel {
 	
 	private EmbeddedModMenuPanel() {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", EmbeddedModMenuPanel.class.getSimpleName()));
-		this.setBackground(Constants.TWITCH_THEME.getBackground());
+		this.setBackground(Constants.TWITCH_THEME.background());
 		this.setLayout(new GridLayout(4, 1));
 		
 		JLabel title = new JLabel(DataManager.getLanguage().getEmbeddedModMenu().getLabel());
 		title.setHorizontalAlignment(JLabel.CENTER);
-		title.setForeground(Constants.TWITCH_THEME.getFont());
+		title.setForeground(Constants.TWITCH_THEME.font());
 		ImageIcon icon = new ImageIcon(this.getClass()
 				.getResource("/pt/theninjask/AnotherTwitchPlaysX/resource/image/ninjask.gif"));
 		icon.setImage(icon.getImage().getScaledInstance(ICON_WIDTH, icon.getIconHeight()*ICON_WIDTH/icon.getIconWidth(), Image.SCALE_DEFAULT));
@@ -48,7 +48,7 @@ public class EmbeddedModMenuPanel extends JPanel {
 		
 		JLabel warn = new JLabel(DataManager.getLanguage().getEmbeddedModMenu().getWarning());
 		warn.setHorizontalAlignment(JLabel.CENTER);
-		warn.setForeground(Constants.TWITCH_THEME.getFont());
+		warn.setForeground(Constants.TWITCH_THEME.font());
 		
 		this.add(warn);
 		

@@ -166,7 +166,7 @@ public class ChatFrame extends JFrame {
 		this.add(inputChat(), BorderLayout.SOUTH);
 		showInputMessage(false);
 		setUndecorated(true);
-		this.setBackground(Constants.TWITCH_THEME.getBackground());
+		this.setBackground(Constants.TWITCH_THEME.background());
 		scroll.getParent().setBackground(null);
 
 		Border border = BorderFactory.createLineBorder(new Color(0, 0, 0, 0), 5);
@@ -242,13 +242,13 @@ public class ChatFrame extends JFrame {
 		scroll.setBorder(null);
 		scroll.setWheelScrollingEnabled(false);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		scroll.getViewport().setBackground(Constants.TWITCH_THEME.getBackground());
+		scroll.getViewport().setBackground(Constants.TWITCH_THEME.background());
 
 		scroll.setOpaque(false);
 		scroll.getViewport().setOpaque(false);
 
 		chat.setOpaque(false);
-		chat.setForeground(Constants.TWITCH_THEME.getFont());
+		chat.setForeground(Constants.TWITCH_THEME.font());
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent event) {
@@ -267,7 +267,7 @@ public class ChatFrame extends JFrame {
 		messagePanel = new JPanel(new BorderLayout());
 		input = new JTextField();
 		input.setFocusTraversalKeysEnabled(false);
-		input.setBorder(BorderFactory.createLineBorder(Constants.TWITCH_THEME.getFont(), 1));
+		input.setBorder(BorderFactory.createLineBorder(Constants.TWITCH_THEME.font(), 1));
 		input.addKeyListener(new KeyListener() {
 
 			@Override

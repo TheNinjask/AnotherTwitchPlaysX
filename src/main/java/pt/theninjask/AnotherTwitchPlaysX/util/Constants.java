@@ -54,6 +54,7 @@ import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import lombok.experimental.UtilityClass;
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
 import org.commonmark.node.Node;
@@ -88,11 +89,8 @@ import pt.theninjask.AnotherTwitchPlaysX.gui.mod.ATPXModProps;
 import pt.theninjask.AnotherTwitchPlaysX.gui.util.PopOutFrame;
 import pt.theninjask.AnotherTwitchPlaysX.stream.DataManager;
 
+@UtilityClass
 public final class Constants {
-
-	private Constants() {
-	}
-
 	public static final String SAVE_PATH = Paths.get(System.getProperty("user.home"), ".ATPX").toString();
 
 	public static final String MOD_FOLDER = "mods";
@@ -138,8 +136,8 @@ public final class Constants {
 
 	public static final ColorTheme DAY_THEME = new ColorTheme("Day", Color.BLACK, Color.WHITE);
 
-	public static final Map<String, ColorTheme> THEMES = Map.of(TWITCH_THEME.getName(), TWITCH_THEME,
-			NIGHT_THEME.getName(), NIGHT_THEME, DAY_THEME.getName(), DAY_THEME);
+	public static final Map<String, ColorTheme> THEMES = Map.of(TWITCH_THEME.name(), TWITCH_THEME,
+			NIGHT_THEME.name(), NIGHT_THEME, DAY_THEME.name(), DAY_THEME);
 
 	// JUST FOR ME :) BUT NOT RECOMENDED
 	// @Deprecated
@@ -299,21 +297,21 @@ public final class Constants {
 				break;
 			case THIRD_PARTY:
 				JTextArea msg = new JTextArea(DataManager.getLanguage().getConstants().getModInfo());
-				msg.setForeground(DataManager.getTheme().getFont());
+				msg.setForeground(DataManager.getTheme().font());
 				msg.setOpaque(false);
 				showCustomColorMessageDialog(null, msg,
 						String.format(DataManager.getLanguage().getConstants().getModInfoTitle(), modFile.getName()),
-						JOptionPane.INFORMATION_MESSAGE, null, DataManager.getTheme().getBackground());
+						JOptionPane.INFORMATION_MESSAGE, null, DataManager.getTheme().background());
 				break;
 			case UNKNOWN:
 			default:
 				msg = new JTextArea(DataManager.getLanguage().getConstants().getModWarn());
-				msg.setForeground(DataManager.getTheme().getFont());
+				msg.setForeground(DataManager.getTheme().font());
 				msg.setOpaque(false);
 				int resp = showCustomColorOptionDialog(null, msg,
 						String.format(DataManager.getLanguage().getConstants().getModWarnTitle(), modFile.getName()),
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null,
-						DataManager.getTheme().getBackground());
+						DataManager.getTheme().background());
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -521,11 +519,11 @@ public final class Constants {
 		JTextArea message = new JTextArea(msg);
 		message.setOpaque(false);
 		message.setEditable(false);
-		message.setForeground(DataManager.getTheme().getFont());
+		message.setForeground(DataManager.getTheme().font());
 		Object paneBG = UIManager.get("OptionPane.background");
 		Object panelBG = UIManager.get("Panel.background");
-		UIManager.put("OptionPane.background", DataManager.getTheme().getBackground());
-		UIManager.put("Panel.background", DataManager.getTheme().getBackground());
+		UIManager.put("OptionPane.background", DataManager.getTheme().background());
+		UIManager.put("Panel.background", DataManager.getTheme().background());
 		JOptionPane.showMessageDialog(null, message, title.length > 0 ? title[0] : "", JOptionPane.PLAIN_MESSAGE, null);
 		UIManager.put("OptionPane.background", paneBG);
 		UIManager.put("Panel.background", panelBG);
@@ -545,11 +543,11 @@ public final class Constants {
 		JTextArea exception = new JTextArea(e.getMessage());
 		exception.setOpaque(false);
 		exception.setEditable(false);
-		exception.setForeground(DataManager.getTheme().getFont());
+		exception.setForeground(DataManager.getTheme().font());
 		Object paneBG = UIManager.get("OptionPane.background");
 		Object panelBG = UIManager.get("Panel.background");
-		UIManager.put("OptionPane.background", DataManager.getTheme().getBackground());
-		UIManager.put("Panel.background", DataManager.getTheme().getBackground());
+		UIManager.put("OptionPane.background", DataManager.getTheme().background());
+		UIManager.put("Panel.background", DataManager.getTheme().background());
 		JOptionPane.showMessageDialog(null, exception, e.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE, null);
 		UIManager.put("OptionPane.background", paneBG);
 		UIManager.put("Panel.background", panelBG);
@@ -705,7 +703,7 @@ public final class Constants {
 			scroll.getViewport().setOpaque(false);
 
 			message.setOpaque(false);
-			message.setForeground(DataManager.getTheme().getFont());
+			message.setForeground(DataManager.getTheme().font());
 
 			scroll.setPreferredSize(new Dimension(151, 151));
 			content.add(scroll, BorderLayout.CENTER);
@@ -730,8 +728,8 @@ public final class Constants {
 			ColorTheme theme = ExternalConsole.getTheme();
 			StringBuilder newReadmeContent = new StringBuilder(String.format(
 					"<body style=\"background-color:rgb(%s,%s,%s);color:rgb(%s,%s,%s);\">\n",
-					theme.getBackground().getRed(), theme.getBackground().getGreen(), theme.getBackground().getBlue(),
-					theme.getFont().getRed(), theme.getFont().getGreen(), theme.getFont().getBlue()));
+					theme.background().getRed(), theme.background().getGreen(), theme.background().getBlue(),
+					theme.font().getRed(), theme.font().getGreen(), theme.font().getBlue()));
 
 			newReadmeContent.append(readme.content);
 			newReadmeContent.append("\n</body>");
@@ -782,7 +780,7 @@ public final class Constants {
 					}
 				}
 			});
-			content.setBackground(DataManager.getTheme().getBackground());
+			content.setBackground(DataManager.getTheme().background());
 
 			readmeFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			message.setCaretPosition(0);

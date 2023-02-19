@@ -153,7 +153,7 @@ public class MainMenuPanel extends JPanel {
 		Constants.printVerboseMessage(Level.INFO, String.format("%s()", MainMenuPanel.class.getSimpleName()));
 		this.isAppStarted = new AtomicBoolean(false);
 		this.inConnection = new AtomicBoolean(false);
-		this.setBackground(Constants.TWITCH_THEME.getBackground());
+		this.setBackground(Constants.TWITCH_THEME.background());
 		this.setLayout(new GridLayout(10, 1));
 		this.add(connectButton());
 		this.add(commandsButton());
@@ -498,14 +498,14 @@ public class MainMenuPanel extends JPanel {
 		twitchChatSize.setPaintLabels(true);
 		twitchChatSize.setOpaque(false);
 		// twitchChatSize.setFocusable(false);
-		twitchChatSize.setForeground(DataManager.getTheme().getFont());
+		twitchChatSize.setForeground(DataManager.getTheme().font());
 		return twitchChatSize;
 	}
 
 	private JLabel twitchChatSliderLabel() {
 		twitchChatSliderLabel = new JLabel(
 				String.format(DataManager.getLanguage().getMainMenu().getCurrentChatSize(), twitchChatSize.getValue()));
-		twitchChatSliderLabel.setForeground(DataManager.getTheme().getFont());
+		twitchChatSliderLabel.setForeground(DataManager.getTheme().font());
 		twitchChatSliderLabel.setFocusable(false);
 		twitchChatSize.addChangeListener(e -> {
 			int value = twitchChatSize.getValue();
@@ -524,7 +524,7 @@ public class MainMenuPanel extends JPanel {
 		tmp.setOpaque(false);
 		tmp.setFocusable(false);
 		twitchChatOptionsLabel = new JLabel(DataManager.getLanguage().getMainMenu().getChatOptions());
-		twitchChatOptionsLabel.setForeground(DataManager.getTheme().getFont());
+		twitchChatOptionsLabel.setForeground(DataManager.getTheme().font());
 		twitchChatOptionsLabel.setHorizontalAlignment(JLabel.CENTER);
 		twitchChatOptionsLabel.setFocusable(false);
 
@@ -556,22 +556,22 @@ public class MainMenuPanel extends JPanel {
 		twitch = new JRadioButton(DataManager.getLanguage().getMainMenu().getTwitchMode());
 		light.setOpaque(false);
 		light.setFocusable(false);
-		light.setForeground(DataManager.getTheme().getFont());
+		light.setForeground(DataManager.getTheme().font());
 		light.addActionListener(i -> {
-			ChatFrame.getInstance().setColor(Constants.DAY_THEME.getFont(), Constants.DAY_THEME.getBackground());
+			ChatFrame.getInstance().setColor(Constants.DAY_THEME.font(), Constants.DAY_THEME.background());
 		});
 		night.setOpaque(false);
 		night.setFocusable(false);
-		night.setForeground(DataManager.getTheme().getFont());
+		night.setForeground(DataManager.getTheme().font());
 		night.addActionListener(i -> {
-			ChatFrame.getInstance().setColor(Constants.NIGHT_THEME.getFont(), Constants.NIGHT_THEME.getBackground());
+			ChatFrame.getInstance().setColor(Constants.NIGHT_THEME.font(), Constants.NIGHT_THEME.background());
 		});
 		twitch.setOpaque(false);
 		twitch.setFocusable(false);
-		twitch.setForeground(DataManager.getTheme().getFont());
+		twitch.setForeground(DataManager.getTheme().font());
 		twitch.setSelected(true);
 		twitch.addActionListener(i -> {
-			ChatFrame.getInstance().setColor(Constants.TWITCH_THEME.getFont(), Constants.TWITCH_THEME.getBackground());
+			ChatFrame.getInstance().setColor(Constants.TWITCH_THEME.font(), Constants.TWITCH_THEME.background());
 		});
 		group.add(light);
 		group.add(night);
@@ -591,19 +591,19 @@ public class MainMenuPanel extends JPanel {
 		solid = new JRadioButton(DataManager.getLanguage().getMainMenu().getSolid());
 		transp.setOpaque(false);
 		transp.setFocusable(false);
-		transp.setForeground(DataManager.getTheme().getFont());
+		transp.setForeground(DataManager.getTheme().font());
 		transp.addActionListener(i -> {
 			ChatFrame.getInstance().setChatMode(ChatMode.TRANSPARENT);
 		});
 		semisolid.setOpaque(false);
 		semisolid.setFocusable(false);
-		semisolid.setForeground(DataManager.getTheme().getFont());
+		semisolid.setForeground(DataManager.getTheme().font());
 		semisolid.addActionListener(i -> {
 			ChatFrame.getInstance().setChatMode(ChatMode.SEMI_SOLID);
 		});
 		solid.setOpaque(false);
 		solid.setFocusable(false);
-		solid.setForeground(DataManager.getTheme().getFont());
+		solid.setForeground(DataManager.getTheme().font());
 		solid.setSelected(true);
 		solid.addActionListener(i -> {
 			ChatFrame.getInstance().setChatMode(ChatMode.SOLID);
@@ -622,7 +622,7 @@ public class MainMenuPanel extends JPanel {
 
 		twitchChatOnTop.setText(DataManager.getLanguage().getMainMenu().getIsChatOnTop());
 		twitchChatOnTop.setHorizontalTextPosition(JCheckBox.LEFT);
-		twitchChatOnTop.setForeground(DataManager.getTheme().getFont());
+		twitchChatOnTop.setForeground(DataManager.getTheme().font());
 		twitchChatOnTop.setHorizontalAlignment(JCheckBox.CENTER);
 		twitchChatOnTop.setOpaque(false);
 		twitchChatOnTop.setFocusable(false);
@@ -648,7 +648,7 @@ public class MainMenuPanel extends JPanel {
 
 		twitchChatInput.setText(DataManager.getLanguage().getMainMenu().getShowInputTextBoxInChat());
 		twitchChatInput.setHorizontalTextPosition(JCheckBox.LEFT);
-		twitchChatInput.setForeground(DataManager.getTheme().getFont());
+		twitchChatInput.setForeground(DataManager.getTheme().font());
 		twitchChatInput.setHorizontalAlignment(JCheckBox.CENTER);
 		twitchChatInput.setOpaque(false);
 		twitchChatInput.setFocusable(false);
@@ -666,14 +666,14 @@ public class MainMenuPanel extends JPanel {
 		mineRadio = new JRadioButton(ChatStyle.MINECRAFT.getStyle());
 		mineRadio.setOpaque(false);
 		mineRadio.setFocusable(false);
-		mineRadio.setForeground(DataManager.getTheme().getFont());
+		mineRadio.setForeground(DataManager.getTheme().font());
 		mineRadio.addActionListener(i -> {
 			ChatFrame.getInstance().setChatStyle(ChatStyle.MINECRAFT);
 		});
 		twitchRadio = new JRadioButton(ChatStyle.TWITCH.getStyle());
 		twitchRadio.setOpaque(false);
 		twitchRadio.setFocusable(false);
-		twitchRadio.setForeground(DataManager.getTheme().getFont());
+		twitchRadio.setForeground(DataManager.getTheme().font());
 		twitchRadio.addActionListener(i -> {
 			ChatFrame.getInstance().setChatStyle(ChatStyle.TWITCH);
 		});
@@ -694,14 +694,14 @@ public class MainMenuPanel extends JPanel {
 		JRadioButton normalChat = new JRadioButton(DataManager.getLanguage().getMainMenu().getNormalChatRadioButton());
 		normalChat.setOpaque(false);
 		normalChat.setFocusable(false);
-		normalChat.setForeground(DataManager.getTheme().getFont());
+		normalChat.setForeground(DataManager.getTheme().font());
 		normalChat.addActionListener(i -> {
 			ChatFrame.getInstance().setChatType(ChatType.STREAM);
 		});
 		JRadioButton cmdChat = new JRadioButton(DataManager.getLanguage().getMainMenu().getCmdChatRadioButton());
 		cmdChat.setOpaque(false);
 		cmdChat.setFocusable(false);
-		cmdChat.setForeground(DataManager.getTheme().getFont());
+		cmdChat.setForeground(DataManager.getTheme().font());
 		cmdChat.addActionListener(i -> {
 			ChatFrame.getInstance().setChatType(ChatType.CMD);
 		});
@@ -744,7 +744,7 @@ public class MainMenuPanel extends JPanel {
 		twitchChatFontPanel.setFocusable(false);
 		twitchChatFontPanel.setOpaque(false);
 		twitchChatFontLabel = new JLabel(DataManager.getLanguage().getMainMenu().getFont());
-		twitchChatFontLabel.setForeground(DataManager.getTheme().getFont());
+		twitchChatFontLabel.setForeground(DataManager.getTheme().font());
 		twitchChatFontPanel.add(twitchChatFontLabel);
 		twitchChatFont = new JComboBox<String>(
 				GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
@@ -764,12 +764,12 @@ public class MainMenuPanel extends JPanel {
 
 		twitchChatFontSizeLabel = new JLabel(
 				String.format(DataManager.getLanguage().getMainMenu().getFontSize(), twitchChatFontSize.getValue()));
-		twitchChatFontSizeLabel.setForeground(DataManager.getTheme().getFont());
+		twitchChatFontSizeLabel.setForeground(DataManager.getTheme().font());
 		twitchChatFontSizePanel.add(twitchChatFontSizeLabel, BorderLayout.WEST);
 
 		twitchChatFontSize.setMajorTickSpacing(45);
 		twitchChatFontSize.setOpaque(false);
-		twitchChatFontSize.setForeground(DataManager.getTheme().getFont());
+		twitchChatFontSize.setForeground(DataManager.getTheme().font());
 		twitchChatFontSize.addChangeListener(l -> {
 			twitchChatFontSizeLabel.setText(String.format(DataManager.getLanguage().getMainMenu().getFontSize(),
 					twitchChatFontSize.getValue()));
@@ -784,7 +784,7 @@ public class MainMenuPanel extends JPanel {
 		sponsor = new JCheckBox();
 		sponsor.setText(DataManager.getLanguage().getMainMenu().getSponsorCreator());
 		sponsor.setHorizontalTextPosition(JCheckBox.LEFT);
-		sponsor.setForeground(DataManager.getTheme().getFont());
+		sponsor.setForeground(DataManager.getTheme().font());
 		sponsor.setHorizontalAlignment(JCheckBox.CENTER);
 		sponsor.setOpaque(false);
 		sponsor.setFocusable(false);
@@ -795,12 +795,12 @@ public class MainMenuPanel extends JPanel {
 						DataManager.getLanguage().getMainMenu().getNevermind() };
 				JTextArea label = new JTextArea();
 				label.setText(DataManager.getLanguage().getMainMenu().getSponsorMsgFirst());
-				label.setForeground(DataManager.getTheme().getFont());
+				label.setForeground(DataManager.getTheme().font());
 				label.setFocusable(false);
 				label.setOpaque(false);
 				int resp = Constants.showCustomColorOptionDialog(null, label,
 						DataManager.getLanguage().getMainMenu().getSponsorTitle(), JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().getBackground());
+						JOptionPane.WARNING_MESSAGE, null, options, null, DataManager.getTheme().background());
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					break;
@@ -815,7 +815,7 @@ public class MainMenuPanel extends JPanel {
 						DataManager.getLanguage().getMainMenu().getNevermind() };
 				resp = Constants.showCustomColorOptionDialog(null, sponsorPanel(),
 						DataManager.getLanguage().getMainMenu().getSponsorTitle(), JOptionPane.YES_NO_CANCEL_OPTION,
-						JOptionPane.PLAIN_MESSAGE, null, options2, null, DataManager.getTheme().getBackground());
+						JOptionPane.PLAIN_MESSAGE, null, options2, null, DataManager.getTheme().background());
 				switch (resp) {
 				case JOptionPane.YES_OPTION:
 					SponsorBot bot = SponsorBot.getInstance();
@@ -832,12 +832,12 @@ public class MainMenuPanel extends JPanel {
 				}
 				label.setText(String.format(DataManager.getLanguage().getMainMenu().getSponsorMsgDemo(),
 						SponsorBot.getSponsorMsg()));
-				label.setForeground(DataManager.getTheme().getFont());
+				label.setForeground(DataManager.getTheme().font());
 				label.setFocusable(false);
 				label.setOpaque(false);
 				resp = Constants.showCustomColorOptionDialog(null, label,
 						DataManager.getLanguage().getMainMenu().getSponsorTitle(), JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.PLAIN_MESSAGE, null, options, null, DataManager.getTheme().getBackground());
+						JOptionPane.PLAIN_MESSAGE, null, options, null, DataManager.getTheme().background());
 				switch (resp) {
 				case JOptionPane.OK_OPTION:
 					SponsorBot bot = SponsorBot.getInstance();
@@ -865,12 +865,12 @@ public class MainMenuPanel extends JPanel {
 		sponsor.setFocusable(false);
 		sponsorSlider.setPaintLabels(true);
 		sponsorSlider.setOpaque(false);
-		sponsorSlider.setForeground(DataManager.getTheme().getFont());
+		sponsorSlider.setForeground(DataManager.getTheme().font());
 
 		JLabel label = new JLabel();
 		label.setText(
 				String.format(DataManager.getLanguage().getMainMenu().getSponsorMsgTime(), sponsorSlider.getValue()));
-		label.setForeground(DataManager.getTheme().getFont());
+		label.setForeground(DataManager.getTheme().font());
 		label.setFocusable(false);
 		sponsorSlider.addChangeListener(e -> {
 			int value = sponsorSlider.getValue();
@@ -882,7 +882,7 @@ public class MainMenuPanel extends JPanel {
 		tmp.add(label);
 		tmp.add(sponsorSlider);
 		tmp.setFocusable(false);
-		tmp.setBackground(DataManager.getTheme().getBackground());
+		tmp.setBackground(DataManager.getTheme().background());
 		return tmp;
 	}
 
@@ -957,24 +957,24 @@ public class MainMenuPanel extends JPanel {
 	@Handler
 	public void updateTheme(ColorThemeUpdateEvent event) {
 		if (event.getTheme() != null) {
-			this.setBackground(event.getTheme().getBackground());
-			twitchChatSize.setForeground(event.getTheme().getFont());
-			twitchChatSliderLabel.setForeground(event.getTheme().getFont());
-			twitchChatOptionsLabel.setForeground(event.getTheme().getFont());
-			light.setForeground(event.getTheme().getFont());
-			night.setForeground(event.getTheme().getFont());
-			twitch.setForeground(event.getTheme().getFont());
-			transp.setForeground(event.getTheme().getFont());
-			semisolid.setForeground(event.getTheme().getFont());
-			solid.setForeground(event.getTheme().getFont());
-			twitchChatOnTop.setForeground(event.getTheme().getFont());
-			twitchChatInput.setForeground(event.getTheme().getFont());
-			mineRadio.setForeground(event.getTheme().getFont());
-			twitchRadio.setForeground(event.getTheme().getFont());
-			twitchChatFontLabel.setForeground(event.getTheme().getFont());
-			twitchChatFontSizeLabel.setForeground(event.getTheme().getFont());
-			twitchChatFontSize.setForeground(event.getTheme().getFont());
-			sponsor.setForeground(event.getTheme().getFont());
+			this.setBackground(event.getTheme().background());
+			twitchChatSize.setForeground(event.getTheme().font());
+			twitchChatSliderLabel.setForeground(event.getTheme().font());
+			twitchChatOptionsLabel.setForeground(event.getTheme().font());
+			light.setForeground(event.getTheme().font());
+			night.setForeground(event.getTheme().font());
+			twitch.setForeground(event.getTheme().font());
+			transp.setForeground(event.getTheme().font());
+			semisolid.setForeground(event.getTheme().font());
+			solid.setForeground(event.getTheme().font());
+			twitchChatOnTop.setForeground(event.getTheme().font());
+			twitchChatInput.setForeground(event.getTheme().font());
+			mineRadio.setForeground(event.getTheme().font());
+			twitchRadio.setForeground(event.getTheme().font());
+			twitchChatFontLabel.setForeground(event.getTheme().font());
+			twitchChatFontSizeLabel.setForeground(event.getTheme().font());
+			twitchChatFontSize.setForeground(event.getTheme().font());
+			sponsor.setForeground(event.getTheme().font());
 		}
 	}
 }

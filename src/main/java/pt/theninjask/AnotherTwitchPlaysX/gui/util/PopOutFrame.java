@@ -40,7 +40,7 @@ public class PopOutFrame extends JFrame{
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
-		this.setBackground(DataManager.getTheme().getBackground());
+		this.setBackground(DataManager.getTheme().background());
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		comp.requestFocusInWindow();
@@ -73,7 +73,7 @@ public class PopOutFrame extends JFrame{
 		this.setMinimumSize(new Dimension(300, 300));
 		ImageIcon icon = new ImageIcon(Constants.ICON_PATH);
 		this.setIconImage(icon.getImage());
-		this.setBackground(DataManager.getTheme().getBackground());
+		this.setBackground(DataManager.getTheme().background());
 		//DataManager.registerLangEvent(this);
 		PopOutFrame tmp = this;
 		this.addWindowListener(new WindowAdapter() {
@@ -106,7 +106,7 @@ public class PopOutFrame extends JFrame{
 	@Handler
 	public void updateTheme(ColorThemeUpdateEvent event) {
 		if(event.getTheme()!=null)
-			this.setBackground(event.getTheme().getBackground());
+			this.setBackground(event.getTheme().background());
 	}
 	
 }

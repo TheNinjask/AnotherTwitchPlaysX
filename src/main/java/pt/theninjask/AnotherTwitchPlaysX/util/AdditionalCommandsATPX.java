@@ -4,12 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -533,7 +537,7 @@ public class AdditionalCommandsATPX {
 				default:
 					String current = "Unknown";
 					if (DataManager.getTheme() != null)
-						current = DataManager.getTheme().getName();
+						current = DataManager.getTheme().name();
 					ExternalConsole.println(String.format("App Theme is set as: %s", current));
 					new HelpFormatter().printHelp("apptheme", options, true);
 					break;
@@ -697,7 +701,7 @@ public class AdditionalCommandsATPX {
 			message = new JTextPane();
 
 			title.setOpaque(false);
-			title.setForeground(DataManager.getTheme().getFont());
+			title.setForeground(DataManager.getTheme().font());
 			title.setText(String.format(DataManager.getLanguage().getUpdateNoticeTitleContent(), update.tag_name,
 					update.update_name));
 			title.setBorder(null);
@@ -716,7 +720,7 @@ public class AdditionalCommandsATPX {
 			scroll.getViewport().setOpaque(false);
 
 			message.setOpaque(false);
-			message.setForeground(DataManager.getTheme().getFont());
+			message.setForeground(DataManager.getTheme().font());
 
 			scroll.setPreferredSize(new Dimension(151, 151));
 			content.add(scroll, BorderLayout.CENTER);
@@ -731,7 +735,7 @@ public class AdditionalCommandsATPX {
 
 			int resp = Constants.showCustomColorOptionDialog(null, content,
 					DataManager.getLanguage().getUpdateNoticeTitle(), JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.PLAIN_MESSAGE, null, options, null, DataManager.getTheme().getBackground());
+					JOptionPane.PLAIN_MESSAGE, null, options, null, DataManager.getTheme().background());
 			switch (resp) {
 			case JOptionPane.YES_OPTION:
 				Constants.openWebsite(update.html_url);
@@ -793,7 +797,7 @@ public class AdditionalCommandsATPX {
 			message = new JTextPane();
 
 			title.setOpaque(false);
-			title.setForeground(DataManager.getTheme().getFont());
+			title.setForeground(DataManager.getTheme().font());
 			title.setText(String.format(DataManager.getLanguage().getUpdateNoticeTitleContent(), release.tag_name,
 					release.update_name));
 			title.setBorder(null);
@@ -812,7 +816,7 @@ public class AdditionalCommandsATPX {
 			scroll.getViewport().setOpaque(false);
 
 			message.setOpaque(false);
-			message.setForeground(DataManager.getTheme().getFont());
+			message.setForeground(DataManager.getTheme().font());
 
 			scroll.setPreferredSize(new Dimension(151, 151));
 			content.add(scroll, BorderLayout.CENTER);
@@ -822,7 +826,7 @@ public class AdditionalCommandsATPX {
 			message.setText(release.body);
 
 			Constants.showCustomColorMessageDialog(null, content, "Changelog: " + release.tag_name,
-					JOptionPane.PLAIN_MESSAGE, null, DataManager.getTheme().getBackground());
+					JOptionPane.PLAIN_MESSAGE, null, DataManager.getTheme().background());
 			return 0;
 		}
 
@@ -930,6 +934,8 @@ public class AdditionalCommandsATPX {
 
 	private static ExternalConsoleCommand dummy = new ExternalConsoleCommand() {
 
+		private AtomicBoolean on = new AtomicBoolean(false);
+
 		@Override
 		public String getCommand() {
 			return "dummy";
@@ -943,6 +949,39 @@ public class AdditionalCommandsATPX {
 		@Override
 		public int executeCommand(String... args) {
 			try {
+				if (on.get()) {
+					on.set(false);
+				} else {
+					on.set(true);
+					new Thread(() -> {
+						try {
+							Robot robot = new SmoothMoveRobot();
+							Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+							int width = (int) dim.getWidth();
+							int height = (int) dim.getHeight();
+							int x = ThreadLocalRandom.current().nextInt(0, width);
+							int y = ThreadLocalRandom.current().nextInt(0, height);
+							int xSpeed = 100;
+							int ySpeed = 100;
+							while (on.get()) {
+								robot.mouseMove(x,y);
+								x += xSpeed;
+								y += ySpeed;
+								x = Math.min(x, width);
+								x = Math.max(x, 0);
+								y = Math.min(y, height);
+								y = Math.max(y, 0);
+								if(x == width || x==0)
+									xSpeed *= -1;
+								if(y == height || y==0)
+									ySpeed *= -1;
+								//Thread.sleep(151);								
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}).start();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return 0;
@@ -952,11 +991,15 @@ public class AdditionalCommandsATPX {
 	};
 
 	private AdditionalCommandsATPX() {
-		
 	}
 
-	// It may expose not AccessibleInCode Commands
-	public static ExternalConsoleCommand[] getCommands() {
+	public static void addCommands() {
+		for (ExternalConsoleCommand cmd : AdditionalCommandsATPX.getCommands()) {
+			ExternalConsole.addCommand(cmd);
+		}
+	}
+
+	private static ExternalConsoleCommand[] getCommands() {
 		return new ExternalConsoleCommand[] { verbose, printcommand, eventlog, debug, disablesession, appfolder, mod,
 				apptheme, localmsg, readme, update, changelog, lang, dummy };
 	}

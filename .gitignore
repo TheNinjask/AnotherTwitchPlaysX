@@ -63,3 +63,10 @@ local.properties
 session.json
 .build/
 .m2/
+
+# IntelliJ Idea
+.idea/
+
+# Eclipse
+.project
+.classpath

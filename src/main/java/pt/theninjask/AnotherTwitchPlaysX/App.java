@@ -28,8 +28,6 @@ import org.jnativehook.GlobalScreen;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 
-import pt.theninjask.externalconsole.console.ExternalConsole;
-import pt.theninjask.externalconsole.console.ExternalConsoleCommand;
 import pt.theninjask.AnotherTwitchPlaysX.data.ATPXConfig;
 import pt.theninjask.AnotherTwitchPlaysX.data.CommandData;
 import pt.theninjask.AnotherTwitchPlaysX.data.ControlData;
@@ -53,6 +51,7 @@ import pt.theninjask.AnotherTwitchPlaysX.util.Constants;
 import pt.theninjask.AnotherTwitchPlaysX.util.KeyPressedAdapter;
 import pt.theninjask.AnotherTwitchPlaysX.util.ThreadPool;
 import pt.theninjask.AnotherTwitchPlaysX.util.TrayManager;
+import pt.theninjask.externalconsole.console.ExternalConsole;
 
 public class App {
 
@@ -232,9 +231,9 @@ public class App {
 			ExternalConsole.setClosable(true);
 			Constants.printVerboseMessage(Level.WARNING, e);
 			JLabel exception = new JLabel(e.getMessage());
-			exception.setForeground(DataManager.getTheme().getFont());
+			exception.setForeground(DataManager.getTheme().font());
 			Constants.showCustomColorMessageDialog(null, exception, e.getClass().getName(), JOptionPane.WARNING_MESSAGE,
-					null, DataManager.getTheme().getBackground());
+					null, DataManager.getTheme().background());
 		}
 	}
 
@@ -366,8 +365,7 @@ public class App {
 		ExternalConsole.setIcon(Constants.ICON_PATH);
 		ExternalConsole.executeCommand("top", "--true");
 		ExternalConsole.setConsoleTitle(String.format("%s's Console", ID));
-		for (ExternalConsoleCommand cmd : AdditionalCommandsATPX.getCommands()) {
-			ExternalConsole.addCommand(cmd);
-		}
+		AdditionalCommandsATPX.addCommands();
+		ExternalConsole.removeDemoCmds();
 	}
 }

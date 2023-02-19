@@ -3,6 +3,7 @@ package pt.theninjask.AnotherTwitchPlaysX.util;
 import java.awt.AWTException;
 import java.awt.MouseInfo;
 import java.awt.Robot;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SmoothMoveRobot extends Robot {
 
@@ -10,9 +11,19 @@ public class SmoothMoveRobot extends Robot {
 
 	private static int steps=40;
 
+	private static int wiggleErrorRange=3;
+	
+	private boolean doWiggle;
+	
 	public SmoothMoveRobot() throws AWTException {
-		super();
+		this(false);
 	}
+	
+	public SmoothMoveRobot(boolean doWiggle) throws AWTException {
+		super();
+		this.doWiggle = doWiggle;
+	}
+	
 
 	public static void setDefaultSpeed(int speed) {
 		SmoothMoveRobot.speed = speed;
@@ -42,6 +53,12 @@ public class SmoothMoveRobot extends Robot {
 	    for(int step=0; step<steps ;step++) {
 	    	double newX = deltaX * (step + 1) + fromX;
 	        double newY = deltaY * (step + 1) + fromY;
+	        if(doWiggle && step+1<steps) {
+	        	int xError = ThreadLocalRandom.current().nextInt(-wiggleErrorRange, wiggleErrorRange);
+	        	int yError = ThreadLocalRandom.current().nextInt(-wiggleErrorRange, wiggleErrorRange);
+	        	deltaX += xError;
+	        	deltaY += yError;
+	        }
 	        super.mouseMove((int)Math.round(newX), (int)Math.round(newY));        
 	        this.delay(sleepPerStep);
 	    }
